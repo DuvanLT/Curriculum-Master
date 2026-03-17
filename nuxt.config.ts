@@ -31,5 +31,10 @@ export default defineNuxtConfig({
       ]
     }
   },
+  nitro: {
+    rollupConfig: {
+      external: ['@napi-rs/canvas']
+    }
+  },
   compatibilityDate: '2024-11-01',
 })

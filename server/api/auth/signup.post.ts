@@ -2,10 +2,11 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 
 export default defineEventHandler(async (event) => {
-  throw createError({
+  /*throw createError({
     statusCode: 403,
     statusMessage: 'Registration is currently disabled for Closed Beta.'
   })
+  */
   const body = await readBody(event)
   const { email, password, name } = body
 

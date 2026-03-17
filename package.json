@@ -17,9 +17,9 @@
     "nuxt": "^4.4.2",
     "nuxt-auth-utils": "^0.5.29",
     "openai": "^6.29.0",
-    "pdf-parse": "^2.4.5",
     "resend": "^6.9.4",
     "tailwindcss": "^4.2.1",
+    "unpdf": "^1.4.0",
     "uuid": "^13.0.0",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3"

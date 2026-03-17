@@ -90,7 +90,7 @@ const send = async (text) => {
   scrollToBottom()
 
   try {
-    const data = await $fetch<any>('/api/coach', {
+    const data = await $fetch('/api/coach', {
       method: 'POST',
       body: {
         messages: msgs.value,

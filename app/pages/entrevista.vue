@@ -271,7 +271,7 @@ const saveSelectedSteps = async () => {
   savingSteps.value = true
   try {
     for (const stepText of selectedSteps.value) {
-      await $fetch<any>('/api/steps', {
+      await $fetch('/api/steps', {
         method: 'POST',
         body: { text: `Entrevista: ${stepText}` }
       })
@@ -294,7 +294,7 @@ const finishAndAnalyze = async (force = false) => {
   showConfirmFinish.value = false
   analyzing.value = true
   try {
-    const data = await $fetch<any>('/api/interview', {
+    const data = await $fetch('/api/interview', {
       method: 'POST',
       body: {
         messages: msgs.value,
@@ -351,7 +351,7 @@ const sendResponse = async (text: string) => {
   scrollToBottom()
 
   try {
-    const data = await $fetch<any>('/api/interview', {
+    const data = await $fetch('/api/interview', {
       method: 'POST',
       body: {
         messages: msgs.value,

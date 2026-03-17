@@ -106,7 +106,7 @@ const generateAI = async () => {
   
   loading.value = true
   try {
-    const data = await $fetch<any>('/api/generate-cv', {
+    const data = await $fetch('/api/generate-cv', {
       method: 'POST',
       body: {
         profile: profile.value,
