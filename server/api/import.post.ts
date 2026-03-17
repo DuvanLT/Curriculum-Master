@@ -1,9 +1,17 @@
 import OpenAI from 'openai'
-import { extractText } from 'unpdf'
+import { extractText, resolvePDFJSImport } from 'unpdf'
+
+// Polyfill DOMMatrix for Node.js / Vercel Serverless environment
+if (typeof globalThis.DOMMatrix === 'undefined') {
+  globalThis.DOMMatrix = class {} as any
+}
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const session = await requireUserSession(event)
+  
+  // Ensure PDF.js is resolved in serverless environments
+  await resolvePDFJSImport()
   
   let text = ''
   
@@ -17,7 +25,10 @@ export default defineEventHandler(async (event) => {
       try {
         const uint8ArrayData = new Uint8Array(file.data)
         const result = await extractText(uint8ArrayData, { mergePages: true })
+        console.log('--- UNPDF RESULT ---')
+        console.log(result)
         text = String(result.text)
+        console.log('--- TEXT OBTAINED ---', text.length, 'chars')
       } catch (pdfError: any) {
         console.error('PDF Parsing Error:', pdfError)
         throw createError({
