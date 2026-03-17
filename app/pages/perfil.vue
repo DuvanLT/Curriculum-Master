@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div>
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Perfil Maestro</div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">// Single source of truth · Base de todos tus CVs</div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Tu perfil maestro debe incluir tu información laboral y profesional más reciente, especialmente en el área en la que estás buscando empleo.</div>
 
       <div class="stats-row grid grid-cols-3 gap-2.5 mb-5">
         <div class="stat-card bg-dark-bg2 border border-border rounded-[5px] p-[14px]">

@@ -1,10 +1,10 @@
 <template>
   <NuxtLayout>
-    <div class="h-full flex flex-col gap-6 overflow-hidden">
+    <div class="h-full flex flex-col gap-6 overflow-hidden max-w-full">
       <div class="flex justify-between items-end flex-shrink-0">
         <div>
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Mis Aplicaciones</div>
-          <div class="page-sub text-[13px] text-text-dim font-mono">// Seguimiento de procesos · Pipeline de carrera · Conversión de ofertas</div>
+          <div class="page-sub text-[13px] text-text-dim font-mono">Realiza seguimiento a las ofertas a las que aplicaste y mantén el control de tus procesos de selección.</div>
         </div>
         <AppButton @click="showAddModal = true" variant="primary">
           + Nueva Aplicación
@@ -18,85 +18,90 @@
         </div>
       </div>
 
-      <!-- Kanban Board -->
-      <div v-else class="flex-1 flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-        <div v-for="status in statusOptions" :key="status" 
-             class="flex-shrink-0 w-[280px] flex flex-col gap-3">
-          
-          <!-- Column Header -->
-          <div class="flex items-center justify-between px-2 mb-1">
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full" :class="statusBg(status)"></div>
-              <h3 class="text-[11px] font-mono uppercase tracking-widest text-text-dim">{{ status }}</h3>
-            </div>
-            <span class="text-[10px] font-mono bg-dark-bg3 px-1.5 py-0.5 rounded border border-border text-text-dim">
-              {{ groupedApps[status]?.length || 0 }}
-            </span>
-          </div>
-
-          <!-- Column Content -->
-          <div class="flex-1 bg-dark-bg/20 border border-border/40 rounded-xl p-2 flex flex-col gap-3 min-h-[200px] overflow-y-auto scrollbar-none">
-            <div v-for="app in groupedApps[status]" :key="app.id" 
-                 class="bg-dark-bg3 border border-border rounded-lg p-4 group hover:border-amber/40 transition-all flex flex-col gap-3 relative shadow-sm">
-              
-              <div class="flex justify-between items-start gap-2">
-                <div class="flex-1 min-w-0">
-                  <h4 class="font-bold text-[13px] tracking-tight leading-tight truncate text-text">{{ app.company }}</h4>
-                  <p class="text-[11px] text-amber-light font-medium truncate opacity-80">{{ app.position }}</p>
-                </div>
-                <!-- FIXED DELETE BUTTON: Simplified and more prominent -->
-                <button 
-                  @click.stop="requestDelete(app.id)" 
-                  class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-md hover:bg-red/10 text-text-dim hover:text-red transition-all"
-                  title="Eliminar aplicación"
-                >
-                  <span class="material-symbols-outlined text-[14px]">close</span>
-                </button>
+      <!-- Kanban Board Wrapper with edge indicators -->
+      <div v-else class="flex-1 relative overflow-hidden min-w-0 pb-2">
+        <!-- Right side indicator gradient -->
+        <div class="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-dark-bg to-transparent pointer-events-none z-10 opacity-60"></div>
+        
+        <div class="h-full flex gap-4 overflow-x-auto pb-4 scrollbar-custom min-w-0">
+          <div v-for="status in statusOptions" :key="status" 
+               class="flex-shrink-0 w-[280px] flex flex-col gap-3">
+            
+            <!-- Column Header -->
+            <div class="flex items-center justify-between px-2 mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full" :class="statusBg(status)"></div>
+                <h3 class="text-[11px] font-mono uppercase tracking-widest text-text-dim">{{ status }}</h3>
               </div>
-
-              <!-- Interview Date Display/Edit -->
-              <div v-if="app.status === 'Entrevista'" class="flex flex-col gap-2">
-                <div v-if="app.interview_date" class="flex items-center gap-2 bg-amber/10 border border-amber/20 rounded px-2 py-1.5">
-                  <span class="material-symbols-outlined text-amber text-[18px]">calendar_month</span>
-                  <div class="flex-1">
-                    <div class="text-[9px] uppercase font-mono text-amber/60 leading-none mb-0.5">Fecha Entrevista</div>
-                    <div class="text-[11px] font-bold text-amber">{{ formatDate(app.interview_date) }}</div>
+              <span class="text-[10px] font-mono bg-dark-bg3 px-1.5 py-0.5 rounded border border-border text-text-dim">
+                {{ groupedApps[status]?.length || 0 }}
+              </span>
+            </div>
+  
+            <!-- Column Content -->
+            <div class="flex-1 bg-dark-bg/20 border border-border/40 rounded-xl p-2 flex flex-col gap-3 min-h-[200px] overflow-y-auto scrollbar-none">
+              <div v-for="app in groupedApps[status]" :key="app.id" 
+                   class="bg-dark-bg3 border border-border rounded-lg p-4 group hover:border-amber/40 transition-all flex flex-col gap-3 relative shadow-sm">
+                
+                <div class="flex justify-between items-start gap-2">
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-[13px] tracking-tight leading-tight truncate text-text">{{ app.company }}</h4>
+                    <p class="text-[11px] text-amber-light font-medium truncate opacity-80">{{ app.position }}</p>
                   </div>
-                  <button @click="promptDate(app)" class="material-symbols-outlined text-[14px] text-amber/50 hover:text-amber">edit</button>
-                </div>
-                <button v-else @click="promptDate(app)" class="w-full border border-dashed border-amber/30 rounded py-2 text-[10px] font-mono text-amber/60 hover:bg-amber/5 transition-colors">
-                  + Programar Fecha
-                </button>
-              </div>
-
-              <div class="flex items-center justify-between mt-1 pt-3 border-t border-border/40">
-                <div class="text-[10px] text-text-dim font-mono">
-                  {{ formatDate(app.date) }}
-                </div>
-                <div class="flex gap-1">
-                  <!-- Quick status move -->
+                  <!-- FIXED DELETE BUTTON -->
                   <button 
-                    v-if="canMoveBackward(app.status)" 
-                    @click="moveApp(app, -1)"
-                    class="w-5 h-5 flex items-center justify-center bg-dark-bg4 border border-border rounded hover:border-amber transition-colors"
+                    @click.stop="requestDelete(app.id)" 
+                    class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-md hover:bg-red/10 text-text-dim hover:text-red transition-all"
+                    title="Eliminar aplicación"
                   >
-                    <span class="material-symbols-outlined text-[12px]">arrow_back</span>
-                  </button>
-                  <button 
-                    v-if="canMoveForward(app.status)" 
-                    @click="moveApp(app, 1)"
-                    class="w-5 h-5 flex items-center justify-center bg-dark-bg4 border border-border rounded hover:border-amber transition-colors"
-                  >
-                    <span class="material-symbols-outlined text-[12px]">arrow_forward</span>
+                    <span class="material-symbols-outlined text-[14px]">close</span>
                   </button>
                 </div>
+  
+                <!-- Interview Date Display/Edit -->
+                <div v-if="app.status === 'Entrevista'" class="flex flex-col gap-2">
+                  <div v-if="app.interview_date" class="flex items-center gap-2 bg-amber/10 border border-amber/20 rounded px-2 py-1.5">
+                    <span class="material-symbols-outlined text-amber text-[18px]">calendar_month</span>
+                    <div class="flex-1">
+                      <div class="text-[9px] uppercase font-mono text-amber/60 leading-none mb-0.5">Fecha Entrevista</div>
+                      <div class="text-[11px] font-bold text-amber">{{ formatDate(app.interview_date) }}</div>
+                    </div>
+                    <button @click="promptDate(app)" class="material-symbols-outlined text-[14px] text-amber/50 hover:text-amber">edit</button>
+                  </div>
+                  <button v-else @click="promptDate(app)" class="w-full border border-dashed border-amber/30 rounded py-2 text-[10px] font-mono text-amber/60 hover:bg-amber/5 transition-colors">
+                    + Programar Fecha
+                  </button>
+                </div>
+  
+                <div class="flex items-center justify-between mt-1 pt-3 border-t border-border/40">
+                  <div class="text-[10px] text-text-dim font-mono">
+                    {{ formatDate(app.date) }}
+                  </div>
+                  <div class="flex gap-1">
+                    <!-- Quick status move -->
+                    <button 
+                      v-if="canMoveBackward(app.status)" 
+                      @click="moveApp(app, -1)"
+                      class="w-5 h-5 flex items-center justify-center bg-dark-bg4 border border-border rounded hover:border-amber transition-colors"
+                    >
+                      <span class="material-symbols-outlined text-[12px]">arrow_back</span>
+                    </button>
+                    <button 
+                      v-if="canMoveForward(app.status)" 
+                      @click="moveApp(app, 1)"
+                      class="w-5 h-5 flex items-center justify-center bg-dark-bg4 border border-border rounded hover:border-amber transition-colors"
+                    >
+                      <span class="material-symbols-outlined text-[12px]">arrow_forward</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <!-- Empty State for Column -->
-            <div v-if="!groupedApps[status]?.length" class="flex-1 flex flex-col items-center justify-center py-10 opacity-20 filter grayscale">
-              <span class="material-symbols-outlined text-3xl mb-1">inventory_2</span>
-              <div class="text-[9px] font-mono uppercase tracking-tighter">Sin items</div>
+  
+              <!-- Empty State for Column -->
+              <div v-if="!groupedApps[status]?.length" class="flex-1 flex flex-col items-center justify-center py-10 opacity-20 filter grayscale">
+                <span class="material-symbols-outlined text-3xl mb-1">inventory_2</span>
+                <div class="text-[9px] font-mono uppercase tracking-tighter">Sin items</div>
+              </div>
             </div>
           </div>
         </div>
@@ -361,17 +366,19 @@ onMounted(fetchApps)
 </script>
 
 <style scoped>
-.scrollbar-thin::-webkit-scrollbar {
-  height: 6px;
+.scrollbar-custom::-webkit-scrollbar {
+  height: 8px;
 }
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: var(--border);
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
 }
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: var(--amber); /* Making it very visible */
+  border-radius: 10px;
+  border: 2px solid var(--dark-bg);
+}
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
   background: var(--amber-dim);
 }
 

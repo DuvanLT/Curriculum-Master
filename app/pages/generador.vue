@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div>
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Generador de CV con IA</div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">// Optimización dinámica · PDF Profesional · Consejos Estratégicos</div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Potencia tu currículum adaptando tu experiencia laboral a la oferta de empleo que te interesa, utilizando inteligencia artificial.</div>
 
       <AppCard title="Adaptar a una vacante">
         <div class="text-[12px] text-text-muted mb-3">

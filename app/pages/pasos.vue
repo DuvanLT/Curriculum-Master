@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div>
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Próximos Pasos</div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">// Hoja de ruta personalizada · IA Action items · To-Do estratégico</div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Añade y completa tareas que te llevarán al éxito profesional.</div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- LISTA DE TAREAS -->

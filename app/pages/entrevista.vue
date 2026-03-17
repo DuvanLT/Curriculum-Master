@@ -4,7 +4,7 @@
       <div class="flex justify-between items-end">
         <div>
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Simulación de Entrevista</div>
-          <div class="page-sub text-[13px] text-text-dim font-mono">// Preparación en tiempo real con IA y Video</div>
+          <div class="page-sub text-[13px] text-text-dim font-mono">Preparación en tiempo real con simulacion de entrevista guiado por Inteligencia artificial - Beta este apartado aun esta en desarrollo</div>
         </div>
         <div class="flex gap-2">
           <AppButton v-if="!active" @click="startInterview" variant="primary">

@@ -1,8 +1,8 @@
 <template>
   <NuxtLayout>
-    <div>
+    <div class="overflow-hidden max-w-full">
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ofertas de Empleo</div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">// Powered by Jooble · Encuentra tu próximo reto</div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Powered by Jooble · Encuentra tu próximo reto profesional</div>
 
       <!-- Search Bar -->
       <div class="flex gap-3 mb-6">

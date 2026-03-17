@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div class="h-full flex flex-col">
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ezra AI</div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">// Career strategy · Mock interviews · Salary negotiation</div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Resuelve tus dudas sobre tu carrera profesional con Ezra IA, la reclutadora inteligente.</div>
 
       <AppCard class="flex-1 flex flex-col min-h-0 !mb-0">
         <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-dark-bg3 mb-2.5 flex flex-col gap-2.5 min-h-[300px]" ref="chatContainer">
