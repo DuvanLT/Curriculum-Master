@@ -1,0 +1,117 @@
+import OpenAI from 'openai'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const pdf = require('pdf-parse')
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+  const session = await requireUserSession(event)
+  
+  let text = ''
+  
+  // Check if it's a multipart request (file upload)
+  const contentType = getHeader(event, 'content-type')
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = await readMultipartFormData(event)
+    const file = formData?.find(f => f.name === 'file')
+    
+    if (file && file.type === 'application/pdf') {
+      // PDFParse v2.4.5 class-based API
+      const { PDFParse } = pdf
+      
+      if (!PDFParse) {
+        console.error('PDFParse class not found in module:', pdf)
+        throw createError({
+          statusCode: 500,
+          statusMessage: 'Error interno: Constructor PDFParse no encontrado.'
+        })
+      }
+
+      try {
+        const parser = new PDFParse({ data: file.data })
+        const result = await parser.getText()
+        text = result.text
+      } catch (pdfError: any) {
+        console.error('PDF Parsing Error:', pdfError)
+        throw createError({
+          statusCode: 422,
+          statusMessage: 'No se pudo leer el archivo PDF. Verifica que sea un PDF válido.'
+        })
+      }
+    } else if (file) {
+      // Try to read as plain text if not PDF
+      text = file.data.toString('utf-8')
+    }
+  } else {
+    // Fallback to plain JSON body text
+    const body = await readBody(event)
+    text = body.text
+  }
+
+  if (!text || text.trim().length < 10) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'No se pudo extraer texto suficiente del archivo o entrada.'
+    })
+  }
+
+  const openai = new OpenAI({
+    apiKey: config.openaiApiKey
+  })
+
+  const systemPrompt = `
+    Eres un experto en reclutamiento y extracción de datos profesionales. 
+    Tu tarea es recibir el texto de un perfil de LinkedIn o de un CV y extraer la información estructurada necesaria para llenar un perfil maestro (Nuxt App).
+
+    IMPORTANTE: 
+    - Extrae la mayor cantidad de detalles posible.
+    - Si el texto está en inglés, traduce los campos descriptivos al español.
+    - El campo 'years' debe ser un número entero (años de experiencia total aproximada).
+
+    DEVUELVE ÚNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA EXACTA:
+    {
+      "nombre": "Nombre completo",
+      "titulo": "Cargo actual / Título profesional",
+      "email": "email",
+      "telefono": "teléfono",
+      "years": 5,
+      "linkedin": "url de linkedin",
+      "github": "url de github",
+      "web": "web personal",
+      "educacion": "Título | Institución | Año",
+      "resumen": "Resumen profesional de 2-3 líneas",
+      "experiences": [
+        {
+          "cargo": "Nombre del cargo",
+          "empresa": "Nombre de la empresa",
+          "inicio": "Mes Año",
+          "fin": "Mes Año (o 'Actual')",
+          "logros": "Descripción resumida de logros y responsabilidades",
+          "skills": "Skill1, Skill2, Skill3"
+        }
+      ]
+    }
+  `
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `TEXTO A PROCESAR:\n\n${text}` }
+      ],
+      response_format: { type: 'json_object' }
+    })
+
+    const content = response.choices[0]?.message?.content
+    if (!content) throw new Error('No se recibió respuesta de la IA')
+
+    return JSON.parse(content)
+  } catch (e: any) {
+    console.error('Import Error:', e)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Error procesando la importación: ' + (e.message || 'Error desconocido')
+    })
+  }
+})

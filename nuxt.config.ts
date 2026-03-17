@@ -1,0 +1,32 @@
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  ssr: false,
+  devtools: { enabled: true },
+  css: ['~/assets/css/main.css'],
+  modules: ['nuxt-auth-utils'],
+  runtimeConfig: {
+    // Private keys (available only on server)
+    openaiApiKey: '',
+    tursoUrl: '',
+    tursoToken: '',
+    apiToken: '',
+    public: {
+      // Public variables (available on both client and server)
+    }
+  },
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+    },
+  },
+  app: {
+    head: {
+      title: 'ATS-Master | Optimiza tu CV con IA',
+      link: [
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200' }
+      ]
+    }
+  },
+  compatibilityDate: '2024-11-01',
+})
