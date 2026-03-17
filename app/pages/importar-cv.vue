@@ -4,6 +4,18 @@
       <!-- Decorative background -->
       <div class="absolute top-0 right-0 w-64 h-64 bg-amber opacity-5 blur-[100px] -mr-32 -mt-32"></div>
       <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-500 opacity-5 blur-[80px] -ml-24 -mb-24"></div>
+
+      <!-- Magical Loading Overlay -->
+      <div v-if="importing" class="absolute inset-0 z-50 bg-dark-bg2/80 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">
+        <div class="magic-loader mb-6">
+          <div class="magic-circle"></div>
+          <div class="magic-sparkles">
+            <span class="material-symbols-outlined text-amber animate-pulse">auto_fix_high</span>
+          </div>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2 font-head tracking-tight">Haciendo la magia...</h3>
+        <p class="text-[13px] text-text-dim font-mono max-w-[280px]">Estamos analizando tu trayectoria para potenciar tu perfil al máximo.</p>
+      </div>
       
       <div class="relative z-10">
         <div class="flex items-center gap-3 mb-6">
@@ -157,5 +169,50 @@ const skipImport = () => {
 }
 .import-card {
   box-shadow: 0 4px 50px rgba(0, 0, 0, 0.6);
+}
+
+/* Magic Loader Styles */
+.magic-loader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.magic-circle {
+  position: absolute;
+  inset: 0;
+  border: 3px solid rgba(var(--amber-rgb, 255, 191, 0), 0.1);
+  border-top: 3px solid var(--amber);
+  border-radius: 50%;
+  animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.magic-circle::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 1px solid var(--amber);
+  opacity: 0.2;
+  border-radius: 50%;
+  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.magic-sparkles {
+  z-index: 1;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 </style>

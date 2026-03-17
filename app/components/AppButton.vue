@@ -7,10 +7,11 @@
       variant === 'danger' ? 'btn-danger bg-transparent text-red border border-red text-[12px] px-2.5 py-1.5' : '',
       size === 'sm' ? 'px-3 py-1.5 text-[12px]' : ''
     ]"
-    :disabled="disabled"
+    :disabled="disabled || loading"
     @click="$emit('click')"
   >
-    <slot name="icon" />
+    <div v-if="loading" class="spinner-sm mr-2"></div>
+    <slot v-else name="icon" />
     <slot />
   </button>
 </template>
@@ -19,7 +20,8 @@
 defineProps({
   variant: { type: String, default: 'primary' },
   size: { type: String, default: 'md' },
-  disabled: Boolean
+  disabled: Boolean,
+  loading: Boolean
 })
 defineEmits(['click'])
 </script>
@@ -44,4 +46,18 @@ defineEmits(['click'])
 .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
 .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); font-size: 12px; padding: 5px 10px; }
 .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+.spinner-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 </style>
