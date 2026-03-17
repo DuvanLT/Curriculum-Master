@@ -29,9 +29,9 @@ export const useAuth = () => {
       })
       await fetchSession()
 
-      if (!data.user.is_verified) {
+      /* if (!data.user.is_verified) {
         navigateTo('/verify')
-      }
+      } */
 
       return { success: true, user: data.user }
     } catch (e: any) {
