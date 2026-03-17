@@ -27,13 +27,6 @@
       </NuxtLink>
     </div>
 
-    <div class="nav-section mb-6">
-      <div class="nav-label text-[10px] text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Sistema</div>
-      <NuxtLink to="/arquitectura" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">settings</span> Arquitectura
-      </NuxtLink>
-    </div>
-
     <!-- User Section & Logout -->
     <div class="mt-auto pt-6 border-t border-border/50">
       <NuxtLink v-if="user" to="/perfil" class="flex items-center gap-3 px-4 mb-4 group cursor-pointer no-underline">
@@ -75,7 +68,7 @@ const { user, logout } = useAuth()
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 8px 16px;
   cursor: pointer;
   font-size: 13px;
