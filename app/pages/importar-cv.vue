@@ -44,7 +44,6 @@
             <span class="material-symbols-outlined text-4xl text-text-dim group-hover:text-amber">upload_file</span>
           </div>
           <div class="text-[14px] font-bold text-white mb-2">Haz clic para subir tu CV (PDF o TXT)</div>
-          <p class="text-[12px] text-text-dim font-mono">O arrastra y suelta el archivo aquí</p>
           
           <input 
             type="file" 
