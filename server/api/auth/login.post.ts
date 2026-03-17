@@ -17,9 +17,17 @@ export default defineEventHandler(async (event) => {
     args: [email]
   })
 
-  const userRow = result.rows[0]
+  if (result.rows.length === 0) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Invalid email or password'
+    })
+  }
 
-  if (!userRow || !(await bcrypt.compare(password, userRow.password as string))) {
+  const userRecord = result.rows[0] as any
+  const isPasswordCorrect = await bcrypt.compare(password, userRecord.password)
+
+  if (!isPasswordCorrect) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Invalid email or password'
@@ -27,9 +35,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = {
-    id: userRow.id,
-    email: userRow.email,
-    name: userRow.name
+    id: userRecord.id,
+    email: userRecord.email,
+    name: userRecord.name,
+    is_verified: userRecord.is_verified
   }
 
   await setUserSession(event, { user })

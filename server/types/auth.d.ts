@@ -3,6 +3,7 @@ declare module '#auth-utils' {
     id: string;
     email: string;
     name?: string;
+    is_verified: number;
   }
 }
 

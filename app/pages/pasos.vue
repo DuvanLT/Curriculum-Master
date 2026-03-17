@@ -108,15 +108,22 @@ definePageMeta({
 const { profile, experiences } = useAppState()
 const toast = useToast()
 
-const steps = ref<any[]>([])
+interface Step {
+  id: string;
+  text: string;
+  completed: boolean;
+  created_at?: string;
+}
+
+const steps = ref<Step[]>([])
 const loading = ref(false)
 const newStepText = ref('')
-const stepToDelete = ref<number | null>(null)
+const stepToDelete = ref<string | null>(null)
 
 const fetchSteps = async () => {
   loading.value = true
   try {
-    steps.value = await $fetch('/api/steps')
+    steps.value = await $fetch<Step[]>('/api/steps')
   } catch (e) {
     console.error('Error fetching steps:', e)
   } finally {
@@ -127,7 +134,7 @@ const fetchSteps = async () => {
 const addStep = async () => {
   if (!newStepText.value.trim()) return
   try {
-    const newItem = await $fetch('/api/steps', {
+    const newItem = await $fetch<Step>('/api/steps', {
       method: 'POST',
       body: { text: newStepText.value }
     })
@@ -140,12 +147,12 @@ const addStep = async () => {
   }
 }
 
-const toggleStep = async (step) => {
+const toggleStep = async (step: Step) => {
   const newStatus = !step.completed
   try {
     // Optimistic UI
     step.completed = newStatus
-    await $fetch('/api/steps', {
+    await $fetch<any>('/api/steps', {
       method: 'PATCH',
       body: { id: step.id, completed: newStatus }
     })
@@ -155,7 +162,7 @@ const toggleStep = async (step) => {
   }
 }
 
-const deleteStep = (id: number) => {
+const deleteStep = (id: string) => {
   stepToDelete.value = id
 }
 
@@ -165,11 +172,11 @@ const confirmDelete = async () => {
   stepToDelete.value = null
 
   try {
-    await $fetch('/api/steps', {
+    await $fetch<any>('/api/steps', {
       method: 'DELETE',
       body: { id }
     })
-    const index = steps.value.findIndex(s => String(s.id) === String(id))
+    const index = steps.value.findIndex((s: Step) => String(s.id) === String(id))
     if (index !== -1) {
       steps.value.splice(index, 1)
     }
@@ -182,7 +189,7 @@ const confirmDelete = async () => {
 
 const completedCount = computed(() => steps.value.filter(s => s.completed).length)
 
-const formatDate = (dateStr) => {
+const formatDate = (dateStr?: string) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
   return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })

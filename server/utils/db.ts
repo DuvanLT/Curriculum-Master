@@ -24,15 +24,28 @@ export const initDb = async () => {
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
       name TEXT,
+      is_verified INTEGER DEFAULT 0,
+      verification_code TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `)
 
   // Add missing columns if they don't exist (Simple migration)
-  const columns = ['titulo', 'resumen', 'telefono', 'linkedin', 'github', 'web', 'educacion', 'years']
+  const columns = [
+    { name: 'titulo', type: 'TEXT' },
+    { name: 'resumen', type: 'TEXT' },
+    { name: 'telefono', type: 'TEXT' },
+    { name: 'linkedin', type: 'TEXT' },
+    { name: 'github', type: 'TEXT' },
+    { name: 'web', type: 'TEXT' },
+    { name: 'educacion', type: 'TEXT' },
+    { name: 'years', type: 'TEXT' },
+    { name: 'is_verified', type: 'INTEGER DEFAULT 0' },
+    { name: 'verification_code', type: 'TEXT' }
+  ]
   for (const col of columns) {
     try {
-      await db.execute(`ALTER TABLE users ADD COLUMN ${col} TEXT`)
+      await db.execute(`ALTER TABLE users ADD COLUMN ${col.name} ${col.type}`)
     } catch (e: any) {
       // Column might already exist, ignore error
     }

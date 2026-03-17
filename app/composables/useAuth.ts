@@ -10,6 +10,11 @@ export const useAuth = () => {
         body: { email, password, name }
       })
       await fetchSession()
+      
+      if (!data.user.is_verified) {
+        navigateTo('/verify')
+      }
+      
       return { success: true, user: data.user }
     } catch (e: any) {
       return { success: false, error: e.data?.statusMessage || 'Error al registrarse' }
@@ -23,6 +28,11 @@ export const useAuth = () => {
         body: { email, password }
       })
       await fetchSession()
+
+      if (!data.user.is_verified) {
+        navigateTo('/verify')
+      }
+
       return { success: true, user: data.user }
     } catch (e: any) {
       return { success: false, error: e.data?.statusMessage || 'Error al iniciar sesión' }
@@ -30,7 +40,7 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    await $fetch('/api/auth/logout', { method: 'POST' })
+    await $fetch<any>('/api/auth/logout', { method: 'POST' })
     await clearSession()
     navigateTo('/login')
   }

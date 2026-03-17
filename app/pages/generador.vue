@@ -12,7 +12,7 @@
           type="textarea" 
           v-model="jd" 
           :rows="4" 
-          placeholder="Ej: Buscamos un desarrollador con experiencia en Nuxt, Tailwind y bases de datos NoSQL..." 
+          placeholder="Ej: Buscamos un Diseñador en Adobe Photoshop, Illustrator y Figma..." 
         />
         <div class="flex items-center gap-2 mt-4">
           <AppButton @click="generateAI" :disabled="loading" class="flex-1 sm:flex-none">
@@ -90,6 +90,14 @@ const jd = ref('')
 const loading = ref(false)
 const aiResult = ref(null)
 
+// Pre-fill JD from query param (e.g. from Ofertas page)
+onMounted(() => {
+  const route = useRoute()
+  if (route.query.jd) {
+    jd.value = String(route.query.jd)
+  }
+})
+
 const generateAI = async () => {
   if (!profile.value.nombre) {
     toast.error('Completa tu Perfil Maestro antes de generar el CV.')
@@ -98,7 +106,7 @@ const generateAI = async () => {
   
   loading.value = true
   try {
-    const data = await $fetch('/api/generate-cv', {
+    const data = await $fetch<any>('/api/generate-cv', {
       method: 'POST',
       body: {
         profile: profile.value,

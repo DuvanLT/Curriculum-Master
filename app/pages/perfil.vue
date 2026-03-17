@@ -21,51 +21,7 @@
         </div>
       </div>
 
-      <div class="bg-amber/5 border border-amber/20 rounded-lg p-6 mb-8 relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">
-          <span class="material-symbols-outlined text-4xl">auto_fix_high</span>
-        </div>
-        <div class="max-w-2xl">
-          <h2 class="text-amber font-head font-bold text-lg mb-2 flex items-center gap-2">
-            Importación Mágica
-          </h2>
-          <p class="text-[13px] text-text-muted mb-4 leading-relaxed italic">
-            Pega el texto de tu LinkedIn o de tu CV actual y deja que la IA llene tu Perfil Maestro por ti en segundos.
-          </p>
-          <div class="flex flex-col gap-4">
-            <div 
-              class="border-2 border-dashed border-amber/20 rounded-xl p-8 flex flex-col items-center justify-center bg-amber/5 hover:bg-amber/10 transition-colors cursor-pointer group/upload"
-              @click="fileInput?.click()"
-            >
-              <div class="material-symbols-outlined text-3xl mb-3 group-hover/upload:scale-110 transition-transform text-amber/40">upload_file</div>
-              <div class="text-[13px] font-bold text-amber mb-1">Cargar mi CV (PDF)</div>
-              <div class="text-[11px] text-text-dim font-mono uppercase tracking-tighter">Click para seleccionar archivo</div>
-              <input 
-                type="file" 
-                ref="fileInput" 
-                class="hidden" 
-                accept=".pdf,.txt" 
-                @change="handleFileChange" 
-              />
-            </div>
-            
-            <div v-if="selectedFile" class="flex items-center justify-between bg-dark-bg/60 border border-border px-4 py-2 rounded-lg">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-green text-[20px]">check_circle</span>
-                <span class="text-[13px] font-mono text-text-muted">{{ selectedFile.name }}</span>
-              </div>
-              <AppButton 
-                variant="primary" 
-                size="sm"
-                @click="runMagicImport" 
-                :loading="importing"
-              >
-                🚀 Iniciar Magia
-              </AppButton>
-            </div>
-          </div>
-        </div>
-      </div>
+  
 
       <AppCard title="Datos Personales">
         <div class="grid grid-cols-2 gap-3 mb-3">
@@ -97,7 +53,7 @@
         </template>
 
         <div v-if="adding" class="bg-dark-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
-          <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">▸ NUEVA EXPERIENCIA</div>
+          <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">▸ {{ editingExpId ? 'EDITAR' : 'NUEVA' }} EXPERIENCIA</div>
           <div class="grid grid-cols-2 gap-3 mb-3">
             <AppInput label="Cargo / Título" v-model="newExp.cargo" placeholder="Senior Developer" />
             <AppInput label="Empresa" v-model="newExp.empresa" placeholder="Empresa S.A.S" />
@@ -108,7 +64,10 @@
           </div>
           <AppInput label="Logros cuantificables" type="textarea" v-model="newExp.logros" placeholder="Reduje el tiempo de respuesta..." />
           <AppInput label="Hard Skills (separadas por coma)" v-model="newExp.skills" placeholder="Python, Django, PostgreSQL, AWS" />
-          <AppButton @click="saveExp">Guardar experiencia</AppButton>
+          <div class="flex gap-3">
+            <AppButton @click="saveExp" class="flex-1">{{ editingExpId ? 'Actualizar' : 'Guardar' }} experiencia</AppButton>
+            <AppButton v-if="editingExpId" variant="secondary" @click="resetExpForm">Cancelar edición</AppButton>
+          </div>
         </div>
 
         <div v-if="loading" class="text-center py-10">
@@ -124,9 +83,55 @@
           v-for="exp in experiences" 
           :key="exp.id" 
           :experience="exp" 
-          @remove="removeExperience"
+          @remove="confirmRemoveExperience"
+          @edit="startEditingExperience"
         />
       </AppCard>
+
+      <!-- Delete Experience Confirmation Modal -->
+      <AppModal
+        :show="showConfirmDeleteExp"
+        title="Eliminar Experiencia"
+        confirm-text="Si, eliminar"
+        cancel-text="Cancelar"
+        confirm-variant="primary"
+        @close="showConfirmDeleteExp = false"
+        @confirm="handleRemoveExperience"
+      >
+        <p>¿Estás seguro de que quieres eliminar esta experiencia? Esta acción no se puede deshacer.</p>
+      </AppModal>
+
+      <!-- Danger Zone -->
+      <div class="mt-12 mb-8 border border-red-500/20 bg-red-500/5 rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="material-symbols-outlined text-red-500">warning</span>
+          <h3 class="text-red-500 font-head font-bold text-lg">Zona de Peligro</h3>
+        </div>
+        <p class="text-[13px] text-text-muted mb-6">
+          Al eliminar tu cuenta, todos tus registros (experiencias, aplicaciones, retos y análisis) serán borrados permanentemente. Esta acción no se puede deshacer.
+        </p>
+        <AppButton 
+          variant="secondary" 
+          class="!border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-white transition-all"
+          @click="showDeleteModal = true"
+        >
+          Borrar mi cuenta definitivamente
+        </AppButton>
+      </div>
+
+      <!-- Delete Confirmation Modal -->
+      <AppModal
+        :show="showDeleteModal"
+        :loading="deletingAccount"
+        title="Eliminar Cuenta"
+        confirm-text="Si, eliminar permanentemente"
+        cancel-text="Cancelar"
+        confirm-variant="primary"
+        @close="showDeleteModal = false"
+        @confirm="handleDeleteAccount"
+      >
+        <p>¿Estás absolutamente seguro? Todos tus datos serán eliminados de nuestros servidores para siempre.</p>
+      </AppModal>
     </div>
   </NuxtLayout>
 </template>
@@ -135,21 +140,20 @@
 definePageMeta({
   middleware: 'auth'
 })
-const { profile, experiences, loading, fetchProfile, saveProfile, addExperience, removeExperience, bulkExperience } = useAppState()
+const { profile, experiences, loading, fetchProfile, saveProfile, addExperience, removeExperience, updateExperience, bulkExperience } = useAppState()
 const toast = useToast()
 
 const adding = ref(false)
 const importing = ref(false)
 const initialized = ref(false)
 const selectedFile = ref(null)
-const fileInput = ref(null)
+const showDeleteModal = ref(false)
+const deletingAccount = ref(false)
 
-const handleFileChange = (e) => {
-  const file = e.target.files[0]
-  if (file) {
-    selectedFile.value = file
-  }
-}
+// Experience Editing & Deletion
+const editingExpId = ref<string | number | null>(null)
+const showConfirmDeleteExp = ref(false)
+const expToDelete = ref<string | number | null>(null)
 
 const newExp = ref({
   cargo: '',
@@ -181,9 +185,54 @@ watch(profile, () => {
 
 const saveExp = () => {
   if (!newExp.value.cargo || !newExp.value.empresa) return
-  addExperience(newExp.value)
+  
+  if (editingExpId.value) {
+    updateExperience(editingExpId.value, {
+      ...newExp.value,
+      skills: newExp.value.skills
+    })
+    toast.success('Experiencia actualizada')
+  } else {
+    addExperience(newExp.value)
+    toast.success('Experiencia agregada')
+  }
+  
+  resetExpForm()
+}
+
+const resetExpForm = () => {
   newExp.value = { cargo: '', empresa: '', inicio: '', fin: '', logros: '', skills: '' }
   adding.value = false
+  editingExpId.value = null
+}
+
+const startEditingExperience = (exp: any) => {
+  editingExpId.value = exp.id
+  newExp.value = {
+    cargo: exp.cargo,
+    empresa: exp.empresa,
+    inicio: exp.inicio,
+    fin: exp.fin || '',
+    logros: exp.logros || '',
+    skills: Array.isArray(exp.skills) ? exp.skills.join(', ') : exp.skills
+  }
+  adding.value = true
+  // Scroll to form
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const confirmRemoveExperience = (id: string | number) => {
+  expToDelete.value = id
+  showConfirmDeleteExp.value = true
+}
+
+const handleRemoveExperience = () => {
+  if (expToDelete.value) {
+    removeExperience(expToDelete.value)
+    toast.success('Experiencia eliminada')
+  }
+  showConfirmDeleteExp.value = false
+  expToDelete.value = null
 }
 
 const runMagicImport = async () => {
@@ -193,7 +242,7 @@ const runMagicImport = async () => {
   formData.append('file', selectedFile.value)
 
   try {
-    const data = await $fetch('/api/import', {
+    const data = await $fetch<any>('/api/import', {
       method: 'POST',
       body: formData
     })
@@ -223,6 +272,26 @@ const runMagicImport = async () => {
     toast.error('Error al importar tu perfil. Asegúrate de subir un PDF válido.')
   } finally {
     importing.value = false
+  }
+}
+
+const handleDeleteAccount = async () => {
+  deletingAccount.value = true
+  try {
+    await $fetch<any>('/api/profile', {
+      method: 'DELETE'
+    })
+    
+    toast.success('Cuenta eliminada. Adiós.')
+    
+    // Redirect to login or home
+    await navigateTo('/login')
+  } catch (e: any) {
+    console.error(e)
+    toast.error('Error al intentar eliminar la cuenta: ' + (e.statusMessage || e.message))
+  } finally {
+    deletingAccount.value = false
+    showDeleteModal.value = false
   }
 }
 </script>

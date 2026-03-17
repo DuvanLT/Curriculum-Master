@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const body = await readBody(event)
   const { messages, profile: rawProfile, experiences: rawExperiences } = body
-  
+
   const profile = rawProfile || { nombre: 'Usuario', titulo: 'Profesional', resumen: '', years: '0', educacion: '' }
   const experiences = rawExperiences || []
 
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   })
 
   const systemPrompt = `
-    Eres un Career Coach experto en el mercado laboral tecnológico. 
+    Eres un Ezra experto en el mercado laboral tecnológico. 
     Tu misión es ayudar al usuario a conseguir el trabajo de sus sueños, mejorar su perfil profesional, preparar entrevistas y negociar su salario.
 
     CONTEXTO DEL USUARIO:
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     2. USA OBLIGATORIAMENTE el contexto del perfil y las experiencias del usuario para dar consejos personalizados. Si el usuario pregunta "quién soy" o sobre su perfil, descríbelo basándote en la información proporcionada.
     3. Si el usuario te pregunta por entrevistas, ofrece hacer un "Mock Interview".
     4. Si el usuario te pregunta por salario, pide más contexto sobre el país y el rol antes de dar rangos.
-    5. Mantén tus respuestas concisas y fáciles de leer (puedes usar markdown, negritas y listas).
+    5. Formato: RESPONDE SIEMPRE USANDO MARKDOWN ESTRUCTURADO. Usa negritas para resaltar conceptos clave. Para listas, utiliza siempre líneas nuevas y puntos/guiones. Asegúrate de dejar una línea en blanco entre párrafos y antes de las listas para que el formato se renderice correctamente.
     6. Idioma: Habla en el mismo idioma que el usuario.
   `
 
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
     if (!content) {
       throw createError({
         statusCode: 500,
-        statusMessage: 'El coach no pudo responder en este momento.'
+        statusMessage: 'El coach no pudo generar una respuesta.'
       })
     }
 
@@ -77,10 +77,10 @@ export default defineEventHandler(async (event) => {
       text: content
     }
   } catch (e: any) {
-    console.error('Coach API Error:', e)
+    console.error('Coach API Error:', e.message)
     throw createError({
-      statusCode: 500,
-      statusMessage: 'Error in Career Coach AI'
+      statusCode: e.statusCode || 500,
+      statusMessage: e.statusMessage || 'Error en el servicio de Ezra'
     })
   }
 })

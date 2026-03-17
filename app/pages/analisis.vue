@@ -150,20 +150,46 @@ definePageMeta({
 })
 
 
+interface Skill {
+  skill: string
+  count: number
+}
+
+interface AnalysisResult {
+  score: number
+  company: string
+  position: string
+  keywords_presentes: string[]
+  keywords_faltantes: string[]
+  hard_skills_top: string[]
+  analisis: string
+  recomendaciones: string[]
+}
+
+interface HistoryItem {
+  id: number
+  company: string
+  position: string
+  jd_text: string
+  analysis: any // The JSON analysis stored in DB
+  score: number
+  created_at: string
+}
+
 const { profile, experiences } = useAppState()
 const toast = useToast()
 
 const jd = ref('')
-const result = ref(null)
-const skills = ref([])
+const result = ref<AnalysisResult | null>(null)
+const skills = ref<Skill[]>([])
 const loading = ref(false)
-const history = ref([])
+const history = ref<HistoryItem[]>([])
 const historyLoading = ref(false)
 
 const fetchHistory = async () => {
   historyLoading.value = true
   try {
-    history.value = await $fetch('/api/analyses')
+    history.value = await $fetch<HistoryItem[]>('/api/analyses')
   } catch (e) {
     console.error('Error fetching history:', e)
   } finally {
@@ -171,7 +197,7 @@ const fetchHistory = async () => {
   }
 }
 
-const loadAnalysis = (item: any) => {
+const loadAnalysis = (item: HistoryItem) => {
   jd.value = item.jd_text
   const data = item.analysis
   result.value = {
@@ -190,6 +216,11 @@ const loadAnalysis = (item: any) => {
 
 onMounted(() => {
   fetchHistory()
+  // Pre-fill JD from query param (e.g. from Ofertas page)
+  const route = useRoute()
+  if (route.query.jd) {
+    jd.value = route.query.jd as string
+  }
 })
 
 const runAIMatch = async () => {
@@ -200,7 +231,7 @@ const runAIMatch = async () => {
   loading.value = true
   
   try {
-    const data = await $fetch('/api/analyze', {
+    const data = await $fetch<any>('/api/analyze', {
       method: 'POST',
       body: {
         jd: jd.value,
@@ -215,7 +246,7 @@ const runAIMatch = async () => {
       position: data.position,
       keywords_presentes: data.keywords_presentes,
       keywords_faltantes: data.keywords_faltantes,
-      hard_skills_top: data.hard_skills_jd.slice(0, 5).map(s => s.skill),
+      hard_skills_top: data.hard_skills_jd.slice(0, 5).map((s: any) => s.skill),
       analisis: data.analisis,
       recomendaciones: data.recomendaciones
     }
@@ -240,7 +271,7 @@ const saveAsApplication = async () => {
   if (!result.value) return
   
   try {
-    await $fetch('/api/applications', {
+    await $fetch<any>('/api/applications', {
       method: 'POST',
       body: {
         company: result.value.company || 'Empresa Desconocida',

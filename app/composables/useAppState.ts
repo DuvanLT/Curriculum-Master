@@ -53,7 +53,7 @@ export const useAppState = () => {
 
   const saveProfile = async () => {
     try {
-      await $fetch('/api/profile', {
+      await $fetch<any>('/api/profile', {
         method: 'POST',
         body: {
           profile: {
@@ -91,6 +91,22 @@ export const useAppState = () => {
     saveProfile();
   };
 
+  const updateExperience = async (id: string | number, updatedData: any) => {
+    const index = experiences.value.findIndex(e => e.id === id);
+    if (index !== -1) {
+      experiences.value[index] = {
+        ...experiences.value[index],
+        ...updatedData,
+        skills: Array.isArray(updatedData.skills) 
+          ? updatedData.skills 
+          : (typeof updatedData.skills === 'string' 
+              ? updatedData.skills.split(',').map((s: string) => s.trim()).filter(Boolean) 
+              : [])
+      };
+      await saveProfile();
+    }
+  };
+
   const bulkExperience = async (exps: any[]) => {
     if (!Array.isArray(exps)) return;
     for (const expData of exps) {
@@ -120,6 +136,7 @@ export const useAppState = () => {
     saveProfile,
     addExperience,
     removeExperience,
+    updateExperience,
     bulkExperience
   };
 };

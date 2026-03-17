@@ -59,18 +59,35 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border2);
   border-radius: 3px;
 }
 
+.badge-beta {
+  font-size: 10px;
+  background-color: #f59e0b;
+  /* Un naranja/ámbar como el de tu icono activo */
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-left: auto;
+  /* Esto lo empuja al final a la derecha */
+}
+
 /* Basic Animations */
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .spinner {
   display: inline-block;
   width: 14px;
@@ -82,9 +99,18 @@ body {
 }
 
 @keyframes bounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-5px); }
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-5px);
+  }
 }
+
 .typing-dot {
   width: 6px;
   height: 6px;
@@ -92,5 +118,11 @@ body {
   background: var(--text3);
   animation: bounce .8s infinite;
 }
-.typing-dot:nth-child(2) { animation-delay: .15s; }
-.typing-dot:nth-child(3) { animation-delay: .3s; }
+
+.typing-dot:nth-child(2) {
+  animation-delay: .15s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: .3s;
+}

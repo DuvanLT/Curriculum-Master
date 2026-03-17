@@ -154,23 +154,23 @@ definePageMeta({
 
 const { profile, experiences, fetchProfile } = useAppState()
 const toast = useToast()
-const msgs = ref<any[]>([])
+const msgs = ref<{ role: string; text: string }[]>([])
 const loading = ref(false)
 const active = ref(false)
 const streamActive = ref(false)
 const isListening = ref(false)
 const analyzing = ref(false)
-const results = ref(null)
-const selectedSteps = ref([])
+const results = ref<any>(null)
+const selectedSteps = ref<string[]>([])
 const savingSteps = ref(false)
 const stepsAdded = ref(false)
 const transcribedText = ref('')
 const showConfirmFinish = ref(false)
 const videoRef = ref<HTMLVideoElement | null>(null)
-const chatContainer = ref(null)
+const chatContainer = ref<HTMLElement | null>(null)
 
-let recognition = null
-let mediaStream = null
+let recognition: any = null
+let mediaStream: MediaStream | null = null
 
 onMounted(async () => {
   await fetchProfile()
@@ -182,14 +182,15 @@ onUnmounted(() => {
 })
 
 const setupSpeechRecognition = () => {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  const win = window as any
+  const SpeechRecognition = win.SpeechRecognition || win.webkitSpeechRecognition
   if (SpeechRecognition) {
     recognition = new SpeechRecognition()
     recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = 'es-ES'
 
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       let finalTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
@@ -201,7 +202,7 @@ const setupSpeechRecognition = () => {
       }
     }
 
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error', event.error)
       isListening.value = false
     }
@@ -258,7 +259,7 @@ const toggleListening = () => {
   }
 }
 
-const toggleSelection = (step) => {
+const toggleSelection = (step: string) => {
   if (selectedSteps.value.includes(step)) {
     selectedSteps.value = selectedSteps.value.filter(s => s !== step)
   } else {
@@ -270,7 +271,7 @@ const saveSelectedSteps = async () => {
   savingSteps.value = true
   try {
     for (const stepText of selectedSteps.value) {
-      await $fetch('/api/steps', {
+      await $fetch<any>('/api/steps', {
         method: 'POST',
         body: { text: `Entrevista: ${stepText}` }
       })
@@ -293,7 +294,7 @@ const finishAndAnalyze = async (force = false) => {
   showConfirmFinish.value = false
   analyzing.value = true
   try {
-    const data = await $fetch('/api/interview', {
+    const data = await $fetch<any>('/api/interview', {
       method: 'POST',
       body: {
         messages: msgs.value,
@@ -320,7 +321,7 @@ const finishAndAnalyze = async (force = false) => {
       mediaStream.getTracks().forEach(track => track.stop())
       streamActive.value = false
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error('Analysis Error:', e)
     // Nuxt $fetch errors store the message in data.statusMessage or just message
     const errorMsg = e.data?.statusMessage || e.message || 'Error desconocido'
@@ -330,7 +331,7 @@ const finishAndAnalyze = async (force = false) => {
   }
 }
 
-const speak = (text) => {
+const speak = (text: string) => {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel() // Stop current speaking
     const utterance = new SpeechSynthesisUtterance(text)
@@ -341,7 +342,7 @@ const speak = (text) => {
   }
 }
 
-const sendResponse = async (text) => {
+const sendResponse = async (text: string) => {
   if (text) {
     msgs.value.push({ role: 'user', text })
   }
@@ -350,7 +351,7 @@ const sendResponse = async (text) => {
   scrollToBottom()
 
   try {
-    const data = await $fetch('/api/interview', {
+    const data = await $fetch<any>('/api/interview', {
       method: 'POST',
       body: {
         messages: msgs.value,

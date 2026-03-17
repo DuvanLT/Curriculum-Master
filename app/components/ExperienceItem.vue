@@ -7,7 +7,10 @@
       </div>
       <div class="text-right">
         <div class="exp-dates text-[11px] text-text-dim font-mono">{{ experience.inicio }} → {{ experience.fin || 'Actual' }}</div>
-        <AppButton variant="danger" size="sm" class="mt-1 opacity-0 group-hover:opacity-100 transition-opacity" @click="$emit('remove', experience.id)">Eliminar</AppButton>
+        <div class="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
+          <AppButton variant="secondary" size="sm" @click="$emit('edit', experience)">Editar</AppButton>
+          <AppButton variant="danger" size="sm" @click="$emit('remove', experience.id)">Eliminar</AppButton>
+        </div>
       </div>
     </div>
     <div v-if="experience.descripcion" class="text-[12px] text-text-dim mb-2">{{ experience.descripcion }}</div>
@@ -28,7 +31,7 @@
 defineProps({
   experience: Object
 })
-defineEmits(['remove'])
+defineEmits(['remove', 'edit'])
 </script>
 
 <style scoped>

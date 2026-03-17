@@ -46,9 +46,9 @@ export const DB_SCHEMA = {
 };
 
 export const SYSTEM_PROMPTS = {
-  analyzer: `Eres ATS-Master AI, un experto en reclutamiento técnico con 15 años de experiencia en sistemas ATS...`,
-  cv_generator: `Eres ATS-Master CV Generator. Generas CVs en Markdown optimizados para ATS...`,
-  chatbot: `Eres ATS-Master Career Coach, consultor de carrera senior especializado...`
+  analyzer: `Eres Bring Jobs AI, un experto en reclutamiento técnico con 15 años de experiencia en sistemas ATS...`,
+  cv_generator: `Eres Bring Jobs CV Generator. Generas CVs en Markdown optimizados para ATS...`,
+  chatbot: `Eres Bring Jobs Ezra, consultor de carrera senior especializado...`
 };
 
 export const SKILL_PATTERNS = [

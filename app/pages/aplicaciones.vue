@@ -185,34 +185,53 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const applications = ref<any[]>([])
+type ApplicationStatus = 'Pendiente' | 'Aplicado' | 'Entrevista' | 'Oferta' | 'Rechazado'
+
+interface Application {
+  id: string
+  company: string
+  position: string
+  status: ApplicationStatus
+  date: string
+  interview_date: string | null
+}
+
+interface NewApplication {
+  company: string
+  position: string
+  status: ApplicationStatus
+  date: string
+  interview_date: string
+}
+
+const applications = ref<Application[]>([])
 const loading = ref(false)
 const showAddModal = ref(false)
 const toast = useToast()
-const statusOptions = ['Pendiente', 'Aplicado', 'Entrevista', 'Oferta', 'Rechazado']
+const statusOptions: ApplicationStatus[] = ['Pendiente', 'Aplicado', 'Entrevista', 'Oferta', 'Rechazado']
 
-const newApp = ref({
+const newApp = ref<NewApplication>({
   company: '',
   position: '',
   status: 'Aplicado',
-  date: new Date().toISOString().split('T')[0],
+  date: new Date().toISOString().slice(0, 10),
   interview_date: ''
 })
 
-const appToDelete = ref<number | null>(null)
-const appToEditDate = ref<any>(null)
+const appToDelete = ref<string | null>(null)
+const appToEditDate = ref<Application | null>(null)
 const tempDate = ref('')
 
 // Group apps by status for Kanban columns
 const groupedApps = computed(() => {
-  const groups = {}
+  const groups: Record<string, Application[]> = {}
   statusOptions.forEach(status => {
     groups[status] = applications.value.filter(a => a.status === status)
   })
   return groups
 })
 
-const statusBg = (status) => {
+const statusBg = (status: ApplicationStatus) => {
   switch (status) {
     case 'Pendiente': return 'bg-text-dim'
     case 'Aplicado': return 'bg-blue'
@@ -226,7 +245,7 @@ const statusBg = (status) => {
 const fetchApps = async () => {
   loading.value = true
   try {
-    applications.value = await $fetch('/api/applications')
+    applications.value = await $fetch<Application[]>('/api/applications')
   } catch (e) {
     console.error('Error fetching applications:', e)
   } finally {
@@ -236,18 +255,18 @@ const fetchApps = async () => {
 
 const addNewApp = async () => {
   try {
-    const res = await $fetch('/api/applications', {
+    const res = await $fetch<any>('/api/applications', {
       method: 'POST',
       body: newApp.value
     })
-    applications.value.unshift(res)
+    applications.value.unshift(res as Application)
     showAddModal.value = false
     toast.success(`Aplicación para ${newApp.value.company} guardada.`)
     newApp.value = {
       company: '',
       position: '',
       status: 'Aplicado',
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().slice(0, 10),
       interview_date: ''
     }
   } catch (e) {
@@ -256,7 +275,7 @@ const addNewApp = async () => {
   }
 }
 
-const updateStatus = async (id, newStatus, interviewDate = null) => {
+const updateStatus = async (id: string, newStatus: ApplicationStatus, interviewDate: string | null = null) => {
   try {
     const app = applications.value.find(a => a.id === id)
     if (app) {
@@ -264,12 +283,12 @@ const updateStatus = async (id, newStatus, interviewDate = null) => {
       if (interviewDate) app.interview_date = interviewDate
     }
     
-    await $fetch('/api/applications', {
+    await $fetch<any>('/api/applications', {
       method: 'PATCH',
       body: { 
         id, 
         status: newStatus, 
-        interview_date: interviewDate || app?.interview_date 
+        interview_date: interviewDate ?? app?.interview_date ?? null
       }
     })
   } catch (e) {
@@ -277,9 +296,9 @@ const updateStatus = async (id, newStatus, interviewDate = null) => {
   }
 }
 
-const promptDate = (app: any) => {
+const promptDate = (app: Application) => {
   appToEditDate.value = app
-  tempDate.value = app.interview_date || new Date().toISOString().split('T')[0]
+  tempDate.value = app.interview_date || new Date().toISOString().slice(0, 10)
 }
 
 const saveDate = () => {
@@ -290,21 +309,23 @@ const saveDate = () => {
   }
 }
 
-const moveApp = (app, direction) => {
+const moveApp = (app: Application, direction: number) => {
   const currentIndex = statusOptions.indexOf(app.status)
   const nextIndex = currentIndex + direction
   if (nextIndex >= 0 && nextIndex < statusOptions.length) {
     const nextStatus = statusOptions[nextIndex]
-    updateStatus(app.id, nextStatus)
+    if (nextStatus) {
+      updateStatus(app.id, nextStatus)
+    }
   }
 }
 
-const canMoveBackward = (status) => statusOptions.indexOf(status) > 0
-const canMoveForward = (status) => statusOptions.indexOf(status) < statusOptions.length - 1
+const canMoveBackward = (status: ApplicationStatus) => statusOptions.indexOf(status) > 0
+const canMoveForward = (status: ApplicationStatus) => statusOptions.indexOf(status) < statusOptions.length - 1
 
 // FIXED: Using a more robust delete with immediate UI feedback
 // NEW DELETE FLOW: Modal-based
-const requestDelete = (id: number) => {
+const requestDelete = (id: string) => {
   appToDelete.value = id
 }
 
@@ -319,7 +340,7 @@ const confirmDelete = async () => {
   applications.value = applications.value.filter(a => a.id !== id)
 
   try {
-    await $fetch('/api/applications', {
+    await $fetch<any>('/api/applications', {
       method: 'DELETE',
       body: { id }
     })
@@ -331,7 +352,7 @@ const confirmDelete = async () => {
   }
 }
 
-const formatDate = (dateStr) => {
+const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
   return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
 }

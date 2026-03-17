@@ -5,7 +5,7 @@
       <div class="absolute top-0 left-0 w-32 h-32 bg-amber opacity-5 blur-[80px] -ml-16 -mt-16"></div>
       
       <div class="text-center mb-8 relative z-10">
-        <h1 class="font-head text-[28px] font-bold text-amber tracking-tighter mb-1">ATS-Master</h1>
+        <h1 class="font-head text-[28px] font-bold text-amber tracking-tighter mb-1">Bring Jobs</h1>
         <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">// Bienvenido de nuevo</p>
       </div>
 
@@ -24,10 +24,10 @@
         </div>
       </form>
 
-      <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
+      <!--<div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
         ¿No tienes cuenta? 
         <NuxtLink to="/signup" class="text-amber hover:underline font-medium ml-1">Regístrate gratis</NuxtLink>
-      </div>
+      </div>-->
     </div>
   </div>
 </template>
@@ -45,7 +45,7 @@ const handleLogin = async () => {
   loading.value = true
   error.value = ''
   
-  const result = await login(form.value.email, form.value.password)
+  const result = await login(form.value.email.toLocaleLowerCase(), form.value.password)
   
   if (result.success) {
     navigateTo('/perfil')

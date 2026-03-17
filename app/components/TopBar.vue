@@ -2,9 +2,9 @@
   <header class="topbar flex items-center justify-between px-6 h-[52px] bg-dark-bg2 border-b border-border flex-shrink-0">
     <div class="flex items-center">
       <div class="logo font-head text-lg font-bold tracking-tighter text-text">
-        ATS<span>-MASTER</span>
+        Bring<span>Jobs</span>
       </div>
-      <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-dark-bg4 border border-border px-1.5 py-0.5 rounded">v2.0-AI</span>
+      <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-dark-bg4 border border-border px-1.5 py-0.5 rounded">Beta Cerrada</span>
     </div>
    <div class="flex items-center">
   <button 

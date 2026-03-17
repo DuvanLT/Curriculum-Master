@@ -4,13 +4,13 @@ export async function getUrlContent(url: string): Promise<string> {
   }
 
   try {
-    const html = await $fetch<string>(url, { 
+    const html = await $fetch<string>(url, {
       timeout: 5000,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; ATS-Master/1.0; +http://localhost:3000)'
+        'User-Agent': 'Mozilla/5.0 (compatible; Bring Jobs/1.0; +http://localhost:3000)'
       }
     })
-    
+
     // Simple cleaning: remove scripts, styles, and extra whitespace
     return html
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')

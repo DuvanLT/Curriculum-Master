@@ -10,13 +10,23 @@ export default defineEventHandler(async (event) => {
 
   let portfolioContent = ''
   if (profile.web) {
-    portfolioContent = await getUrlContent(profile.web)
+    try {
+      const parsedUrl = new URL(profile.web)
+      // Solo permitir http y https para evitar file:// o gopher://
+      if (['http:', 'https:'].includes(parsedUrl.protocol)) {
+        portfolioContent = await getUrlContent(parsedUrl.href)
+      } else {
+        console.warn('URL de portafolio no permitida:', profile.web)
+      }
+    } catch (e) {
+      console.warn('URL de portafolio inválida:', profile.web)
+    }
   }
 
   if (!config.openaiApiKey) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'OpenAI API key missing in server configuration'
+      statusMessage: 'Key missing in server configuration'
     })
   }
 
@@ -38,7 +48,7 @@ export default defineEventHandler(async (event) => {
     7. Si se proporciona información del portafolio/web, úsala para enriquecer el perfil y los logros.
   `
 
-const userPrompt = `
+  const userPrompt = `
     DATOS DEL PERFIL:
     ${JSON.stringify(profile)}
 
@@ -89,7 +99,7 @@ const userPrompt = `
     }
 
     const result = JSON.parse(content)
-    
+
     // Save next steps to DB
     if (result.next_steps && Array.isArray(result.next_steps)) {
       const db = useDb()

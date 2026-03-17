@@ -3,22 +3,27 @@
     <div class="nav-section mb-6">
       <div class="nav-label text-[10px] text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Principal</div>
       <NuxtLink to="/analisis" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">search</span> Análisis JD
+        <span class="material-symbols-outlined nav-icon">search</span> Analizar Vacante
       </NuxtLink>
       <NuxtLink to="/generador" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">description</span> Generador CV
+        <span class="material-symbols-outlined nav-icon">description</span> Constructor CV
       </NuxtLink>
       <NuxtLink to="/coach" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">chat</span> Career Coach
+        <span class="material-symbols-outlined nav-icon">smart_toy</span> Ezra
       </NuxtLink>
       <NuxtLink to="/pasos" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">fact_check</span> Próximos Pasos
+        <span class="material-symbols-outlined nav-icon">fact_check</span> Mi Ruta
       </NuxtLink>
       <NuxtLink to="/entrevista" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">videocam</span> Simulación Entrevista
+        <span class="material-symbols-outlined nav-icon">videocam</span>
+        <span class="nav-text">Practicar Entrevista</span>
+        <span class="badge-beta">BETA</span>
       </NuxtLink>
       <NuxtLink to="/aplicaciones" class="nav-item" active-class="active">
         <span class="material-symbols-outlined nav-icon">view_kanban</span> Mis Aplicaciones
+      </NuxtLink>
+      <NuxtLink to="/ofertas" class="nav-item" active-class="active">
+        <span class="material-symbols-outlined nav-icon">work</span> Bolsa de Empleo
       </NuxtLink>
     </div>
 
@@ -37,7 +42,7 @@
         </div>
         <div class="flex flex-col min-w-0">
           <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || 'Sin Nombre' }}</div>
-          <div class="text-[9px] text-text-dim truncate font-mono opacity-50 group-hover:opacity-100 transition-opacity">{{ user.email }}</div>
+          <div class="text-[9px] text-white truncate font-mono  group-hover:opacity-100 transition-opacity">Plan Beta</div>
         </div>
       </NuxtLink>
     </div>
