@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <!-- TEMPLATE OCULTO PARA PDF (Se renderiza siempre para que html2pdf lo encuentre, pero oculto con absolute off-screen) -->
+      <!-- TEMPLATE OCULTO PARA IMPRESION/PDF (Se renderiza fuera de pantalla para clonar su HTML en la ventana de impresion) -->
       <div style="position: absolute; left: -9999px; top: -9999px;">
         <CVTemplate 
           v-if="aiResult"
@@ -125,19 +125,70 @@ const generateAI = async () => {
 
 const exportToPDF = async () => {
   if (!aiResult.value) return
-  
-  // Cargamos html2pdf solo en el cliente
-  const html2pdf = (await import('html2pdf.js')).default
-  
+
   const element = document.getElementById('pdf-area')
-  const opt = {
-    margin: 0,
-    filename: `CV_${profile.value.nombre.replace(/\s/g, '_')}_Optimizado.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  if (!element) {
+    toast.error('No se pudo preparar el CV para impresión.')
+    return
   }
 
-  html2pdf().from(element).set(opt).save()
+  const printWindow = window.open('', '_blank', 'width=900,height=1200')
+  if (!printWindow) {
+    toast.error('El navegador bloqueó la ventana de impresión.')
+    return
+  }
+
+  const safeName = (profile.value.nombre || 'CV').replace(/\s+/g, '_')
+
+  printWindow.document.open()
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${safeName}_Optimizado</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 0;
+          }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+          }
+
+          body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          #print-root {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="print-root">${element.outerHTML}</div>
+      </body>
+    </html>
+  `)
+  printWindow.document.close()
+
+  printWindow.focus()
+
+  const handleAfterPrint = () => {
+    printWindow.close()
+  }
+
+  printWindow.addEventListener('afterprint', handleAfterPrint, { once: true })
+
+  setTimeout(() => {
+    printWindow.print()
+  }, 300)
 }
 </script>
