@@ -33,6 +33,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'guest'
+})
 const { login } = useAuth()
 const loading = ref(false)
 const error = ref('')

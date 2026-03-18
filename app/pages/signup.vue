@@ -47,6 +47,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'guest'
+})
 const { signup } = useAuth()
 const loading = ref(false)
 const error = ref('')
