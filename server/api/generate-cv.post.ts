@@ -1,6 +1,35 @@
 import OpenAI from 'openai'
 import { getUrlContent } from '../utils/fetch-url'
 
+function splitAchievements(raw: unknown) {
+  if (typeof raw !== 'string') return []
+
+  return raw
+    .split(/\r?\n|\u2022|\u00B7|;/)
+    .map(item => item.replace(/^[\-\*\u2022\s]+/, '').trim())
+    .filter(Boolean)
+}
+
+function normalizeExperienceType(value: unknown) {
+  return value === 'project' ? 'project' : 'work'
+}
+
+function findSourceExperience(aiExp: any, sourceExperiences: any[]) {
+  if (aiExp?.id) {
+    const directMatch = sourceExperiences.find((exp: any) => String(exp.id) === String(aiExp.id))
+    if (directMatch) return directMatch
+  }
+
+  const aiCargo = String(aiExp?.cargo || '').trim().toLowerCase()
+  const aiEmpresa = String(aiExp?.empresa || '').trim().toLowerCase()
+
+  return sourceExperiences.find((exp: any) => {
+    const expCargo = String(exp?.cargo || '').trim().toLowerCase()
+    const expEmpresa = String(exp?.empresa || '').trim().toLowerCase()
+    return expCargo === aiCargo && expEmpresa === aiEmpresa
+  }) || null
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const session = await requireUserSession(event)
@@ -12,14 +41,13 @@ export default defineEventHandler(async (event) => {
   if (profile.web) {
     try {
       const parsedUrl = new URL(profile.web)
-      // Solo permitir http y https para evitar file:// o gopher://
       if (['http:', 'https:'].includes(parsedUrl.protocol)) {
         portfolioContent = await getUrlContent(parsedUrl.href)
       } else {
         console.warn('URL de portafolio no permitida:', profile.web)
       }
-    } catch (e) {
-      console.warn('URL de portafolio inválida:', profile.web)
+    } catch {
+      console.warn('URL de portafolio invalida:', profile.web)
     }
   }
 
@@ -34,55 +62,98 @@ export default defineEventHandler(async (event) => {
     apiKey: config.openaiApiKey
   })
 
+  const normalizedExperiences = Array.isArray(experiences)
+    ? experiences.map((exp: any) => ({
+        id: exp.id,
+        type: exp.type === 'project' ? 'project' : 'work',
+        cargo: exp.cargo || '',
+        empresa: exp.empresa || '',
+        inicio: exp.inicio || '',
+        fin: exp.fin || '',
+        skills: Array.isArray(exp.skills) ? exp.skills : [],
+        logros_originales: typeof exp.logros === 'string' ? exp.logros : '',
+        logros_desglosados: splitAchievements(exp.logros)
+      }))
+    : []
+
   const systemPrompt = `
-    Eres un experto en optimización de CVs para sistemas ATS (Applicant Tracking Systems) y reclutadores técnicos.
-    Tu objetivo es reescribir la información del usuario para que sea impactante, profesional y esté alineada con una vacante específica.
-    
-    REGLAS CRÍTICAS:
-    1. Usa la "Fórmula de Google" para los logros: [Verbo de Acción fuerte] + [Resultado medible] + [Contexto/Métrica].
-    2. Evita clichés y palabras vacías.
-    3. Asegúrate de incluir palabras clave relevantes de la vacante (JD) de forma natural.
-    4. El tono debe ser profesional, ejecutivo y técnico.
-    5. Devuelve la información en formato JSON estructurado.
-    6. Traduce o mantén el idioma según el contexto (si la vacante es en inglés, el CV debe estar en inglés; si es en español, en español).
-    7. Si se proporciona información del portafolio/web, úsala para enriquecer el perfil y los logros.
-  `
+Eres un experto en optimizacion de CVs para sistemas ATS y reclutadores.
+Tu objetivo es adaptar el CV del usuario a una vacante especifica sin inventar experiencia, contexto ni metricas.
+
+REGLAS CRITICAS:
+1. Primero analiza la vacante y detecta responsabilidades, herramientas, seniority y resultados esperados.
+2. Luego evalua cada experiencia del usuario y decide que tan relevante es para la vacante.
+3. Respeta el tipo de cada entrada:
+   - "work" = experiencia laboral.
+   - "project" = proyecto personal, academico, freelance puntual o iniciativa de portafolio.
+   Nunca presentes un proyecto como si fuera empleo formal.
+4. No copies ni maquilles el mismo texto del perfil. Reescribe cada logro para conectarlo con la vacante usando el contexto disponible.
+5. Usa metodologia STAR de forma realista:
+   - Situation/Task: deja claro el contexto o problema.
+   - Action: explica la accion o contribucion del candidato.
+   - Result: expresa el impacto.
+6. Solo usa porcentajes, cifras o volumenes cuando haya evidencia explicita en el perfil, experiencias o portafolio.
+7. Nunca inventes numeros ni exageres. Evita mejoras imposibles o sospechosas como "reduje tiempos en 100%".
+8. Si no hay dato numerico confiable, usa resultados cualitativos verosimiles sin cifra.
+9. Incluye palabras clave relevantes de la vacante solo cuando encajen de forma honesta con la experiencia real del candidato.
+10. Destaca mas las experiencias mas relevantes y baja el peso de las menos relacionadas.
+11. Cuando el tipo sea "project", enfoca la redaccion en alcance, stack, problema resuelto, entregable y aprendizaje aplicado al rol.
+12. Cuando el tipo sea "work", enfoca la redaccion en responsabilidad, colaboracion, resultados y contexto de negocio.
+13. El tono debe ser profesional, ejecutivo y concreto. Evita cliches y palabras vacias.
+14. Devuelve unicamente JSON estructurado.
+15. Traduce o manten el idioma segun la vacante: si la vacante esta en ingles, responde en ingles; si esta en espanol, responde en espanol.
+16. Si se proporciona informacion del portafolio/web, usala solo para enriquecer con evidencia compatible con el perfil existente.
+`
 
   const userPrompt = `
-    DATOS DEL PERFIL:
-    ${JSON.stringify(profile)}
+DATOS DEL PERFIL:
+${JSON.stringify(profile)}
 
-    EXPERIENCIAS:
-    ${JSON.stringify(experiences)}
+EXPERIENCIAS NORMALIZADAS:
+${JSON.stringify(normalizedExperiences)}
 
-    PORTAFOLIO/WEB (Información extraída del enlace):
-    ${portfolioContent || 'N/A'}
+PORTAFOLIO/WEB (Informacion extraida del enlace):
+${portfolioContent || 'N/A'}
 
-    VACANTE OBJETIVO (JD):
-    ${jd || 'N/A (Haz una optimización general de alta calidad si no hay JD)'}
+VACANTE OBJETIVO (JD):
+${jd || 'N/A (Haz una optimizacion general de alta calidad si no hay JD)'}
 
-    POR FAVOR, DEVUELVE UN OBJETO JSON CON LA SIGUIENTE ESTRUCTURA:
+INSTRUCCIONES ADICIONALES DE SALIDA:
+- Ordena "experiences" de mayor a menor relevancia para la vacante.
+- Para cada experiencia, analiza si realmente aporta a la vacante y adapta el enfoque.
+- Conserva y devuelve el campo "type" en cada experiencia.
+- Cada "logros_optimizados" debe sonar especifico para la vacante, no ser una simple copia del texto original.
+- Si faltan datos para una metrica, no inventes porcentajes.
+- Usa maximo 2 logros cuando la relevancia sea baja o media-baja.
+- Usa 3 o 4 logros solo cuando la experiencia sea claramente relevante.
+
+DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
+{
+  "summary": "Resumen profesional optimizado (3-4 lineas)",
+  "optimized_title": "Titulo profesional ajustado a la vacante",
+  "experiences": [
     {
-      "summary": "Resumen profesional optimizado (aprox 3-4 líneas)",
-      "optimized_title": "Título profesional ajustado a la vacante",
-      "experiences": [
-        {
-          "id": "mismo id original",
-          "cargo": "título optimizado",
-          "empresa": "nombre empresa",
-          "logros_optimizados": ["lista de 3-4 logros usando la fórmula de Google"],
-          "skills_sugeridas": ["lista de skills clave para esta posición"]
-        }
-      ],
-      "top_skills": ["lista de las 10 skills más importantes para este rol"],
-      "advice": ["3-4 consejos clave para destacar en este proceso de selección"],
-      "next_steps": ["3-4 tareas concretas de to-do para mejorar el perfil o postulación"]
+      "id": "mismo id original",
+      "type": "work o project",
+      "relevance_score": 0,
+      "relevance_reason": "explicacion breve de por que esta experiencia si o no es relevante para la vacante",
+      "cargo": "titulo optimizado",
+      "empresa": "nombre empresa",
+      "focus_for_role": "enfoque especifico con el que se debe presentar esta experiencia para la vacante",
+      "logros_optimizados": ["lista de 2-4 logros adaptados y realistas"],
+      "skills_sugeridas": ["lista de skills clave para esta posicion"],
+      "metricas_confiables": ["lista corta de metricas que si se pueden sostener con la informacion dada, o vacio si no hay"]
     }
-  `
+  ],
+  "top_skills": ["lista de las 10 skills mas importantes para este rol"],
+  "advice": ["3-4 consejos clave para destacar en este proceso de seleccion"],
+  "next_steps": ["3-4 tareas concretas de to-do para mejorar el perfil o postulacion"]
+}
+`
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o', // Or gpt-3.5-turbo if cost is an issue, but user asked for "openai"
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
@@ -100,7 +171,34 @@ export default defineEventHandler(async (event) => {
 
     const result = JSON.parse(content)
 
-    // Save next steps to DB
+    if (Array.isArray(result?.experiences)) {
+      result.experiences = result.experiences.map((aiExp: any) => {
+        const sourceExp = findSourceExperience(aiExp, normalizedExperiences)
+
+        return {
+          ...sourceExp,
+          ...aiExp,
+          id: aiExp?.id || sourceExp?.id || crypto.randomUUID(),
+          type: normalizeExperienceType(aiExp?.type || sourceExp?.type),
+          cargo: aiExp?.cargo || sourceExp?.cargo || '',
+          empresa: aiExp?.empresa || sourceExp?.empresa || '',
+          inicio: aiExp?.inicio || sourceExp?.inicio || '',
+          fin: aiExp?.fin || sourceExp?.fin || '',
+          logros_optimizados: Array.isArray(aiExp?.logros_optimizados)
+            ? aiExp.logros_optimizados.filter(Boolean)
+            : [],
+          skills_sugeridas: Array.isArray(aiExp?.skills_sugeridas)
+            ? aiExp.skills_sugeridas.filter(Boolean)
+            : [],
+          metricas_confiables: Array.isArray(aiExp?.metricas_confiables)
+            ? aiExp.metricas_confiables.filter(Boolean)
+            : []
+        }
+      })
+    } else {
+      result.experiences = []
+    }
+
     if (result.next_steps && Array.isArray(result.next_steps)) {
       const db = useDb()
       for (const stepText of result.next_steps) {

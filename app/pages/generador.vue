@@ -2,17 +2,20 @@
   <NuxtLayout>
     <div>
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Generador de CV con IA</div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Potencia tu currículum adaptando tu experiencia laboral a la oferta de empleo que te interesa, utilizando inteligencia artificial.</div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Potencia tu curriculum adaptando tu experiencia laboral a la oferta de empleo que te interesa, utilizando inteligencia artificial.</div>
 
       <AppCard title="Adaptar a una vacante">
         <div class="text-[12px] text-text-muted mb-3">
-          Copia y pega la descripción de la oferta para que la IA optimice tus logros y palabras clave.
+          Copia y pega la descripcion de la oferta para que la IA optimice tus logros y palabras clave.
         </div>
-        <AppInput 
-          type="textarea" 
-          v-model="jd" 
-          :rows="4" 
-          placeholder="Ej: Buscamos un Diseñador en Adobe Photoshop, Illustrator y Figma..." 
+        <div class="text-[11px] text-text-dim mb-3 leading-relaxed">
+          La adaptacion prioriza las experiencias mas relevantes para la vacante y evita inventar porcentajes o resultados no sustentados por tu perfil maestro.
+        </div>
+        <AppInput
+          type="textarea"
+          v-model="jd"
+          :rows="4"
+          placeholder="Ej: Buscamos un Disenador con experiencia en Adobe Photoshop, Illustrator y Figma..."
         />
         <div class="flex items-center gap-2 mt-4">
           <AppButton @click="generateAI" :disabled="loading" class="flex-1 sm:flex-none">
@@ -23,25 +26,43 @@
         </div>
       </AppCard>
 
-      <!-- RESULTADO / CONSEJOS -->
       <div v-if="aiResult" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <div class="md:col-span-2">
-          <AppCard title="Vista Previa de Optimización">
+          <AppCard title="Vista Previa de Optimizacion">
             <div class="p-3 bg-dark-bg2 rounded border border-border">
               <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
-                ▸ RESUMEN OPTIMIZADO
+                RESUMEN OPTIMIZADO
               </div>
               <p class="text-[13px] text-text-muted leading-relaxed italic mb-4">
                 "{{ aiResult.summary }}"
               </p>
-              
+
               <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
-                ▸ TOP SKILLS PARA ESTA POSICIÓN
+                TOP SKILLS PARA ESTA POSICION
               </div>
               <div class="flex flex-wrap gap-2 mb-2">
                 <span v-for="skill in aiResult.top_skills" :key="skill" class="text-[11px] bg-dark-bg3 border border-border px-2 py-0.5 rounded text-text-dim">
                   {{ skill }}
                 </span>
+              </div>
+
+              <div v-if="optimizedExperiences.length" class="mt-5">
+                <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
+                  EXPERIENCIAS PRIORIZADAS
+                </div>
+                <div v-for="exp in optimizedExperiences" :key="exp.id" class="mb-4 border border-border rounded p-3 bg-dark-bg3">
+                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <div class="text-[13px] font-semibold text-text-main">
+                      {{ exp.cargo }} - {{ exp.empresa }}
+                    </div>
+                  </div>
+                  <ul class="space-y-2">
+                    <li v-for="(achievement, index) in exp.logros_optimizados || []" :key="index" class="text-[12px] text-text-dim leading-relaxed flex gap-2">
+                      <span class="text-amber">-</span>
+                      <span>{{ achievement }}</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </AppCard>
@@ -54,7 +75,7 @@
             </template>
             <ul class="space-y-3">
               <li v-for="(advice, i) in aiResult.advice" :key="i" class="text-[12px] text-text-dim leading-snug flex gap-2">
-                <span class="text-amber">▸</span> {{ advice }}
+                <span class="text-amber">-</span> {{ advice }}
               </li>
             </ul>
             <AppButton variant="ghost" class="w-full mt-4 !text-[12px]" @click="exportToPDF">
@@ -65,13 +86,13 @@
         </div>
       </div>
 
-      <!-- TEMPLATE OCULTO PARA IMPRESION/PDF (Se renderiza fuera de pantalla para clonar su HTML en la ventana de impresion) -->
       <div style="position: absolute; left: -9999px; top: -9999px;">
-        <CVTemplate 
+        <CVTemplate
           v-if="aiResult"
           id="pdf-area"
-          :profile="profile" 
-          :experiences="experiences" 
+          :profile="profile"
+          :educations="educations"
+          :experiences="experiences"
           :aiData="aiResult"
         />
       </div>
@@ -84,13 +105,16 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { profile, experiences } = useAppState()
+const { profile, educations, experiences } = useAppState()
 const toast = useToast()
 const jd = ref('')
 const loading = ref(false)
 const aiResult = ref(null)
 
-// Pre-fill JD from query param (e.g. from Ofertas page)
+const optimizedExperiences = computed(() => {
+  return Array.isArray(aiResult.value?.experiences) ? aiResult.value.experiences : []
+})
+
 onMounted(() => {
   const route = useRoute()
   if (route.query.jd) {
@@ -103,7 +127,7 @@ const generateAI = async () => {
     toast.error('Completa tu Perfil Maestro antes de generar el CV.')
     return
   }
-  
+
   loading.value = true
   try {
     const data = await $fetch('/api/generate-cv', {
@@ -128,13 +152,13 @@ const exportToPDF = async () => {
 
   const element = document.getElementById('pdf-area')
   if (!element) {
-    toast.error('No se pudo preparar el CV para impresión.')
+    toast.error('No se pudo preparar el CV para impresion.')
     return
   }
 
   const printWindow = window.open('', '_blank', 'width=900,height=1200')
   if (!printWindow) {
-    toast.error('El navegador bloqueó la ventana de impresión.')
+    toast.error('El navegador bloqueo la ventana de impresion.')
     return
   }
 
@@ -158,6 +182,7 @@ const exportToPDF = async () => {
             margin: 0;
             padding: 0;
             background: #ffffff;
+            width: 210mm;
           }
 
           body {
@@ -165,10 +190,47 @@ const exportToPDF = async () => {
             print-color-adjust: exact;
           }
 
+          * {
+            box-sizing: border-box;
+          }
+
           #print-root {
             width: 210mm;
-            min-height: 297mm;
             margin: 0 auto;
+            overflow: visible;
+          }
+
+          #print-root .pdf-container {
+            width: 100% !important;
+            max-width: 210mm !important;
+            min-height: auto !important;
+            padding: 12mm 10mm !important;
+            margin: 0 auto !important;
+          }
+
+          #print-root .pdf-section,
+          #print-root .pdf-entry {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+
+          #print-root ul,
+          #print-root li,
+          #print-root p,
+          #print-root div,
+          #print-root section {
+            overflow: visible !important;
+          }
+
+          @media print {
+            html, body {
+              width: auto;
+              height: auto;
+            }
+
+            #print-root {
+              width: auto;
+            }
           }
         </style>
       </head>

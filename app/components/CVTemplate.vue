@@ -1,58 +1,91 @@
 <template>
-  <!-- Este componente se renderiza oculto solo para generar el PDF -->
-  <div id="cv-template" class="pdf-container bg-white font-serif leading-relaxed" style="width: 210mm; min-height: 297mm; margin: 0 auto; color: #1e293b; padding: 40px; background-color: #ffffff;">
+  <div id="cv-template" class="pdf-container" style="width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; color: #000; padding: 8mm 10mm; background-color: #fff; font-family: 'Helvetica', 'Arial', sans-serif; line-height: 1.3;">
     
-    <!-- HEADER -->
-    <header style="border-bottom: 2px solid #cbd5e1; padding-bottom: 16px; margin-bottom: 24px; text-align: center;">
-      <h1 style="font-size: 30px; font-weight: bold; text-transform: uppercase; letter-spacing: -0.025em; color: #0f172a; margin: 0;">{{ profile.nombre }}</h1>
-      <p style="font-size: 18px; color: #475569; font-weight: 500; margin-top: 4px;">{{ aiData.optimized_title || profile.titulo }}</p>
-      <div style="display: flex; justify-content: center; gap: 16px; font-size: 14px; color: #64748b; margin-top: 12px; font-family: sans-serif;">
-        <span v-if="profile.email_profile">✉ {{ profile.email_profile }}</span>
-        <span v-if="profile.telefono">📞 {{ profile.telefono }}</span>
-        <span v-if="profile.web">🌐 {{ profile.web }}</span>
-        <span v-if="profile.linkedin">in/{{ profile.linkedin.split('/').pop() }}</span>
-      </div>
+    <header style="text-align: right; margin-bottom: 20px;">
+      <h1 style="font-size: 20px; font-weight: 800; margin: 0; color: #000000; letter-spacing: -0.025em;">{{ profile.nombre }}</h1>
+      <p style="font-size: 15px; margin: 3px 0; color: #334155;"><span style="font-weight: bold; color: #000;">Ubicado:</span> {{ profile.ubicacion }}</p>
+      <p style="font-size: 14px; margin: 2px 0;">
+        <span style="font-weight: bold;">Correo:</span>
+        <a v-if="profile.email_profile" :href="emailHref" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">{{ profile.email_profile }}</a>
+      </p>
+      <p style="font-size: 14px; margin: 2px 0;"><span style="font-weight: bold;">Telefono:</span> {{ profile.telefono }}</p>
+      <p v-if="socialLinks.length" style="font-size: 14px; margin: 2px 0;">
+        <span style="font-weight: bold;">Redes:</span>
+        <template v-for="(link, index) in socialLinks" :key="link.label">
+          <span v-if="index > 0"> - </span>
+          <a :href="link.href" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
+            {{ link.label }}
+          </a>
+        </template>
+      </p>
+      <p style="font-size: 16px; margin: 4px 0; color: #0f172a;"><span style="font-weight: 800;">Rol:</span> {{ aiData.optimized_title || profile.titulo }}</p>
+      <p v-if="profile.web" style="font-size: 14px; margin: 2px 0;">
+        <span style="font-weight: bold;">Portafolio web:</span>
+        <a :href="webHref" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
+          {{ profile.web }}
+        </a>
+      </p>
     </header>
 
-    <!-- SUMMARY -->
-    <section style="margin-bottom: 32px;">
-      <h2 style="font-size: 13px; font-weight: bold; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; padding-bottom: 4px; font-family: sans-serif;">Perfil Profesional</h2>
-      <p style="font-size: 14px; color: #334155; text-align: justify; margin: 0;">
+    <hr style="border: 0; border-top: 2px solid #0f172a; margin-bottom: 10px;">
+
+    <section style="margin-bottom: 14px;">
+      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; margin-bottom: 5px;">Resumen Profesional</h2>
+      <p style="font-size: 13px; color: #0f172a; text-align: justify; margin: 0; line-height: 1.4;">
         {{ aiData.summary || profile.resumen }}
       </p>
-    </section>
-
-    <!-- EXPERIENCE -->
-    <section style="margin-bottom: 32px;">
-      <h2 style="font-size: 13px; font-weight: bold; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; padding-bottom: 4px; font-family: sans-serif;">Experiencia Laboral</h2>
-      
-      <div v-for="exp in optimizedExperiences" :key="exp.id" style="margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
-          <h3 style="font-weight: bold; color: #0f172a; margin: 0; font-size: 14px;">{{ exp.cargo }}</h3>
-          <span style="font-size: 12px; color: #64748b; font-family: sans-serif; font-style: italic;">{{ exp.inicio }} — {{ exp.fin || 'Presente' }}</span>
-        </div>
-        <div style="font-size: 14px; font-weight: 600; color: #334155; font-style: italic; margin-bottom: 8px;">{{ exp.empresa }}</div>
-        <ul style="list-style-type: disc; margin-left: 20px; font-size: 14px; color: #334155; margin-top: 0; padding-left: 0;">
-          <li v-for="(logro, i) in exp.logros_optimizados" :key="i" style="margin-bottom: 4px;">
-            {{ logro }}
-          </li>
-        </ul>
+      <div style="font-size: 12.5px; margin-top: 8px; color: #0f172a; background-color: #f8fafc; padding: 6px; border-radius: 4px;">
+        <span style="font-weight: bold; color: #0f172a;">Habilidades:</span> {{ (aiData.top_skills || []).join(', ') }}
       </div>
     </section>
 
-    <!-- EDUCATION -->
-    <section style="margin-bottom: 32px;" v-if="profile.educacion">
-      <h2 style="font-size: 13px; font-weight: bold; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; padding-bottom: 4px; font-family: sans-serif;">Educación</h2>
-      <p style="font-size: 14px; color: #334155; margin: 0;">{{ profile.educacion }}</p>
+    <section v-if="workExperiences.length" style="margin-bottom: 18px;">
+      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 10px; padding-bottom: 2px;">Experiencia profesional</h2>
+
+      <div v-for="exp in workExperiences" :key="exp.id" style="margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="font-size: 14px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
+          <span style="font-size: 12px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
+        </div>
+
+        <ul style="margin: 4px 0 4px 18px; padding: 0; color: #334155; font-size: 12.5px; line-height: 1.4;">
+          <li v-for="(achievement, index) in exp.logros_optimizados" :key="index" style="margin-bottom: 2px;">
+            {{ achievement }}
+          </li>
+        </ul>
+
+        <div style="font-size: 12px; color: #475569; font-style: italic;">
+          <span style="font-weight: bold; color: #334155;">Tecnologías:</span> {{ exp.skills_sugeridas?.join(', ') }}
+        </div>
+      </div>
     </section>
 
-    <!-- SKILLS -->
-    <section>
-      <h2 style="font-size: 13px; font-weight: bold; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; padding-bottom: 4px; font-family: sans-serif;">Skills & Tecnologías</h2>
-      <div style="display: flex; flex-wrap: wrap; column-gap: 24px; row-gap: 4px; margin-top: 8px;">
-        <div v-for="skill in aiData.top_skills || profile.skills" :key="skill" style="font-size: 12px; color: #334155; font-family: sans-serif;">
-          • {{ skill }}
+      <section v-if="projectExperiences.length" style="margin-bottom: 18px;">
+      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 10px; padding-bottom: 2px;">Proyectos</h2>
+
+      <div v-for="exp in projectExperiences" :key="exp.id" style="margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="font-size: 14px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
+          <span style="font-size: 12px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
         </div>
+
+        <ul style="margin: 4px 0 4px 18px; padding: 0; color: #334155; font-size: 12.5px; line-height: 1.4;">
+          <li v-for="(achievement, index) in exp.logros_optimizados" :key="index" style="margin-bottom: 2px;">
+            {{ achievement }}
+          </li>
+        </ul>
+
+        <div style="font-size: 12px; color: #475569; font-style: italic;">
+          <span style="font-weight: bold; color: #334155;">Tecnologías:</span> {{ exp.skills_sugeridas?.join(', ') }}
+        </div>
+      </div>
+    </section>
+
+    <section v-if="normalizedEducations.length">
+      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 2px;">Estudios</h2>
+      <div v-for="edu in normalizedEducations" :key="edu.id" style="margin-bottom: 6px;">
+        <p style="margin: 0; font-size: 13.5px; font-weight: bold; color: #0f172a;">{{ edu.titulo }} - {{ edu.institucion }}</p>
+        <p style="margin: 0; font-size: 12px; color: #64748b;">{{ edu.inicio }} - {{ edu.fin || 'Actual' }}</p>
       </div>
     </section>
 
@@ -62,31 +95,129 @@
 <script setup>
 const props = defineProps({
   profile: Object,
-  experiences: Array,
-  aiData: Object
+  educations: {
+    type: Array,
+    default: () => []
+  },
+  experiences: {
+    type: Array,
+    default: () => []
+  },
+  aiData: {
+    type: Object,
+    default: () => ({})
+  }
 })
 
+const normalizeHref = (value) => {
+  if (!value || typeof value !== 'string') return ''
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+  if (/^(mailto:|https?:\/\/|tel:)/i.test(trimmed)) return trimmed
+  return `https://${trimmed}`
+}
+
+const emailHref = computed(() => {
+  const email = String(props.profile?.email_profile || '').trim()
+  return email ? `mailto:${email}` : ''
+})
+
+const webHref = computed(() => normalizeHref(props.profile?.web))
+
+const socialLinks = computed(() => {
+  const links = []
+
+  if (props.profile?.linkedin) {
+    links.push({ label: 'LinkedIn', href: normalizeHref(props.profile.linkedin) })
+  }
+
+  if (props.profile?.github) {
+    links.push({ label: 'Github', href: normalizeHref(props.profile.github) })
+  }
+
+  return links
+})
+
+const normalizeExperienceType = (value) => {
+  return value === 'project' ? 'project' : 'work'
+}
+
 const optimizedExperiences = computed(() => {
-  return props.experiences.map(exp => {
-    const aiExp = props.aiData.experiences?.find(ae => ae.id === exp.id)
-    return {
+  const sourceExperiences = Array.isArray(props.experiences) ? props.experiences : []
+  const aiExperiences = Array.isArray(props.aiData?.experiences) ? props.aiData.experiences : []
+
+  if (!aiExperiences.length) {
+    return sourceExperiences.map(exp => ({
       ...exp,
-      cargo: aiExp?.cargo || exp.cargo,
-      logros_optimizados: aiExp?.logros_optimizados || [exp.logros]
+      type: normalizeExperienceType(exp.type),
+      logros_optimizados: exp.logros ? [exp.logros] : []
+    }))
+  }
+
+  return aiExperiences.map((aiExp) => {
+    const sourceExp = sourceExperiences.find(exp => exp.id === aiExp.id) || {}
+    return {
+      ...sourceExp,
+      ...aiExp,
+      type: normalizeExperienceType(aiExp.type || sourceExp.type),
+      inicio: aiExp.inicio || sourceExp.inicio || '',
+      fin: aiExp.fin || sourceExp.fin || '',
+      logros_optimizados: Array.isArray(aiExp.logros_optimizados)
+        ? aiExp.logros_optimizados
+        : (sourceExp.logros ? [sourceExp.logros] : []),
+      skills_sugeridas: Array.isArray(aiExp.skills_sugeridas) ? aiExp.skills_sugeridas : []
     }
   })
+})
+
+const workExperiences = computed(() => {
+  return optimizedExperiences.value.filter(exp => normalizeExperienceType(exp.type) !== 'project')
+})
+
+const projectExperiences = computed(() => {
+  return optimizedExperiences.value.filter(exp => normalizeExperienceType(exp.type) === 'project')
+})
+
+const normalizedEducations = computed(() => {
+  if (Array.isArray(props.educations) && props.educations.length) {
+    return props.educations
+  }
+
+  if (typeof props.profile?.educacion === 'string' && props.profile.educacion.trim()) {
+    return props.profile.educacion
+      .split('\n')
+      .map((line, index) => ({
+        id: `legacy-${index}`,
+        titulo: line,
+        institucion: '',
+        inicio: '',
+        fin: '',
+        descripcion: ''
+      }))
+      .filter(item => item.titulo.trim())
+  }
+
+  return []
 })
 </script>
 
 <style scoped>
-/* Estilos específicos para asegurar la calidad del PDF */
 .pdf-container {
   box-sizing: border-box;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.pdf-section,
+.pdf-entry {
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 @media print {
   .pdf-container {
-    padding: 0;
+    max-width: none;
+    padding: 12mm 10mm;
     margin: 0;
   }
 }

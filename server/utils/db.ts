@@ -34,6 +34,7 @@ export const initDb = async () => {
   const columns = [
     { name: 'email_profile', type: 'TEXT' },
     { name: 'titulo', type: 'TEXT' },
+    { name: 'ubicacion', type: 'TEXT' },
     { name: 'resumen', type: 'TEXT' },
     { name: 'telefono', type: 'TEXT' },
     { name: 'linkedin', type: 'TEXT' },
@@ -64,6 +65,25 @@ export const initDb = async () => {
       fin TEXT,
       logros TEXT,
       skills TEXT,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `)
+
+  try {
+    await db.execute('ALTER TABLE experiences ADD COLUMN type TEXT DEFAULT \'work\'')
+  } catch (e: any) {
+    // Column might already exist, ignore error
+  }
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS educations (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      titulo TEXT NOT NULL,
+      institucion TEXT NOT NULL,
+      inicio TEXT,
+      fin TEXT,
+      descripcion TEXT,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `)

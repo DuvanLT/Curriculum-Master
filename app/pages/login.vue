@@ -5,8 +5,8 @@
       <div class="absolute top-0 left-0 w-32 h-32 bg-amber opacity-5 blur-[80px] -ml-16 -mt-16"></div>
       
       <div class="text-center mb-8 relative z-10">
-        <h1 class="font-head text-[28px] font-bold text-amber tracking-tighter mb-1">Bring Jobs</h1>
-        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">// Bienvenido de nuevo</p>
+        <h1 class="font-head text-[28px] font-bold text-white tracking-tighter mb-1">Bring<span class="text-amber">Jobs</span></h1>
+        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">Bienvenido de nuevo</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-4 relative z-10">

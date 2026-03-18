@@ -1,6 +1,7 @@
 export interface Profile {
   nombre: string;
   titulo: string;
+  ubicacion: string;
   email_profile: string;
   telefono: string;
   linkedin: string;
@@ -11,8 +12,18 @@ export interface Profile {
   years: string;
 }
 
+export interface Education {
+  id?: string | number;
+  titulo: string;
+  institucion: string;
+  inicio: string;
+  fin: string;
+  descripcion: string;
+}
+
 export interface Experience {
   id?: string | number;
+  type: 'work' | 'project';
   cargo: string;
   empresa: string;
   inicio: string;
@@ -21,10 +32,18 @@ export interface Experience {
   skills: string[];
 }
 
+function normalizeEducationSummary(educations: Education[]) {
+  return educations
+    .map(edu => [edu.titulo, edu.institucion, edu.fin || edu.inicio].filter(Boolean).join(' | '))
+    .filter(Boolean)
+    .join('\n')
+}
+
 export const useAppState = () => {
   const profile = useState<Profile>('profile', () => ({
     nombre: '',
     titulo: '',
+    ubicacion: '',
     email_profile: '',
     telefono: '',
     linkedin: '',
@@ -35,15 +54,22 @@ export const useAppState = () => {
     years: ''
   }));
 
+  const educations = useState<Education[]>('educations', () => []);
   const experiences = useState<Experience[]>('experiences', () => []);
   const loading = useState('app-loading', () => false);
+
+  const syncEducationSummary = () => {
+    profile.value.educacion = normalizeEducationSummary(educations.value)
+  }
 
   const fetchProfile = async () => {
     loading.value = true;
     try {
-      const data = await $fetch<{ profile: Profile, experiences: Experience[] }>('/api/profile');
+      const data = await $fetch<{ profile: Profile, educations: Education[], experiences: Experience[] }>('/api/profile');
       profile.value = data.profile;
+      educations.value = Array.isArray(data.educations) ? data.educations : [];
       experiences.value = data.experiences;
+      syncEducationSummary()
     } catch (e) {
       console.error('Error fetching profile:', e);
     } finally {
@@ -53,6 +79,7 @@ export const useAppState = () => {
 
   const saveProfile = async () => {
     try {
+      syncEducationSummary()
       await $fetch<any>('/api/profile', {
         method: 'POST',
         body: {
@@ -60,6 +87,7 @@ export const useAppState = () => {
             ...profile.value,
             years: profile.value.years?.toString() || '0'
           },
+          educations: educations.value,
           experiences: experiences.value
         }
       });
@@ -73,6 +101,7 @@ export const useAppState = () => {
       ...profile.value,
       nombre: data.nombre || profile.value.nombre,
       titulo: data.titulo || profile.value.titulo,
+      ubicacion: data.ubicacion || profile.value.ubicacion,
       email_profile: data.email_profile || profile.value.email_profile,
       telefono: data.telefono || profile.value.telefono,
       linkedin: data.linkedin || profile.value.linkedin,
@@ -84,9 +113,59 @@ export const useAppState = () => {
     };
   };
 
+  const addEducation = (newEdu: any) => {
+    const education: Education = {
+      id: Date.now().toString(),
+      titulo: newEdu.titulo || '',
+      institucion: newEdu.institucion || '',
+      inicio: newEdu.inicio || '',
+      fin: newEdu.fin || '',
+      descripcion: newEdu.descripcion || ''
+    };
+    educations.value.unshift(education);
+    syncEducationSummary()
+    saveProfile();
+  };
+
+  const updateEducation = async (id: string | number, updatedData: any) => {
+    const index = educations.value.findIndex(e => e.id === id);
+    if (index !== -1) {
+      educations.value[index] = {
+        ...educations.value[index],
+        ...updatedData
+      };
+      syncEducationSummary()
+      await saveProfile();
+    }
+  };
+
+  const removeEducation = (id: string | number) => {
+    educations.value = educations.value.filter(e => e.id !== id);
+    syncEducationSummary()
+    saveProfile();
+  };
+
+  const bulkEducation = async (items: any[]) => {
+    if (!Array.isArray(items)) return;
+    for (const eduData of items) {
+      const education: Education = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+        titulo: eduData.titulo || '',
+        institucion: eduData.institucion || '',
+        inicio: eduData.inicio || '',
+        fin: eduData.fin || '',
+        descripcion: eduData.descripcion || ''
+      };
+      educations.value.unshift(education);
+    }
+    syncEducationSummary()
+    await saveProfile();
+  };
+
   const addExperience = (newExp: any) => {
     const exp: Experience = {
       id: Date.now().toString(),
+      type: newExp.type === 'project' ? 'project' : 'work',
       cargo: newExp.cargo || '',
       empresa: newExp.empresa || '',
       inicio: newExp.inicio || '',
@@ -113,6 +192,7 @@ export const useAppState = () => {
       experiences.value[index] = {
         ...experiences.value[index],
         ...updatedData,
+        type: updatedData.type === 'project' ? 'project' : (experiences.value[index].type || 'work'),
         skills: Array.isArray(updatedData.skills)
           ? updatedData.skills
           : (typeof updatedData.skills === 'string'
@@ -128,6 +208,7 @@ export const useAppState = () => {
     for (const expData of exps) {
       const exp: Experience = {
         id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+        type: expData.type === 'project' ? 'project' : 'work',
         cargo: expData.cargo || '',
         empresa: expData.empresa || '',
         inicio: expData.inicio || '',
@@ -146,11 +227,16 @@ export const useAppState = () => {
 
   return {
     profile,
+    educations,
     experiences,
     loading,
     fetchProfile,
     saveProfile,
     mergeImportedProfile,
+    addEducation,
+    updateEducation,
+    removeEducation,
+    bulkEducation,
     addExperience,
     removeExperience,
     updateExperience,
