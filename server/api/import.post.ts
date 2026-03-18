@@ -3,24 +3,24 @@ import { extractText, resolvePDFJSImport } from 'unpdf'
 
 // Polyfill DOMMatrix for Node.js / Vercel Serverless environment
 if (typeof globalThis.DOMMatrix === 'undefined') {
-  globalThis.DOMMatrix = class {} as any
+  globalThis.DOMMatrix = class { } as any
 }
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   await requireUserSession(event)
-  
+
   // Ensure PDF.js is resolved in serverless environments
   await resolvePDFJSImport()
-  
+
   let text = ''
-  
+
   // Check if it's a multipart request (file upload)
   const contentType = getHeader(event, 'content-type')
   if (contentType?.includes('multipart/form-data')) {
     const formData = await readMultipartFormData(event)
     const file = formData?.find(f => f.name === 'file')
-    
+
     if (file && (file.type === 'application/pdf' || file.name?.endsWith('.pdf'))) {
       try {
         const uint8ArrayData = new Uint8Array(file.data)
@@ -65,7 +65,9 @@ export default defineEventHandler(async (event) => {
     - Extrae la mayor cantidad de detalles posible.
     - Si el texto está en inglés, traduce los campos descriptivos al español.
     - El campo 'years' debe ser un número entero (años de experiencia total aproximada).
-
+    - Si el apartado no especifica que es experiencia laboral, no lo incluyas su tiempo en el campo years.
+    - Si los apartados de enlace (linekdin,github,web) no inician por https no los incluyas
+    - Si no encuentras un apartado, déjalo como string vacío ""
     DEVUELVE ÚNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA EXACTA:
     {
       "nombre": "Nombre completo",
@@ -73,9 +75,9 @@ export default defineEventHandler(async (event) => {
       "email_profile": "email",
       "telefono": "teléfono",
       "years": 5,
-      "linkedin": "url de linkedin",
-      "github": "url de github",
-      "web": "web personal",
+      "linkedin": "https://www.linkedin.com/in/nombre-usuario/",
+      "github": "https://github.com/nombre-usuario",
+      "web": "https://www.nombre-usuario.com",
       "educacion": "Título | Institución | Año",
       "resumen": "Resumen profesional de 2-3 líneas",
       "experiences": [
