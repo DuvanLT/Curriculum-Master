@@ -98,7 +98,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { profile, bulkExperience } = useAppState()
+const { mergeImportedProfile, bulkExperience, saveProfile } = useAppState()
 const toast = useToast()
 
 const importing = ref(false)
@@ -126,23 +126,13 @@ const runMagicImport = async () => {
       body: formData
     })
     
-    // Fill profile state
-    profile.value = {
-      ...profile.value,
-      nombre: data.nombre || profile.value.nombre,
-      titulo: data.titulo || profile.value.titulo,
-      telefono: data.telefono || profile.value.telefono,
-      years: data.years?.toString() || profile.value.years,
-      linkedin: data.linkedin || profile.value.linkedin,
-      github: data.github || profile.value.github,
-      web: data.web || profile.value.web,
-      educacion: data.educacion || profile.value.educacion,
-      resumen: data.resumen || profile.value.resumen
-    }
+    mergeImportedProfile(data)
     
     // Add experiences
     if (data.experiences?.length > 0) {
       await bulkExperience(data.experiences)
+    } else {
+      await saveProfile()
     }
     
     toast.success('¡Increíble! Hemos procesado tu CV con éxito.')

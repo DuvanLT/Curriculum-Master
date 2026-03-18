@@ -7,35 +7,21 @@ export default defineEventHandler(async (event) => {
   const { profile, experiences } = body
   const db = useDb()
 
-  // Check if new email is already taken by another user
-  const existingUser = await db.execute({
-    sql: 'SELECT id FROM users WHERE email = ? AND id != ?',
-    args: [profile.email, userId]
-  })
-
-  if (existingUser.rows.length > 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'El correo electrónico ya está en uso por otra cuenta.'
-    })
-  }
-
-  // Update profile
   await db.execute({
-    sql: `UPDATE users SET 
-      email = ?,
-      name = ?, 
-      titulo = ?, 
-      resumen = ?, 
-      telefono = ?, 
-      linkedin = ?, 
-      github = ?, 
-      web = ?, 
+    sql: `UPDATE users SET
+      email_profile = ?,
+      name = ?,
+      titulo = ?,
+      resumen = ?,
+      telefono = ?,
+      linkedin = ?,
+      github = ?,
+      web = ?,
       educacion = ?,
       years = ?
       WHERE id = ?`,
     args: [
-      profile.email,
+      profile.email_profile,
       profile.nombre,
       profile.titulo,
       profile.resumen,
@@ -49,11 +35,10 @@ export default defineEventHandler(async (event) => {
     ]
   })
 
-  // Update session to keep it in sync with the new email/name
+  // Keep the session display name aligned with the master profile.
   await setUserSession(event, {
     user: {
       ...session.user,
-      email: profile.email,
       name: profile.nombre
     }
   })
@@ -67,7 +52,7 @@ export default defineEventHandler(async (event) => {
   if (experiences && experiences.length > 0) {
     for (const exp of experiences) {
       await db.execute({
-        sql: `INSERT INTO experiences (id, user_id, empresa, cargo, inicio, fin, logros, skills) 
+        sql: `INSERT INTO experiences (id, user_id, empresa, cargo, inicio, fin, logros, skills)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           exp.id || uuidv4(),

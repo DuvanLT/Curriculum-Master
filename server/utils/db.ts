@@ -32,6 +32,7 @@ export const initDb = async () => {
 
   // Add missing columns if they don't exist (Simple migration)
   const columns = [
+    { name: 'email_profile', type: 'TEXT' },
     { name: 'titulo', type: 'TEXT' },
     { name: 'resumen', type: 'TEXT' },
     { name: 'telefono', type: 'TEXT' },
@@ -50,6 +51,8 @@ export const initDb = async () => {
       // Column might already exist, ignore error
     }
   }
+
+
 
   await db.execute(`
     CREATE TABLE IF NOT EXISTS experiences (

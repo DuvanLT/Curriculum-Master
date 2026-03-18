@@ -29,7 +29,7 @@
           <AppInput label="Título / Cargo actual" v-model="profile.titulo" placeholder="Senior Backend Developer" />
         </div>
         <div class="grid grid-cols-3 gap-3 mb-3">
-          <AppInput label="Email" type="email" v-model="profile.email" placeholder="juan@email.com" />
+          <AppInput label="Email del perfil" type="email" v-model="profile.email_profile" placeholder="juan@email.com" />
           <AppInput label="Teléfono" v-model="profile.telefono" placeholder="+57 321..." />
           <AppInput label="Años de experiencia total" type="number" v-model="profile.years" placeholder="7" />
         </div>
@@ -140,7 +140,7 @@
 definePageMeta({
   middleware: 'auth'
 })
-const { profile, experiences, loading, fetchProfile, saveProfile, addExperience, removeExperience, updateExperience, bulkExperience } = useAppState()
+const { profile, experiences, loading, fetchProfile, saveProfile, mergeImportedProfile, addExperience, removeExperience, updateExperience, bulkExperience } = useAppState()
 const toast = useToast()
 
 const adding = ref(false)
@@ -247,22 +247,13 @@ const runMagicImport = async () => {
       body: formData
     })
     
-    // Fill main profile
-    Object.assign(profile.value, {
-      nombre: data.nombre || profile.value.nombre,
-      titulo: data.titulo || profile.value.titulo,
-      telefono: data.telefono || profile.value.telefono,
-      years: data.years?.toString() || profile.value.years,
-      linkedin: data.linkedin || profile.value.linkedin,
-      github: data.github || profile.value.github,
-      web: data.web || profile.value.web,
-      educacion: data.educacion || profile.value.educacion,
-      resumen: data.resumen || profile.value.resumen
-    })
+    mergeImportedProfile(data)
     
     // Add experiences
     if (data.experiences?.length > 0) {
       await bulkExperience(data.experiences)
+    } else {
+      await saveProfile()
     }
     
     selectedFile.value = null

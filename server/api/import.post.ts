@@ -8,7 +8,7 @@ if (typeof globalThis.DOMMatrix === 'undefined') {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const session = await requireUserSession(event)
+  await requireUserSession(event)
   
   // Ensure PDF.js is resolved in serverless environments
   await resolvePDFJSImport()
@@ -27,13 +27,13 @@ export default defineEventHandler(async (event) => {
         const result = await extractText(uint8ArrayData, { mergePages: true })
         console.log('--- UNPDF RESULT ---')
         console.log(result)
-        text = String(result.text)
+        text = String(result.text || '')
         console.log('--- TEXT OBTAINED ---', text.length, 'chars')
       } catch (pdfError: any) {
         console.error('PDF Parsing Error:', pdfError)
         throw createError({
           statusCode: 422,
-          message: `No se pudo leer el archivo PDF: ${pdfError.message || 'Error desconocido'}`
+          message: `No se pudo leer el archivo PDF: ${pdfError.message || 'Error desconocido'}. Solo se admiten PDFs con texto seleccionable.`
         })
       }
     } else if (file) {
@@ -48,8 +48,8 @@ export default defineEventHandler(async (event) => {
 
   if (!text || text.trim().length < 10) {
     throw createError({
-      statusCode: 400,
-      message: 'No se pudo extraer texto suficiente del archivo o entrada.'
+      statusCode: 422,
+      message: 'No se pudo extraer texto suficiente del archivo. Este importador solo admite PDFs con texto seleccionable y no procesa PDFs escaneados o basados en imagen.'
     })
   }
 
@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
     {
       "nombre": "Nombre completo",
       "titulo": "Cargo actual / Título profesional",
-      "email": "email",
+      "email_profile": "email",
       "telefono": "teléfono",
       "years": 5,
       "linkedin": "url de linkedin",
@@ -104,7 +104,13 @@ export default defineEventHandler(async (event) => {
     const content = response.choices[0]?.message?.content
     if (!content) throw new Error('No se recibió respuesta de la IA')
 
-    return JSON.parse(content)
+    const parsed = JSON.parse(content)
+
+    if (parsed?.email && !parsed?.email_profile) {
+      parsed.email_profile = parsed.email
+    }
+
+    return parsed
   } catch (e: any) {
     console.error('Import Error:', e)
     throw createError({

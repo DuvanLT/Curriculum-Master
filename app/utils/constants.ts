@@ -2,7 +2,8 @@ export const DB_SCHEMA = {
   usuarios: [
     { col: 'id', type: 'INTEGER', notes: 'PK AUTOINCREMENT' },
     { col: 'nombre', type: 'TEXT', notes: 'NOT NULL' },
-    { col: 'email', type: 'TEXT', notes: 'UNIQUE NOT NULL' },
+    { col: 'email', type: 'TEXT', notes: 'UNIQUE NOT NULL | correo de registro/login' },
+    { col: 'email_profile', type: 'TEXT', notes: 'correo del perfil maestro / importado desde CV' },
     { col: 'titulo_actual', type: 'TEXT', notes: '' },
     { col: 'years_experiencia', type: 'INTEGER', notes: 'DEFAULT 0' },
     { col: 'resumen_bio', type: 'TEXT', notes: '' },

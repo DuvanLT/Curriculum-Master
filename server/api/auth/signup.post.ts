@@ -2,11 +2,11 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 
 export default defineEventHandler(async (event) => {
-  /*throw createError({
+  throw createError({
     statusCode: 403,
     statusMessage: 'Registration is currently disabled for Closed Beta.'
   })
-  */
+
   const body = await readBody(event)
   const { email, password, name } = body
 
@@ -60,8 +60,8 @@ export default defineEventHandler(async (event) => {
   const verificationCode = Math.floor(100000 + Math.random() * 900000).toString()
 
   await db.execute({
-    sql: 'INSERT INTO users (id, email, password, name, is_verified, verification_code) VALUES (?, ?, ?, ?, 0, ?)',
-    args: [id, email, hashedPassword, name || null, verificationCode]
+    sql: 'INSERT INTO users (id, email, email_profile, password, name, is_verified, verification_code) VALUES (?, ?, ?, ?, ?, 0, ?)',
+    args: [id, email, null, hashedPassword, name || null, verificationCode]
   })
 
   // Send verification email

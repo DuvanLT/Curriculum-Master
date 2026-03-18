@@ -1,7 +1,7 @@
 export interface Profile {
   nombre: string;
   titulo: string;
-  email: string;
+  email_profile: string;
   telefono: string;
   linkedin: string;
   github: string;
@@ -25,7 +25,7 @@ export const useAppState = () => {
   const profile = useState<Profile>('profile', () => ({
     nombre: '',
     titulo: '',
-    email: '',
+    email_profile: '',
     telefono: '',
     linkedin: '',
     github: '',
@@ -68,6 +68,22 @@ export const useAppState = () => {
     }
   };
 
+  const mergeImportedProfile = (data: Partial<Profile>) => {
+    profile.value = {
+      ...profile.value,
+      nombre: data.nombre || profile.value.nombre,
+      titulo: data.titulo || profile.value.titulo,
+      email_profile: data.email_profile || profile.value.email_profile,
+      telefono: data.telefono || profile.value.telefono,
+      linkedin: data.linkedin || profile.value.linkedin,
+      github: data.github || profile.value.github,
+      web: data.web || profile.value.web,
+      educacion: data.educacion || profile.value.educacion,
+      resumen: data.resumen || profile.value.resumen,
+      years: data.years?.toString() || profile.value.years
+    };
+  };
+
   const addExperience = (newExp: any) => {
     const exp: Experience = {
       id: Date.now().toString(),
@@ -76,11 +92,11 @@ export const useAppState = () => {
       inicio: newExp.inicio || '',
       fin: newExp.fin || '',
       logros: newExp.logros || '',
-      skills: Array.isArray(newExp.skills) 
-        ? newExp.skills 
-        : (typeof newExp.skills === 'string' 
-            ? newExp.skills.split(',').map((s: string) => s.trim()).filter(Boolean) 
-            : [])
+      skills: Array.isArray(newExp.skills)
+        ? newExp.skills
+        : (typeof newExp.skills === 'string'
+          ? newExp.skills.split(',').map((s: string) => s.trim()).filter(Boolean)
+          : [])
     };
     experiences.value.unshift(exp);
     saveProfile();
@@ -97,11 +113,11 @@ export const useAppState = () => {
       experiences.value[index] = {
         ...experiences.value[index],
         ...updatedData,
-        skills: Array.isArray(updatedData.skills) 
-          ? updatedData.skills 
-          : (typeof updatedData.skills === 'string' 
-              ? updatedData.skills.split(',').map((s: string) => s.trim()).filter(Boolean) 
-              : [])
+        skills: Array.isArray(updatedData.skills)
+          ? updatedData.skills
+          : (typeof updatedData.skills === 'string'
+            ? updatedData.skills.split(',').map((s: string) => s.trim()).filter(Boolean)
+            : [])
       };
       await saveProfile();
     }
@@ -117,11 +133,11 @@ export const useAppState = () => {
         inicio: expData.inicio || '',
         fin: expData.fin || '',
         logros: expData.logros || '',
-        skills: Array.isArray(expData.skills) 
-          ? expData.skills 
-          : (typeof expData.skills === 'string' 
-              ? expData.skills.split(',').map((s: string) => s.trim()).filter(Boolean) 
-              : [])
+        skills: Array.isArray(expData.skills)
+          ? expData.skills
+          : (typeof expData.skills === 'string'
+            ? expData.skills.split(',').map((s: string) => s.trim()).filter(Boolean)
+            : [])
       };
       experiences.value.unshift(exp);
     }
@@ -134,6 +150,7 @@ export const useAppState = () => {
     loading,
     fetchProfile,
     saveProfile,
+    mergeImportedProfile,
     addExperience,
     removeExperience,
     updateExperience,

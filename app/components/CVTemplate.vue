@@ -7,7 +7,7 @@
       <h1 style="font-size: 30px; font-weight: bold; text-transform: uppercase; letter-spacing: -0.025em; color: #0f172a; margin: 0;">{{ profile.nombre }}</h1>
       <p style="font-size: 18px; color: #475569; font-weight: 500; margin-top: 4px;">{{ aiData.optimized_title || profile.titulo }}</p>
       <div style="display: flex; justify-content: center; gap: 16px; font-size: 14px; color: #64748b; margin-top: 12px; font-family: sans-serif;">
-        <span v-if="profile.email">✉ {{ profile.email }}</span>
+        <span v-if="profile.email_profile">✉ {{ profile.email_profile }}</span>
         <span v-if="profile.telefono">📞 {{ profile.telefono }}</span>
         <span v-if="profile.web">🌐 {{ profile.web }}</span>
         <span v-if="profile.linkedin">in/{{ profile.linkedin.split('/').pop() }}</span>

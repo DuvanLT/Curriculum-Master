@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   // Fetch user profile
   const userResult = await db.execute({
-    sql: 'SELECT email, name, titulo, resumen, telefono, linkedin, github, web, educacion, years FROM users WHERE id = ?',
+    sql: 'SELECT email_profile, name, titulo, resumen, telefono, linkedin, github, web, educacion, years FROM users WHERE id = ?',
     args: [userId]
   })
 
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     profile: {
-      email: user.email || '',
+      email_profile: user.email_profile || '',
       nombre: user.name || '',
       titulo: user.titulo || '',
       resumen: user.resumen || '',
