@@ -2,11 +2,11 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 
 export default defineEventHandler(async (event) => {
-  throw createError({
-    statusCode: 403,
-    statusMessage: 'Registration is currently disabled for Closed Beta.'
-  })
-
+  /* throw createError({
+     statusCode: 403,
+     statusMessage: 'Registration is currently disabled for Closed Beta.'
+   })
+  */
   const body = await readBody(event)
   const { email, password, name } = body
 
@@ -76,16 +76,16 @@ export default defineEventHandler(async (event) => {
         to: email,
         subject: 'Código de verificación - Bring Jobs',
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-            <h1 style="color: #f59e0b; text-align: center;">Bring Jobs</h1>
-            <p style="font-size: 16px; color: #333;">¡Hola ${name || 'usuario'}!</p>
-            <p style="font-size: 16px; color: #333;">Gracias por unirte a Bring Jobs. Para completar tu registro, utiliza el siguiente código de verificación:</p>
-            <div style="background-color: #f9f9f9; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
-              <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #f59e0b;">${verificationCode}</span>
-            </div>
-            <p style="font-size: 14px; color: #666; text-align: center;">Este código expirará pronto. Si no solicitaste este registro, puedes ignorar este correo.</p>
-          </div>
-        `
+         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+           <h1 style="color: #f59e0b; text-align: center;">Bring Jobs</h1>
+           <p style="font-size: 16px; color: #333;">¡Hola ${name || 'usuario'}!</p>
+           <p style="font-size: 16px; color: #333;">Gracias por unirte a Bring Jobs. Para completar tu registro, utiliza el siguiente código de verificación:</p>
+           <div style="background-color: #f9f9f9; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
+             <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #f59e0b;">${verificationCode}</span>
+           </div>
+           <p style="font-size: 14px; color: #666; text-align: center;">Este código expirará pronto. Si no solicitaste este registro, puedes ignorar este correo.</p>
+         </div>
+       `
       })
     } catch (error) {
       console.error('Error sending email with Resend:', error)
