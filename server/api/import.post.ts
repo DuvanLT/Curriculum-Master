@@ -66,7 +66,6 @@ export default defineEventHandler(async (event) => {
     - Si el texto está en inglés, traduce los campos descriptivos al español.
     - El campo 'years' debe ser un número entero (años de experiencia total aproximada).
     - Si el apartado no especifica que es experiencia laboral, no lo incluyas su tiempo en el campo years.
-    - Si los apartados de enlace (linekdin,github,web) no inician por https no los incluyas
     - Si no encuentras un apartado, déjalo como string vacío ""
     DEVUELVE ÚNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA EXACTA:
     {

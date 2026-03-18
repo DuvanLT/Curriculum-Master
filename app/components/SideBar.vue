@@ -25,6 +25,10 @@
       <NuxtLink to="/ofertas" class="nav-item" active-class="active">
         <span class="material-symbols-outlined nav-icon">work</span> Bolsa de Empleo
       </NuxtLink>
+            <div class="nav-label text-[10px] mt-6 text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Configuracion</div>
+            <NuxtLink to="/settings" class="nav-item" active-class="active">
+        <span class="material-symbols-outlined nav-icon">settings</span> Ajustes
+      </NuxtLink>
     </div>
 
     <!-- User Section & Logout -->

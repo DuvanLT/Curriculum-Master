@@ -7,25 +7,12 @@
       <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-dark-bg4 border border-border px-1.5 py-0.5 rounded">Beta Cerrada</span>
     </div>
    <div class="flex items-center">
-  <button 
-    @click="logout" 
-    class="group flex items-center gap-2 px-2 py-1 rounded-lg text-sm font-medium text-text-dim cursor-pointer transition-all duration-200 hover:bg-red-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-200"
-    aria-label="Cerrar sesión"
-  >
-    <span class="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">
-      logout
-    </span>
-    <span>Cerrar Sesión</span>
-  </button>
+    <a href="mailto:soporte@bringjobs.com">
+    <span class="text-[13px] text-text-dim font-mono hover:text-amber">soporte@bringjobs.com</span>
+    </a>
 </div>
   </header>
 </template>
-
-<script setup lang="ts">
-import { useAuth } from '~/composables/useAuth'
-
-const { logout } = useAuth()
-</script>
 
 <style scoped>
 .topbar {

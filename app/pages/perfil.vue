@@ -101,37 +101,6 @@
         <p>¿Estás seguro de que quieres eliminar esta experiencia? Esta acción no se puede deshacer.</p>
       </AppModal>
 
-      <!-- Danger Zone -->
-      <div class="mt-12 mb-8 border border-red-500/20 bg-red-500/5 rounded-xl p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="material-symbols-outlined text-red-500">warning</span>
-          <h3 class="text-red-500 font-head font-bold text-lg">Zona de Peligro</h3>
-        </div>
-        <p class="text-[13px] text-text-muted mb-6">
-          Al eliminar tu cuenta, todos tus registros (experiencias, aplicaciones, retos y análisis) serán borrados permanentemente. Esta acción no se puede deshacer.
-        </p>
-        <AppButton 
-          variant="secondary" 
-          class="!border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-white transition-all"
-          @click="showDeleteModal = true"
-        >
-          Borrar mi cuenta definitivamente
-        </AppButton>
-      </div>
-
-      <!-- Delete Confirmation Modal -->
-      <AppModal
-        :show="showDeleteModal"
-        :loading="deletingAccount"
-        title="Eliminar Cuenta"
-        confirm-text="Si, eliminar permanentemente"
-        cancel-text="Cancelar"
-        confirm-variant="primary"
-        @close="showDeleteModal = false"
-        @confirm="handleDeleteAccount"
-      >
-        <p>¿Estás absolutamente seguro? Todos tus datos serán eliminados de nuestros servidores para siempre.</p>
-      </AppModal>
     </div>
   </NuxtLayout>
 </template>
@@ -147,8 +116,6 @@ const adding = ref(false)
 const importing = ref(false)
 const initialized = ref(false)
 const selectedFile = ref(null)
-const showDeleteModal = ref(false)
-const deletingAccount = ref(false)
 
 // Experience Editing & Deletion
 const editingExpId = ref<string | number | null>(null)
@@ -173,7 +140,7 @@ onMounted(async () => {
 })
 
 // Debounced auto-save for profile fields
-let saveTimeout = null
+let saveTimeout: ReturnType<typeof setTimeout> | null = null
 watch(profile, () => {
   if (!initialized.value) return
   if (saveTimeout) clearTimeout(saveTimeout)
@@ -266,23 +233,4 @@ const runMagicImport = async () => {
   }
 }
 
-const handleDeleteAccount = async () => {
-  deletingAccount.value = true
-  try {
-    await $fetch<any>('/api/profile', {
-      method: 'DELETE'
-    })
-    
-    toast.success('Cuenta eliminada. Adiós.')
-    
-    // Redirect to login or home
-    await navigateTo('/login')
-  } catch (e: any) {
-    console.error(e)
-    toast.error('Error al intentar eliminar la cuenta: ' + (e.statusMessage || e.message))
-  } finally {
-    deletingAccount.value = false
-    showDeleteModal.value = false
-  }
-}
 </script>

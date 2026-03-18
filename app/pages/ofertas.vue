@@ -53,7 +53,11 @@
         <div class="text-[12px] text-text-dim font-mono mb-4">
           {{ totalCount }} ofertas encontradas
         </div>
-
+       
+            <div class="mt-3 flex mb-4 items-center gap-1.5 text-[10px] text-amber/60 font-mono italic">
+              <span class="material-symbols-outlined text-[12px]">info</span>
+              Recomendamos ir al enlace de la vacante para encontrar la información completa
+            </div>
         <div class="grid gap-3">
           <div 
             v-for="(job, i) in jobs" 
@@ -88,8 +92,10 @@
 
             <div 
               v-if="job.snippet" 
-              class="text-[12px] text-text-muted leading-relaxed line-clamp-3"
-            >{{ cleanHtml(job.snippet) }}</div>
+              class="text-[12px] text-text-muted leading-relaxed line-clamp-3 markdown-content"
+              v-html="renderMarkdown(job.snippet)"
+            ></div>
+
 
             <!-- Hover Actions -->
             <div class="job-actions absolute top-3 right-3 flex flex-row gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -98,7 +104,7 @@
                 class="action-btn cursor-pointer flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded-md bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-all whitespace-nowrap"
               >
                 <span class="material-symbols-outlined text-[10px]">search</span>
-                Analizar JD
+                Analizar vacante
               </button>
               <button 
                 @click="goToGenerador(job)" 
@@ -135,6 +141,8 @@
 definePageMeta({
   middleware: 'auth'
 })
+
+import { marked } from 'marked'
 
 const toast = useToast()
 
@@ -271,6 +279,11 @@ const cleanHtml = (html: string) => {
   return html.replace(/<[^>]+>/g, '') 
 }
 
+const renderMarkdown = (text: string) => {
+  if (!text) return ''
+  return marked.parse(text)
+}
+
 const buildJobJD = (job: JoobleJob) => {
   const parts = [`Título: ${job.title}`]
   if (job.company) parts.push(`Empresa: ${job.company}`)
@@ -309,5 +322,23 @@ const goToGenerador = (job: JoobleJob) => {
   line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+:deep(.markdown-content) p {
+  margin-bottom: 0.5rem;
+}
+:deep(.markdown-content) p:last-child {
+  margin-bottom: 0;
+}
+:deep(.markdown-content) ul, :deep(.markdown-content) ol {
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+}
+:deep(.markdown-content) li {
+  margin-bottom: 0.15rem;
+}
+:deep(.markdown-content) strong {
+  color: var(--amber);
+  font-weight: 600;
 }
 </style>

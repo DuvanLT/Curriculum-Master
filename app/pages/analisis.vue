@@ -4,7 +4,7 @@
       <!-- Main Column -->
       <div>
         <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Análisis de Vacante</div>
-        <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">// Job matching engine · Keyword gap analysis</div>
+        <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Pega la descripción completa de la vacante para analizar tu compatibilidad con el perfil.</div>
 
       <AppCard title="Descripción de la Oferta (JD)">
         <AppInput 
@@ -23,7 +23,7 @@
       </AppCard>
 
       <AppCard v-if="skills.length > 0" title="Hard Skills detectadas en la oferta">
-        <div class="font-mono text-[11px] text-text-dim mb-3">// extractHardSkills() · ordenadas por frecuencia</div>
+        <div class="font-mono text-[11px] text-text-dim mb-3">habilidades ordenadas por frecuencia</div>
         <div v-for="skill in skills.slice(0, 10)" :key="skill.skill" class="grid grid-cols-[120px_1fr_30px] items-center gap-2.5 mb-2">
           <div class="text-[12px] font-mono text-text-muted">{{ skill.skill }}</div>
           <div class="h-1.5 bg-dark-bg4 rounded-full overflow-hidden">
