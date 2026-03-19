@@ -24,10 +24,10 @@
         </div>
       </form>
 
-      <!--<div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
+      <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
         ¿No tienes cuenta? 
         <NuxtLink to="/signup" class="text-amber hover:underline font-medium ml-1">Regístrate gratis</NuxtLink>
-      </div>-->
+      </div>
     </div>
   </div>
 </template>
