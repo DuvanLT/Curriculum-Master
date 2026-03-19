@@ -8,7 +8,7 @@
         <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-dark-bg3 mb-2.5 flex flex-col gap-2.5 min-h-[300px]" ref="chatContainer">
           <div v-for="(msg, i) in msgs" :key="i" class="max-w-[85%] p-2.5 px-3.5 rounded-[5px] text-[13px] leading-relaxed"
             :class="msg.role === 'user' ? 'msg-user bg-amber-dim text-amber-light self-end rounded-br-none' : 'msg-ai bg-dark-bg4 text-text self-start rounded-bl-none border border-border'">
-            <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? 'Tú' : 'Coach AI' }}</div>
+            <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? 'Tú' : 'Ezra' }}</div>
             <div v-if="msg.role === 'user'">{{ msg.text }}</div>
             <div v-else class="markdown-content" v-html="renderMarkdown(msg.text)"></div>
           </div>
@@ -50,7 +50,6 @@
 definePageMeta({
   middleware: 'auth'
 })
-import { marked } from 'marked'
 
 const { profile, experiences, fetchProfile } = useAppState()
 
@@ -110,7 +109,7 @@ const send = async (text) => {
 }
 
 const renderMarkdown = (text) => {
-  return marked.parse(text)
+  return renderSafeMarkdown(text)
 }
 </script>
 

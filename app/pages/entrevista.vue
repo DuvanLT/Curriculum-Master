@@ -154,6 +154,7 @@ definePageMeta({
 
 const { profile, experiences, fetchProfile } = useAppState()
 const toast = useToast()
+const MAX_STEPS = 40
 const msgs = ref<{ role: string; text: string }[]>([])
 const loading = ref(false)
 const active = ref(false)
@@ -270,6 +271,12 @@ const toggleSelection = (step: string) => {
 const saveSelectedSteps = async () => {
   savingSteps.value = true
   try {
+    const existingSteps = await $fetch<{ id: string }[]>('/api/steps')
+    if (existingSteps.length + selectedSteps.value.length > MAX_STEPS) {
+      toast.warning('Coach: ya tienes el maximo de 40 tareas o no hay suficiente espacio. Resuelve y elimina algunas para continuar.')
+      return
+    }
+
     for (const stepText of selectedSteps.value) {
       await $fetch('/api/steps', {
         method: 'POST',
@@ -278,8 +285,13 @@ const saveSelectedSteps = async () => {
     }
     stepsAdded.value = true
     selectedSteps.value = []
-  } catch (e) {
+  } catch (e: any) {
     console.error('Error saving steps:', e)
+    const message = e?.data?.statusMessage || e?.statusMessage || e?.message || ''
+    if (message.includes('maximo de 40 tareas')) {
+      toast.warning('Coach: ya tienes el maximo de 40 tareas. Resuelve y elimina algunas para continuar.')
+      return
+    }
     toast.error('Hubo un error al guardar los pasos.')
   } finally {
     savingSteps.value = false

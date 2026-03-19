@@ -1,8 +1,9 @@
 import OpenAI from 'openai'
+import { requireVerifiedUserSession } from '../utils/verified-session'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const session = await requireUserSession(event)
+  await requireVerifiedUserSession(event)
   const body = await readBody(event)
   const { messages, profile, experiences, isFinal } = body
 
@@ -36,7 +37,6 @@ export default defineEventHandler(async (event) => {
           "next_steps": ["Sugerencia 1", "Sugerencia 2", "Sugerencia 3"]
         }
       `
-      console.log('Final Analysis Prompt:', finalPrompt)
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini', // Faster and more reliable for simple JSON extraction

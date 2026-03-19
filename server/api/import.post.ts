@@ -1,8 +1,9 @@
 import OpenAI from 'openai'
 import { extractText, resolvePDFJSImport } from 'unpdf'
+import { requireVerifiedUserSession } from '../utils/verified-session'
 
 if (typeof globalThis.DOMMatrix === 'undefined') {
-  globalThis.DOMMatrix = class {} as any
+  globalThis.DOMMatrix = class { } as any
 }
 
 function normalizeExperienceDescription(raw: unknown) {
@@ -65,7 +66,7 @@ function dedupeEntries(entries: any[]) {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  await requireUserSession(event)
+  await requireVerifiedUserSession(event)
 
   await resolvePDFJSImport()
 
@@ -80,10 +81,7 @@ export default defineEventHandler(async (event) => {
       try {
         const uint8ArrayData = new Uint8Array(file.data)
         const result = await extractText(uint8ArrayData, { mergePages: true })
-        console.log('--- UNPDF RESULT ---')
-        console.log(result)
         text = String(result.text || '')
-        console.log('--- TEXT OBTAINED ---', text.length, 'chars')
       } catch (pdfError: any) {
         console.error('PDF Parsing Error:', pdfError)
         throw createError({
@@ -137,7 +135,7 @@ DEVUELVE UNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA EXACTA:
   "telefono": "telefono",
   "years": 5,
   "linkedin": "https://www.linkedin.com/in/nombre-usuario/",
-  "github": "https://github.com/nombre-usuario",
+  "otros": "https://pagina_profesional/nombre-usuario o cualquier otro enlace profesional relevante",
   "web": "https://www.nombre-usuario.com",
   "educacion": "Resumen corto legacy de educacion",
   "educations": [
@@ -181,6 +179,10 @@ DEVUELVE UNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA EXACTA:
 
     if (parsed?.email && !parsed?.email_profile) {
       parsed.email_profile = parsed.email
+    }
+
+    if (parsed?.github && !parsed?.otros) {
+      parsed.otros = parsed.github
     }
 
     parsed.ubicacion = parsed?.ubicacion || ''

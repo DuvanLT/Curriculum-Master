@@ -83,7 +83,7 @@
             @click="skipImport"
             class="w-full h-14 border border-border rounded-xl text-text-dim hover:text-white hover:bg-white/5 transition-all text-[14px] font-medium flex items-center justify-center gap-2"
           >
-            Llenar manualmente (Omitir)
+            Importar despues
             <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
         </div>

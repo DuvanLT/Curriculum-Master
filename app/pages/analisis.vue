@@ -176,7 +176,7 @@ interface HistoryItem {
   created_at: string
 }
 
-const { profile, experiences } = useAppState()
+const { profile, experiences, ensureProfileLoaded, loading: profileLoading } = useAppState()
 const toast = useToast()
 
 const jd = ref('')
@@ -224,6 +224,13 @@ onMounted(() => {
 })
 
 const runAIMatch = async () => {
+  await ensureProfileLoaded()
+
+  if (profileLoading.value) {
+    toast.error('Estamos cargando tu Perfil Maestro. Intenta de nuevo en un momento.')
+    return
+  }
+
   if (!jd.value.trim() || !profile.value.nombre) {
     toast.error('Completa tu perfil y pega una descripción de vacante.')
     return

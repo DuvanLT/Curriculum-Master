@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
       resumen: user.resumen || '',
       telefono: user.telefono || '',
       linkedin: user.linkedin || '',
-      github: user.github || '',
+      otros: user.github || '',
       web: user.web || '',
       educacion: buildEducationSummary(educations) || user.educacion || '',
       years: user.years || ''

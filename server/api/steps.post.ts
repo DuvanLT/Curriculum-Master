@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
+const MAX_STEPS = 40
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const userId = session.user.id
@@ -8,6 +10,19 @@ export default defineEventHandler(async (event) => {
 
   if (!text) {
     throw createError({ statusCode: 400, statusMessage: 'Task text is required' })
+  }
+
+  const countResult = await db.execute({
+    sql: 'SELECT COUNT(*) as total FROM next_steps WHERE user_id = ?',
+    args: [userId]
+  })
+
+  const currentCount = Number(countResult.rows?.[0]?.total ?? 0)
+  if (currentCount >= MAX_STEPS) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: 'Has alcanzado el maximo de 40 tareas. Resuelve y elimina algunas para continuar.'
+    })
   }
 
   const id = uuidv4()

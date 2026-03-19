@@ -5,8 +5,8 @@
       <div class="absolute top-0 right-0 w-32 h-32 bg-amber opacity-5 blur-[80px] -mr-16 -mt-16"></div>
       
       <div class="text-center mb-8 relative z-10">
-        <h1 class="font-head text-[28px] font-bold text-amber tracking-tighter mb-1">Bring Jobs</h1>
-        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">// Crea tu cuenta maestra</p>
+        <h1 class="font-head text-[28px] font-bold text-white tracking-tighter mb-1">Bring<span class="text-amber">Jobs</span></h1>
+        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">Crea tu cuenta</p>
       </div>
 
       <form @submit.prevent="handleSignup" class="space-y-4 relative z-10">
@@ -14,7 +14,7 @@
           {{ error }}
         </div>
 
-      <!--
+
         <div class="space-y-6 relative z-10 text-center py-6">
         <div class="bg-amber/10 border border-amber/20 text-text p-6 rounded-[8px] font-sans">
           <span class="material-symbols-outlined text-[48px] text-amber mb-4">lock</span>
@@ -25,17 +25,18 @@
           </p>
         </div>
         </div>
-            -->
+                  <!--
         <AppInput label="Nombre completo" v-model="form.name" placeholder="John Doe" required />
         <AppInput label="Email" type="email" v-model="form.email" placeholder="john@example.com" required />
         <AppInput label="Contraseña" type="password" v-model="form.password" placeholder="••••••••" required />
- 
+        <AppInput label="Confirmar contraseña" type="password" v-model="form.confirmPassword" placeholder="••••••••" required />
+
         <div class="pt-2">
           <AppButton type="submit" :loading="loading" class="w-full h-[45px]">
             Registrarse
           </AppButton>
         </div>
-     
+      -->
       </form>
 
       <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
@@ -56,10 +57,16 @@ const error = ref('')
 const form = ref({
   name: '',
   email: '',
-  password: ''
+  password: '',
+  confirmPassword: ''
 })
 
 const handleSignup = async () => {
+  if (form.value.password !== form.value.confirmPassword) {
+    error.value = 'Las contraseñas no coinciden'
+    return
+  }
+
   loading.value = true
   error.value = ''
   

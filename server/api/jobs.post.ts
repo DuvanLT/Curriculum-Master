@@ -1,3 +1,5 @@
+import { requireVerifiedUserSession } from '../utils/verified-session'
+
 // In-memory cache: 30 min TTL
 const CACHE_TTL_MS = 30 * 60 * 1000
 const cache = new Map<string, { data: any; timestamp: number }>()
@@ -16,7 +18,7 @@ function cleanExpiredCache() {
 }
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event)
+  await requireVerifiedUserSession(event)
   const config = useRuntimeConfig()
   const body = await readBody(event)
 

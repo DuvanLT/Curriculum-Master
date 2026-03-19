@@ -1,9 +1,10 @@
 import OpenAI from 'openai'
 import { v4 as uuidv4 } from 'uuid'
+import { requireVerifiedUserSession } from '../utils/verified-session'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const session = await requireUserSession(event)
+  const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
   const { jd, profile, experiences } = await readBody(event)
 

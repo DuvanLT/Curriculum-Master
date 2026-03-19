@@ -1,5 +1,7 @@
 import OpenAI from 'openai'
-import { getUrlContent } from '../utils/fetch-url'
+import { requireVerifiedUserSession } from '../utils/verified-session'
+
+const MAX_STEPS = 40
 
 function splitAchievements(raw: unknown) {
   if (typeof raw !== 'string') return []
@@ -32,24 +34,10 @@ function findSourceExperience(aiExp: any, sourceExperiences: any[]) {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const session = await requireUserSession(event)
+  const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
   const body = await readBody(event)
   const { profile, experiences, jd } = body
-
-  let portfolioContent = ''
-  if (profile.web) {
-    try {
-      const parsedUrl = new URL(profile.web)
-      if (['http:', 'https:'].includes(parsedUrl.protocol)) {
-        portfolioContent = await getUrlContent(parsedUrl.href)
-      } else {
-        console.warn('URL de portafolio no permitida:', profile.web)
-      }
-    } catch {
-      console.warn('URL de portafolio invalida:', profile.web)
-    }
-  }
 
   if (!config.openaiApiKey) {
     throw createError({
@@ -64,16 +52,16 @@ export default defineEventHandler(async (event) => {
 
   const normalizedExperiences = Array.isArray(experiences)
     ? experiences.map((exp: any) => ({
-        id: exp.id,
-        type: exp.type === 'project' ? 'project' : 'work',
-        cargo: exp.cargo || '',
-        empresa: exp.empresa || '',
-        inicio: exp.inicio || '',
-        fin: exp.fin || '',
-        skills: Array.isArray(exp.skills) ? exp.skills : [],
-        logros_originales: typeof exp.logros === 'string' ? exp.logros : '',
-        logros_desglosados: splitAchievements(exp.logros)
-      }))
+      id: exp.id,
+      type: exp.type === 'project' ? 'project' : 'work',
+      cargo: exp.cargo || '',
+      empresa: exp.empresa || '',
+      inicio: exp.inicio || '',
+      fin: exp.fin || '',
+      skills: Array.isArray(exp.skills) ? exp.skills : [],
+      logros_originales: typeof exp.logros === 'string' ? exp.logros : '',
+      logros_desglosados: splitAchievements(exp.logros)
+    }))
     : []
 
   const systemPrompt = `
@@ -102,7 +90,7 @@ REGLAS CRITICAS:
 13. El tono debe ser profesional, ejecutivo y concreto. Evita cliches y palabras vacias.
 14. Devuelve unicamente JSON estructurado.
 15. Traduce o manten el idioma segun la vacante: si la vacante esta en ingles, responde en ingles; si esta en espanol, responde en espanol.
-16. Si se proporciona informacion del portafolio/web, usala solo para enriquecer con evidencia compatible con el perfil existente.
+16. Si se proporciona una URL de portafolio/web, usala solo como referencia declarativa del perfil y no inventes evidencia a partir de ella.
 `
 
   const userPrompt = `
@@ -112,8 +100,8 @@ ${JSON.stringify(profile)}
 EXPERIENCIAS NORMALIZADAS:
 ${JSON.stringify(normalizedExperiences)}
 
-PORTAFOLIO/WEB (Informacion extraida del enlace):
-${portfolioContent || 'N/A'}
+PORTAFOLIO/WEB:
+${profile?.web || 'N/A'}
 
 VACANTE OBJETIVO (JD):
 ${jd || 'N/A (Haz una optimizacion general de alta calidad si no hay JD)'}
@@ -201,7 +189,14 @@ DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
 
     if (result.next_steps && Array.isArray(result.next_steps)) {
       const db = useDb()
-      for (const stepText of result.next_steps) {
+      const countResult = await db.execute({
+        sql: 'SELECT COUNT(*) as total FROM next_steps WHERE user_id = ?',
+        args: [userId]
+      })
+      const currentCount = Number(countResult.rows?.[0]?.total ?? 0)
+      const remainingSlots = Math.max(0, MAX_STEPS - currentCount)
+
+      for (const stepText of result.next_steps.slice(0, remainingSlots)) {
         try {
           await db.execute({
             sql: 'INSERT INTO next_steps (id, user_id, text, completed) VALUES (?, ?, ?, 0)',

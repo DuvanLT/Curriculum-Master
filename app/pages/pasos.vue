@@ -10,7 +10,7 @@
           <AppCard title="Mi Roadmap Profesional">
             <template #title-action>
               <div class="text-[11px] font-mono text-text-dim">
-                {{ completedCount }} / {{ steps.length }} completados
+                {{ completedCount }} / {{ steps.length }} completados · {{ steps.length }}/{{ MAX_STEPS }} tareas
               </div>
             </template>
 
@@ -69,10 +69,13 @@
               v-model="newStepText" 
               @keyup.enter="addStep"
             />
-            <AppButton @click="addStep" class="w-full mt-2" :disabled="!newStepText.trim()">
+            <AppButton @click="addStep" class="w-full mt-2" :disabled="!newStepText.trim() || steps.length >= MAX_STEPS">
               Añadir Paso
             </AppButton>
             
+            <p class="mt-2 text-[11px] font-mono text-text-muted">
+              MÃ¡ximo {{ MAX_STEPS }} tareas activas en tu roadmap.
+            </p>
             <div class="mt-6 pt-6 border-t border-border-dim">
               <div class="text-[11px] text-amber font-mono mb-2 uppercase tracking-widest flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[14px]">lightbulb</span>
@@ -107,6 +110,7 @@ definePageMeta({
 
 const { profile, experiences } = useAppState()
 const toast = useToast()
+const MAX_STEPS = 40
 
 interface Step {
   id: string;
@@ -133,16 +137,26 @@ const fetchSteps = async () => {
 
 const addStep = async () => {
   if (!newStepText.value.trim()) return
+  if (steps.value.length >= MAX_STEPS) {
+    toast.warning('Coach: ya tienes el maximo de 40 tareas. Resuelve y elimina algunas para continuar.')
+    return
+  }
+
   try {
     const newItem = await $fetch<Step>('/api/steps', {
       method: 'POST',
-      body: { text: newStepText.value }
+      body: { text: newStepText.value.trim() }
     })
     steps.value.unshift(newItem)
     newStepText.value = ''
     toast.success('Paso añadido correctamente')
-  } catch (e) {
+  } catch (e: any) {
     console.error('Error adding step:', e)
+    const message = e?.data?.statusMessage || e?.statusMessage || e?.message || ''
+    if (message.includes('maximo de 40 tareas')) {
+      toast.warning('Coach: ya tienes el maximo de 40 tareas. Resuelve y elimina algunas para continuar.')
+      return
+    }
     toast.error('Error al añadir el paso')
   }
 }

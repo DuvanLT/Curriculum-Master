@@ -1,14 +1,14 @@
 <template>
-  <div id="cv-template" class="pdf-container" style="width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; color: #000; padding: 8mm 10mm; background-color: #fff; font-family: 'Helvetica', 'Arial', sans-serif; line-height: 1.3;">
+  <div id="cv-template" class="pdf-container" style="width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; color: #000; padding: 6mm 8mm; background-color: #fff; font-family: 'Helvetica', 'Arial', sans-serif; line-height: 1.25;">
     
-    <header style="text-align: right; margin-bottom: 20px;">
-      <h1 style="font-size: 20px; font-weight: 800; margin: 0; color: #000000; letter-spacing: -0.025em;">{{ profile.nombre }}</h1>
-      <p style="font-size: 15px; margin: 3px 0; color: #334155;"><span style="font-weight: bold; color: #000;">Ubicado:</span> {{ profile.ubicacion }}</p>
-      <p style="font-size: 14px; margin: 2px 0;">
+    <header style="text-align: right; margin-bottom: 12px;">
+      <h1 style="font-size: 18px; font-weight: 800; margin: 0; color: #000000; letter-spacing: -0.025em;">{{ profile.nombre }}</h1>
+      <p style="font-size: 13px; margin: 2px 0; color: #334155;"><span style="font-weight: bold; color: #000;">Ubicado:</span> {{ profile.ubicacion }}</p>
+      <p style="font-size: 12px; margin: 1px 0;">
         <span style="font-weight: bold;">Correo:</span>
         <a v-if="profile.email_profile" :href="emailHref" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">{{ profile.email_profile }}</a>
       </p>
-      <p style="font-size: 14px; margin: 2px 0;"><span style="font-weight: bold;">Telefono:</span> {{ profile.telefono }}</p>
+      <p style="font-size: 12px; margin: 1px 0;"><span style="font-weight: bold;">Telefono:</span> {{ profile.telefono }}</p>
       <p v-if="socialLinks.length" style="font-size: 14px; margin: 2px 0;">
         <span style="font-weight: bold;">Redes:</span>
         <template v-for="(link, index) in socialLinks" :key="link.label">
@@ -18,8 +18,8 @@
           </a>
         </template>
       </p>
-      <p style="font-size: 16px; margin: 4px 0; color: #0f172a;"><span style="font-weight: 800;">Rol:</span> {{ aiData.optimized_title || profile.titulo }}</p>
-      <p v-if="profile.web" style="font-size: 14px; margin: 2px 0;">
+      <p style="font-size: 14px; margin: 3px 0; color: #0f172a;"><span style="font-weight: 800;">Rol:</span> {{ aiData.optimized_title || profile.titulo }}</p>
+      <p v-if="profile.web" style="font-size: 12px; margin: 1px 0;">
         <span style="font-weight: bold;">Portafolio web:</span>
         <a :href="webHref" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
           {{ profile.web }}
@@ -29,63 +29,63 @@
 
     <hr style="border: 0; border-top: 2px solid #0f172a; margin-bottom: 10px;">
 
-    <section style="margin-bottom: 14px;">
-      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; margin-bottom: 5px;">Resumen Profesional</h2>
-      <p style="font-size: 13px; color: #0f172a; text-align: justify; margin: 0; line-height: 1.4;">
+    <section style="margin-bottom: 12px;">
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; margin-bottom: 4px;">Resumen Profesional</h2>
+      <p style="font-size: 11.5px; color: #0f172a; text-align: justify; margin: 0; line-height: 1.35;">
         {{ aiData.summary || profile.resumen }}
       </p>
-      <div style="font-size: 12.5px; margin-top: 8px; color: #0f172a; background-color: #f8fafc; padding: 6px; border-radius: 4px;">
+      <div style="font-size: 11px; margin-top: 6px; color: #0f172a; background-color: #f8fafc; padding: 4px 6px; border-radius: 4px;">
         <span style="font-weight: bold; color: #0f172a;">Habilidades:</span> {{ (aiData.top_skills || []).join(', ') }}
       </div>
     </section>
 
-    <section v-if="workExperiences.length" style="margin-bottom: 18px;">
-      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 10px; padding-bottom: 2px;">Experiencia profesional</h2>
+    <section v-if="workExperiences.length" style="margin-bottom: 14px;">
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 1px;">Experiencia profesional</h2>
 
-      <div v-for="exp in workExperiences" :key="exp.id" style="margin-bottom: 14px;">
+      <div v-for="exp in workExperiences" :key="exp.id" style="margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          <span style="font-size: 14px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
-          <span style="font-size: 12px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
+          <span style="font-size: 12.5px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
+          <span style="font-size: 11px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
         </div>
 
-        <ul style="margin: 4px 0 4px 18px; padding: 0; color: #334155; font-size: 12.5px; line-height: 1.4;">
-          <li v-for="(achievement, index) in exp.logros_optimizados" :key="index" style="margin-bottom: 2px;">
+        <ul style="margin: 2px 0 2px 14px; padding: 0; color: #334155; font-size: 11px; line-height: 1.35;">
+          <li v-for="(achievement, index) in exp.logros_optimizados" :key="index" style="margin-bottom: 1px;">
             {{ achievement }}
           </li>
         </ul>
 
-        <div style="font-size: 12px; color: #475569; font-style: italic;">
-          <span style="font-weight: bold; color: #334155;">Tecnologías:</span> {{ exp.skills_sugeridas?.join(', ') }}
+        <div style="font-size: 10.5px; color: #475569; font-style: italic;">
+          <span style="font-weight: bold; color: #334155;">Herramientas:</span> {{ exp.skills_sugeridas?.join(', ') }}
         </div>
       </div>
     </section>
 
-      <section v-if="projectExperiences.length" style="margin-bottom: 18px;">
-      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 10px; padding-bottom: 2px;">Proyectos</h2>
+    <section v-if="projectExperiences.length" style="margin-bottom: 14px;">
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 1px;">Proyectos</h2>
 
-      <div v-for="exp in projectExperiences" :key="exp.id" style="margin-bottom: 14px;">
+      <div v-for="exp in projectExperiences" :key="exp.id" style="margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          <span style="font-size: 14px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
-          <span style="font-size: 12px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
+          <span style="font-size: 12.5px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
+          <span style="font-size: 11px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
         </div>
 
-        <ul style="margin: 4px 0 4px 18px; padding: 0; color: #334155; font-size: 12.5px; line-height: 1.4;">
-          <li v-for="(achievement, index) in exp.logros_optimizados" :key="index" style="margin-bottom: 2px;">
+        <ul style="margin: 2px 0 2px 14px; padding: 0; color: #334155; font-size: 11px; line-height: 1.35;">
+          <li v-for="(achievement, index) in exp.logros_optimizados" :key="index" style="margin-bottom: 1px;">
             {{ achievement }}
           </li>
         </ul>
 
-        <div style="font-size: 12px; color: #475569; font-style: italic;">
+        <div style="font-size: 10.5px; color: #475569; font-style: italic;">
           <span style="font-weight: bold; color: #334155;">Tecnologías:</span> {{ exp.skills_sugeridas?.join(', ') }}
         </div>
       </div>
     </section>
 
     <section v-if="normalizedEducations.length">
-      <h2 style="font-size: 17px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 2px;">Estudios</h2>
-      <div v-for="edu in normalizedEducations" :key="edu.id" style="margin-bottom: 6px;">
-        <p style="margin: 0; font-size: 13.5px; font-weight: bold; color: #0f172a;">{{ edu.titulo }} - {{ edu.institucion }}</p>
-        <p style="margin: 0; font-size: 12px; color: #64748b;">{{ edu.inicio }} - {{ edu.fin || 'Actual' }}</p>
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 6px; padding-bottom: 1px;">Estudios</h2>
+      <div v-for="edu in normalizedEducations" :key="edu.id" style="margin-bottom: 4px;">
+        <p style="margin: 0; font-size: 12px; font-weight: bold; color: #0f172a;">{{ edu.titulo }} - {{ edu.institucion }}</p>
+        <p style="margin: 0; font-size: 10.5px; color: #64748b;">{{ edu.inicio }} - {{ edu.fin || 'Actual' }}</p>
       </div>
     </section>
 
@@ -131,8 +131,8 @@ const socialLinks = computed(() => {
     links.push({ label: 'LinkedIn', href: normalizeHref(props.profile.linkedin) })
   }
 
-  if (props.profile?.github) {
-    links.push({ label: 'Github', href: normalizeHref(props.profile.github) })
+  if (props.profile?.otros) {
+    links.push({ label: 'Otros', href: normalizeHref(props.profile.otros) })
   }
 
   return links

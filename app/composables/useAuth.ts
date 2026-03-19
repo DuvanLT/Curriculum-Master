@@ -1,7 +1,9 @@
 export const useAuth = () => {
-  const { user, session, fetch: fetchSession, clear: clearSession } = useUserSession()
+  const { user, fetch: fetchSession, clear: clearSession } = useUserSession()
+  const { fetchProfile, resetProfileState } = useAppState()
+  const loggingOut = useState('auth-logging-out', () => false)
   
-  const loggedIn = computed(() => !!user.value)
+  const loggedIn = computed(() => !!user.value && !loggingOut.value)
 
   const signup = async (email: string, password: string, name?: string) => {
     try {
@@ -10,6 +12,7 @@ export const useAuth = () => {
         body: { email, password, name }
       })
       await fetchSession()
+      await fetchProfile(true)
       
       if (!data.user.is_verified) {
         navigateTo('/verify')
@@ -28,6 +31,7 @@ export const useAuth = () => {
         body: { email, password }
       })
       await fetchSession()
+      await fetchProfile(true)
 
       if (!data.user.is_verified) {
         navigateTo('/verify')
@@ -40,14 +44,24 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    await $fetch<any>('/api/auth/logout', { method: 'POST' })
-    await clearSession()
-    navigateTo('/login')
+    if (loggingOut.value) {
+      return
+    }
+
+    loggingOut.value = true
+
+    try {
+      await clearSession()
+      resetProfileState()
+    } finally {
+      loggingOut.value = false
+    }
   }
 
   return {
     user,
     loggedIn,
+    loggingOut,
     signup,
     login,
     logout

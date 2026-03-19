@@ -5,7 +5,7 @@ export interface Profile {
   email_profile: string;
   telefono: string;
   linkedin: string;
-  github: string;
+  otros: string;
   web: string;
   educacion: string;
   resumen: string;
@@ -47,7 +47,7 @@ export const useAppState = () => {
     email_profile: '',
     telefono: '',
     linkedin: '',
-    github: '',
+    otros: '',
     web: '',
     educacion: '',
     resumen: '',
@@ -57,24 +57,93 @@ export const useAppState = () => {
   const educations = useState<Education[]>('educations', () => []);
   const experiences = useState<Experience[]>('experiences', () => []);
   const loading = useState('app-loading', () => false);
+  const initialized = useState('app-profile-initialized', () => false);
+  const hasData = useState('app-profile-has-data', () => false);
+  const pendingRequest = useState<Promise<void> | null>('app-profile-pending-request', () => null);
+
+  const hasProfileData = (value: Profile) => {
+    return Boolean(
+      value.nombre ||
+      value.titulo ||
+      value.ubicacion ||
+      value.email_profile ||
+      value.telefono ||
+      value.linkedin ||
+      value.otros ||
+      value.web ||
+      value.educacion ||
+      value.resumen ||
+      value.years
+    )
+  }
+
+  const resetProfileState = () => {
+    profile.value = {
+      nombre: '',
+      titulo: '',
+      ubicacion: '',
+      email_profile: '',
+      telefono: '',
+      linkedin: '',
+      otros: '',
+      web: '',
+      educacion: '',
+      resumen: '',
+      years: ''
+    };
+    educations.value = [];
+    experiences.value = [];
+    loading.value = false;
+    initialized.value = false;
+    hasData.value = false;
+    pendingRequest.value = null;
+  }
 
   const syncEducationSummary = () => {
     profile.value.educacion = normalizeEducationSummary(educations.value)
   }
 
-  const fetchProfile = async () => {
-    loading.value = true;
-    try {
-      const data = await $fetch<{ profile: Profile, educations: Education[], experiences: Experience[] }>('/api/profile');
-      profile.value = data.profile;
-      educations.value = Array.isArray(data.educations) ? data.educations : [];
-      experiences.value = data.experiences;
-      syncEducationSummary()
-    } catch (e) {
-      console.error('Error fetching profile:', e);
-    } finally {
-      loading.value = false;
+  const fetchProfile = async (force = false) => {
+    if (pendingRequest.value && !force) {
+      return pendingRequest.value;
     }
+
+    if (initialized.value && !force) {
+      return;
+    }
+
+    loading.value = true;
+    pendingRequest.value = (async () => {
+      try {
+        const data = await $fetch<{ profile: Profile, educations: Education[], experiences: Experience[] }>('/api/profile');
+        profile.value = data.profile;
+        educations.value = Array.isArray(data.educations) ? data.educations : [];
+        experiences.value = Array.isArray(data.experiences) ? data.experiences : [];
+        syncEducationSummary()
+        hasData.value = hasProfileData(profile.value) || educations.value.length > 0 || experiences.value.length > 0
+        initialized.value = true;
+      } catch (e) {
+        console.error('Error fetching profile:', e);
+      } finally {
+        loading.value = false;
+        pendingRequest.value = null;
+      }
+    })();
+
+    return pendingRequest.value;
+  };
+
+  const ensureProfileLoaded = async () => {
+    if (pendingRequest.value) {
+      await pendingRequest.value;
+      return;
+    }
+
+    if (initialized.value) {
+      return;
+    }
+
+    await fetchProfile();
   };
 
   const saveProfile = async () => {
@@ -93,10 +162,11 @@ export const useAppState = () => {
       });
     } catch (e) {
       console.error('Error saving profile:', e);
+      throw e;
     }
   };
 
-  const mergeImportedProfile = (data: Partial<Profile>) => {
+  const mergeImportedProfile = (data: Partial<Profile> & { github?: string }) => {
     profile.value = {
       ...profile.value,
       nombre: data.nombre || profile.value.nombre,
@@ -105,7 +175,7 @@ export const useAppState = () => {
       email_profile: data.email_profile || profile.value.email_profile,
       telefono: data.telefono || profile.value.telefono,
       linkedin: data.linkedin || profile.value.linkedin,
-      github: data.github || profile.value.github,
+      otros: data.otros || data.github || profile.value.otros,
       web: data.web || profile.value.web,
       educacion: data.educacion || profile.value.educacion,
       resumen: data.resumen || profile.value.resumen,
@@ -230,7 +300,11 @@ export const useAppState = () => {
     educations,
     experiences,
     loading,
+    initialized,
+    hasData,
     fetchProfile,
+    ensureProfileLoaded,
+    resetProfileState,
     saveProfile,
     mergeImportedProfile,
     addEducation,

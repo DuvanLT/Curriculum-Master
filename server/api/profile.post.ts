@@ -24,53 +24,51 @@ export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const userId = session.user.id
   const body = await readBody(event)
-  const { profile, educations, experiences } = body
+  const profile = body?.profile || {}
+  const educations = Array.isArray(body?.educations) ? body.educations : []
+  const experiences = Array.isArray(body?.experiences) ? body.experiences : []
   const db = useDb()
 
-  const educationSummary = Array.isArray(educations)
+  const educationSummary = educations.length
     ? buildEducationSummary(educations)
     : (profile.educacion || '')
-
-  await db.execute({
-    sql: `UPDATE users SET
-      email_profile = ?,
-      name = ?,
-      titulo = ?,
-      ubicacion = ?,
-      resumen = ?,
-      telefono = ?,
-      linkedin = ?,
-      github = ?,
-      web = ?,
-      educacion = ?,
-      years = ?
-      WHERE id = ?`,
-    args: [
-      profile.email_profile,
-      profile.nombre,
-      profile.titulo,
-      profile.ubicacion,
-      profile.resumen,
-      profile.telefono,
-      profile.linkedin,
-      profile.github,
-      profile.web,
-      educationSummary,
-      profile.years,
-      userId
-    ]
-  })
-
-  await setUserSession(event, {
-    user: {
-      ...session.user,
-      name: profile.nombre
-    }
-  })
+  const availableColumns = await getEducationSchema(db)
+  const userIdColumn = pickColumn(availableColumns, ['user_id', 'userId'])
+  let transactionStarted = false
 
   try {
-    const availableColumns = await getEducationSchema(db)
-    const userIdColumn = pickColumn(availableColumns, ['user_id', 'userId'])
+    await db.execute('BEGIN')
+    transactionStarted = true
+
+    await db.execute({
+      sql: `UPDATE users SET
+        email_profile = ?,
+        name = ?,
+        titulo = ?,
+        ubicacion = ?,
+        resumen = ?,
+        telefono = ?,
+        linkedin = ?,
+        github = ?,
+        web = ?,
+        educacion = ?,
+        years = ?
+        WHERE id = ?`,
+      args: [
+        profile.email_profile,
+        profile.nombre,
+        profile.titulo,
+        profile.ubicacion,
+        profile.resumen,
+        profile.telefono,
+        profile.linkedin,
+        profile.otros || profile.github || '',
+        profile.web,
+        educationSummary,
+        profile.years,
+        userId
+      ]
+    })
 
     if (userIdColumn) {
       await db.execute({
@@ -78,7 +76,7 @@ export default defineEventHandler(async (event) => {
         args: [userId]
       })
 
-      if (Array.isArray(educations) && educations.length > 0) {
+      if (educations.length > 0) {
         const idColumn = pickColumn(availableColumns, ['id'])
         const titleColumn = pickColumn(availableColumns, ['titulo', 'title', 'degree', 'name'])
         const institutionColumn = pickColumn(availableColumns, ['institucion', 'institution', 'school', 'academy'])
@@ -132,16 +130,12 @@ export default defineEventHandler(async (event) => {
         }
       }
     }
-  } catch (error) {
-    console.error('Error saving educations:', error)
-  }
 
-  await db.execute({
-    sql: 'DELETE FROM experiences WHERE user_id = ?',
-    args: [userId]
-  })
+    await db.execute({
+      sql: 'DELETE FROM experiences WHERE user_id = ?',
+      args: [userId]
+    })
 
-  if (experiences && experiences.length > 0) {
     for (const exp of experiences) {
       await db.execute({
         sql: `INSERT INTO experiences (id, user_id, empresa, cargo, inicio, fin, logros, skills, type)
@@ -159,6 +153,33 @@ export default defineEventHandler(async (event) => {
         ]
       })
     }
+
+    await db.execute('COMMIT')
+    transactionStarted = false
+  } catch (error) {
+    if (transactionStarted) {
+      try {
+        await db.execute('ROLLBACK')
+      } catch {
+      }
+    }
+
+    console.error('Error saving profile:', error)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'No se pudieron guardar los cambios del perfil.'
+    })
+  }
+
+  try {
+    await setUserSession(event, {
+      user: {
+        ...session.user,
+        name: profile.nombre
+      }
+    })
+  } catch (error) {
+    console.error('Error updating profile session:', error)
   }
 
   return { success: true }

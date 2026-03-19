@@ -9,7 +9,7 @@
         <AppInput 
           label="Cargo o palabras clave" 
           v-model="keywords" 
-          placeholder="Desarrollador Backend, Python, Data..." 
+          placeholder="Desarrollador Backend, Comercial, Marketing Digital" 
           class="flex-1"
           @keyup.enter="searchJobs"
         />
@@ -141,8 +141,6 @@
 definePageMeta({
   middleware: 'auth'
 })
-
-import { marked } from 'marked'
 
 const toast = useToast()
 
@@ -280,8 +278,7 @@ const cleanHtml = (html: string) => {
 }
 
 const renderMarkdown = (text: string) => {
-  if (!text) return ''
-  return marked.parse(text)
+  return renderSafeMarkdown(text)
 }
 
 const buildJobJD = (job: JoobleJob) => {

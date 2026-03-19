@@ -6,9 +6,17 @@
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Perfil Maestro</div>
           <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Tu perfil maestro debe incluir tu informacion laboral, academica y profesional mas reciente.</div>
         </div>
-        <NuxtLink to="/importar-cv" class="nav-item" active-class="active">
-          <AppButton>Importar CV</AppButton>
+        <div class="flex items-center gap-4">
+        <div class="text-[11px] font-mono uppercase tracking-widest" :class="hasUnsavedChanges ? 'text-amber' : 'text-text-dim'">
+          {{ hasUnsavedChanges ? 'Cambios sin guardar' : 'Sin cambios pendientes' }}
+        </div>
+        <NuxtLink to="/examen" class="nav-item" active-class="active">
+          <AppButton variant="ghost">Descubrir habilidades</AppButton>
         </NuxtLink>
+        <NuxtLink to="/importar-cv" class="nav-item" active-class="active">
+          <AppButton variant="ghost">Importar CV</AppButton>
+        </NuxtLink>
+        </div>
       </div>
 
       <div class="stats-row grid grid-cols-4 gap-2.5 mb-5">
@@ -44,13 +52,16 @@
         </div>
         <div class="grid grid-cols-3 gap-3 mb-3">
           <AppInput label="LinkedIn (URL)" v-model="profile.linkedin" placeholder="linkedin.com/in/..." />
-          <AppInput label="GitHub (URL)" v-model="profile.github" placeholder="github.com/..." />
           <AppInput label="Web / Portafolio" v-model="profile.web" placeholder="miweb.com" />
+          <AppInput label="Otra" v-model="profile.otros" placeholder="Tu red social profesional" />
         </div>
         <div class="grid grid-cols-1 gap-3 mb-3">
           <AppInput label="Ubicacion" v-model="profile.ubicacion" placeholder="Cali, Colombia" />
         </div>
         <AppInput label="Resumen profesional" type="textarea" v-model="profile.resumen" placeholder="Desarrollador backend con 7+ anos de experiencia..." />
+        <AppButton :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
+          Guardar cambios
+        </AppButton>
       </AppCard>
 
       <AppCard title="Formacion Academica">
@@ -144,7 +155,7 @@
             Escribe una descripcion con buen contexto. Lo ideal es superar los 300 caracteres incluyendo problema, responsabilidad, stack, entregable o resultado.
           </div>
 
-          <AppInput label="Hard Skills (separadas por coma)" v-model="newExp.skills" placeholder="Python, Django, PostgreSQL, AWS" />
+          <AppInput label="Habilidades usadas (separadas por coma)" v-model="newExp.skills" placeholder="Ej: Power BI, Analisis, Excel, Python" />
 
           <div class="text-[11px] text-text-dim mb-3 leading-relaxed">
             Usa "Experiencia laboral" para roles reales en empresa, contrato o freelance continuo. Usa "Proyecto" para portafolio, iniciativa personal, practica academica o entregable puntual.
@@ -218,12 +229,15 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { profile, educations, experiences, loading, fetchProfile, saveProfile, addEducation, updateEducation, removeEducation, addExperience, removeExperience, updateExperience } = useAppState()
+const { profile, educations, experiences, loading, fetchProfile, saveProfile } = useAppState()
 const toast = useToast()
 
 const adding = ref(false)
 const addingEducation = ref(false)
 const initialized = ref(false)
+const savingProfile = ref(false)
+const hasUnsavedChanges = ref(false)
+const trackUnsavedChanges = ref(true)
 
 const editingExpId = ref<string | number | null>(null)
 const editingEducationId = ref<string | number | null>(null)
@@ -258,18 +272,51 @@ onMounted(async () => {
   await fetchProfile()
   nextTick(() => {
     initialized.value = true
+    hasUnsavedChanges.value = false
   })
 })
 
-let saveTimeout: ReturnType<typeof setTimeout> | null = null
-watch(profile, () => {
-  if (!initialized.value) return
-  if (saveTimeout) clearTimeout(saveTimeout)
-  saveTimeout = setTimeout(() => {
-    saveProfile()
-    toast.success('Perfil autoguardado')
-  }, 1000)
+watch([profile, educations, experiences], () => {
+  if (!initialized.value || !trackUnsavedChanges.value) return
+  hasUnsavedChanges.value = true
 }, { deep: true })
+
+const createLocalId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+const normalizeSkills = (value: unknown) => {
+  if (Array.isArray(value)) {
+    return value.map(skill => String(skill).trim()).filter(Boolean)
+  }
+
+  if (typeof value === 'string') {
+    return value.split(',').map(skill => skill.trim()).filter(Boolean)
+  }
+
+  return []
+}
+
+const handleManualSave = async () => {
+  if (!hasUnsavedChanges.value || savingProfile.value) {
+    return
+  }
+
+  savingProfile.value = true
+  trackUnsavedChanges.value = false
+
+  try {
+    await saveProfile()
+    hasUnsavedChanges.value = false
+    toast.success('Perfil guardado correctamente')
+  } catch (error) {
+    console.error(error)
+    toast.error('No se pudieron guardar los cambios')
+  } finally {
+    savingProfile.value = false
+    nextTick(() => {
+      trackUnsavedChanges.value = true
+    })
+  }
+}
 
 const toggleEducationForm = () => {
   if (addingEducation.value) {
@@ -285,10 +332,19 @@ const saveEducation = () => {
   if (!newEducation.value.titulo || !newEducation.value.institucion) return
 
   if (editingEducationId.value) {
-    updateEducation(editingEducationId.value, newEducation.value)
+    const index = educations.value.findIndex(edu => edu.id === editingEducationId.value)
+    if (index !== -1) {
+      educations.value[index] = {
+        ...educations.value[index],
+        ...newEducation.value
+      }
+    }
     toast.success('Estudio actualizado')
   } else {
-    addEducation(newEducation.value)
+    educations.value.unshift({
+      id: createLocalId(),
+      ...newEducation.value
+    })
     toast.success('Estudio agregado')
   }
 
@@ -315,7 +371,7 @@ const startEditingEducation = (edu: any) => {
 }
 
 const removeEducationEntry = (id: string | number) => {
-  removeEducation(id)
+  educations.value = educations.value.filter(edu => edu.id !== id)
   toast.success('Estudio eliminado')
 }
 
@@ -340,13 +396,27 @@ const saveExp = () => {
   }
 
   if (editingExpId.value) {
-    updateExperience(editingExpId.value, {
-      ...newExp.value,
-      skills: newExp.value.skills
-    })
+    const index = experiences.value.findIndex(exp => exp.id === editingExpId.value)
+    if (index !== -1) {
+      experiences.value[index] = {
+        ...experiences.value[index],
+        ...newExp.value,
+        type: newExp.value.type === 'project' ? 'project' : 'work',
+        skills: normalizeSkills(newExp.value.skills)
+      }
+    }
     toast.success(newExp.value.type === 'project' ? 'Proyecto actualizado' : 'Experiencia actualizada')
   } else {
-    addExperience(newExp.value)
+    experiences.value.unshift({
+      id: createLocalId(),
+      type: newExp.value.type === 'project' ? 'project' : 'work',
+      cargo: newExp.value.cargo,
+      empresa: newExp.value.empresa,
+      inicio: newExp.value.inicio,
+      fin: newExp.value.fin || '',
+      logros: newExp.value.logros || '',
+      skills: normalizeSkills(newExp.value.skills)
+    })
     toast.success(newExp.value.type === 'project' ? 'Proyecto agregado' : 'Experiencia agregada')
   }
 
@@ -381,7 +451,7 @@ const confirmRemoveExperience = (id: string | number) => {
 
 const handleRemoveExperience = () => {
   if (expToDelete.value) {
-    removeExperience(expToDelete.value)
+    experiences.value = experiences.value.filter(exp => exp.id !== expToDelete.value)
     toast.success('Entrada eliminada')
   }
   showConfirmDeleteExp.value = false

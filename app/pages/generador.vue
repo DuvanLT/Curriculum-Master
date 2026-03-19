@@ -105,7 +105,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { profile, educations, experiences } = useAppState()
+const { profile, educations, experiences, ensureProfileLoaded, loading: profileLoading } = useAppState()
 const toast = useToast()
 const jd = ref('')
 const loading = ref(false)
@@ -123,6 +123,13 @@ onMounted(() => {
 })
 
 const generateAI = async () => {
+  await ensureProfileLoaded()
+
+  if (profileLoading.value) {
+    toast.error('Estamos cargando tu Perfil Maestro. Intenta de nuevo en un momento.')
+    return
+  }
+
   if (!profile.value.nombre) {
     toast.error('Completa tu Perfil Maestro antes de generar el CV.')
     return

@@ -1,19 +1,14 @@
 import OpenAI from 'openai'
-import { getUrlContent } from '../utils/fetch-url'
+import { requireVerifiedUserSession } from '../utils/verified-session'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const session = await requireUserSession(event)
+  await requireVerifiedUserSession(event)
   const body = await readBody(event)
   const { messages, profile: rawProfile, experiences: rawExperiences } = body
 
   const profile = rawProfile || { nombre: 'Usuario', titulo: 'Profesional', resumen: '', years: '0', educacion: '' }
   const experiences = rawExperiences || []
-
-  let portfolioContent = ''
-  if (profile.web) {
-    portfolioContent = await getUrlContent(profile.web)
-  }
 
   if (!config.openaiApiKey) {
     throw createError({
@@ -37,7 +32,6 @@ export default defineEventHandler(async (event) => {
     Años Exp: ${profile.years}
     Educación: ${profile.educacion}
     Web/Portafolio: ${profile.web || 'N/A'}
-    Contenido del Portafolio: ${portfolioContent || 'N/A'}
 
     EXPERIENCIAS:
     ${JSON.stringify(experiences)}
