@@ -37,21 +37,116 @@
 
       <div v-else-if="activeTab === 'privacy'">
         <AppCard title="Privacidad y Datos">
-          <div class="border border-red-500/20 bg-red-500/5 rounded-xl p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="material-symbols-outlined text-red-500">warning</span>
-              <h3 class="text-red-500 font-head font-bold text-lg">Zona de Peligro</h3>
+          <div class="space-y-6">
+            <div class="border border-border/60 bg-dark-bg3/50 rounded-xl p-6">
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <div class="flex items-center gap-3 mb-3">
+                    <span class="material-symbols-outlined text-amber">lock_reset</span>
+                    <h3 class="text-text font-head font-bold text-lg">Recuperar contraseña</h3>
+                  </div>
+                  <p class="text-[13px] text-text-muted max-w-2xl">
+                    Enviaremos un codigo de 6 digitos a <strong class="text-text">{{ user?.email }}</strong> para validar el cambio antes de guardar una nueva contraseña.
+                  </p>
+                </div>
+
+                <AppButton
+                  variant="primary"
+                  :loading="requestingPasswordResetCode"
+                  @click="handleRequestPasswordResetCode"
+                >
+                  {{ resetStep === 'idle' ? 'Recuperar contraseña' : 'Reenviar codigo' }}
+                </AppButton>
+              </div>
+
+              <div
+                v-if="resetFeedback"
+                class="mt-4 border rounded-lg px-4 py-3 text-[12px] font-mono"
+                :class="resetFeedbackType === 'error' ? 'bg-red/10 border-red/20 text-red' : 'bg-amber/10 border-amber/20 text-amber'"
+              >
+                {{ resetFeedback }}
+              </div>
+
+              <div v-if="resetStep !== 'idle'" class="mt-6 space-y-5">
+                <div>
+                  <label class="block text-[12px] text-text-dim font-mono uppercase tracking-wider mb-2">
+                    Codigo de recuperacion
+                  </label>
+
+                  <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+                    <input
+                      :value="resetCode"
+                      type="text"
+                      inputmode="numeric"
+                      maxlength="6"
+                      placeholder="000000"
+                      class="bg-dark-bg border-2 border-border focus:border-amber outline-none rounded-[12px] w-full py-4 text-center text-3xl font-bold tracking-[10px] text-amber transition-all"
+                      @input="handleResetCodeInput"
+                    />
+
+                    <AppButton
+                      variant="secondary"
+                      class="lg:min-w-[170px]"
+                      :loading="verifyingPasswordResetCode"
+                      @click="handleVerifyPasswordResetCode"
+                    >
+                      Validar codigo
+                    </AppButton>
+                  </div>
+
+                  <p class="text-[12px] text-text-dim mt-2">
+                    El codigo vence en 15 minutos. Si pediste uno nuevo, solo el mas reciente funciona.
+                  </p>
+                </div>
+
+                <div v-if="resetStep === 'verified'" class="border border-amber/20 bg-amber/5 rounded-xl p-5">
+                  <div class="flex items-center gap-2 text-amber mb-4">
+                    <span class="material-symbols-outlined text-[18px]">verified</span>
+                    <p class="text-[13px] font-medium">Codigo validado. Ya puedes definir una nueva contrasena.</p>
+                  </div>
+
+                  <div class="grid gap-2 lg:grid-cols-2">
+                    <AppInput
+                      v-model="passwordResetForm.password"
+                      label="Nueva contrasena"
+                      type="password"
+                      placeholder="********"
+                    />
+                    <AppInput
+                      v-model="passwordResetForm.confirmPassword"
+                      label="Confirmar contrasena"
+                      type="password"
+                      placeholder="********"
+                    />
+                  </div>
+
+                  <p class="text-[12px] text-text-dim mb-4">
+                    {{ passwordRequirementsText }}
+                  </p>
+
+                  <AppButton :loading="updatingPassword" @click="handleUpdatePassword">
+                    Guardar nueva contrasena
+                  </AppButton>
+                </div>
+              </div>
             </div>
-            <p class="text-[13px] text-text-muted mb-6">
-              Al eliminar tu cuenta, todos tus registros (experiencias, aplicaciones, retos y analisis) seran borrados permanentemente. Esta accion no se puede deshacer.
-            </p>
-            <AppButton
-              variant="secondary"
-              class="!border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-white transition-all"
-              @click="showDeleteModal = true"
-            >
-              Borrar mi cuenta definitivamente
-            </AppButton>
+
+            <div class="border border-red-500/20 bg-red-500/5 rounded-xl p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-outlined text-red-500">warning</span>
+                <h3 class="text-red-500 font-head font-bold text-lg">Zona de Peligro</h3>
+              </div>
+              <p class="text-[13px] text-text-muted mb-6">
+                Al eliminar tu cuenta, todos tus registros (experiencias, aplicaciones, retos y analisis) seran borrados permanentemente. Esta accion no se puede deshacer.
+              </p>
+              <AppButton
+                variant="secondary"
+                class="!border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-white transition-all"
+                @click="showDeleteModal = true"
+              >
+                Borrar mi cuenta definitivamente
+              </AppButton>
+            </div>
           </div>
         </AppCard>
       </div>
@@ -73,9 +168,13 @@
 </template>
 
 <script setup lang="ts">
+import { getPasswordValidationError, passwordRequirementsText } from '../utils/password-validation'
+
 definePageMeta({
   middleware: 'auth'
 })
+
+type PasswordResetStep = 'idle' | 'code-sent' | 'verified'
 
 const { user, logout, loggingOut } = useAuth()
 const toast = useToast()
@@ -83,6 +182,128 @@ const toast = useToast()
 const activeTab = ref('session')
 const showDeleteModal = ref(false)
 const deletingAccount = ref(false)
+const resetStep = ref<PasswordResetStep>('idle')
+const resetCode = ref('')
+const resetFeedback = ref('')
+const resetFeedbackType = ref<'error' | 'success'>('success')
+const requestingPasswordResetCode = ref(false)
+const verifyingPasswordResetCode = ref(false)
+const updatingPassword = ref(false)
+const passwordResetForm = ref({
+  password: '',
+  confirmPassword: ''
+})
+
+const setResetFeedback = (message: string, type: 'error' | 'success') => {
+  resetFeedback.value = message
+  resetFeedbackType.value = type
+}
+
+const clearResetForm = () => {
+  resetCode.value = ''
+  passwordResetForm.value = {
+    password: '',
+    confirmPassword: ''
+  }
+}
+
+const handleResetCodeInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  resetCode.value = target.value.replace(/\D/g, '').slice(0, 6)
+}
+
+const handleRequestPasswordResetCode = async () => {
+  requestingPasswordResetCode.value = true
+  resetFeedback.value = ''
+
+  try {
+    await $fetch('/api/auth/update-password', {
+      method: 'POST',
+      body: {
+        action: 'request-code'
+      }
+    })
+
+    resetStep.value = 'code-sent'
+    clearResetForm()
+    setResetFeedback('Te enviamos un codigo de recuperacion a tu correo.', 'success')
+    toast.success('Revisa tu correo para continuar.')
+  } catch (e: any) {
+    console.error(e)
+    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos enviar el codigo de recuperacion.', 'error')
+    toast.error(e.data?.statusMessage || e.message || 'No pudimos enviar el codigo de recuperacion.')
+  } finally {
+    requestingPasswordResetCode.value = false
+  }
+}
+
+const handleVerifyPasswordResetCode = async () => {
+  if (resetCode.value.length !== 6) {
+    setResetFeedback('El codigo debe tener 6 digitos.', 'error')
+    return
+  }
+
+  verifyingPasswordResetCode.value = true
+  resetFeedback.value = ''
+
+  try {
+    await $fetch('/api/auth/update-password', {
+      method: 'POST',
+      body: {
+        action: 'verify-code',
+        code: resetCode.value
+      }
+    })
+
+    resetStep.value = 'verified'
+    setResetFeedback('Codigo validado correctamente.', 'success')
+    toast.success('Ahora puedes definir tu nueva contrasena.')
+  } catch (e: any) {
+    console.error(e)
+    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos validar el codigo.', 'error')
+    toast.error(e.data?.statusMessage || e.message || 'No pudimos validar el codigo.')
+  } finally {
+    verifyingPasswordResetCode.value = false
+  }
+}
+
+const handleUpdatePassword = async () => {
+  if (passwordResetForm.value.password !== passwordResetForm.value.confirmPassword) {
+    setResetFeedback('Las contrasenas no coinciden.', 'error')
+    return
+  }
+
+  const passwordError = getPasswordValidationError(passwordResetForm.value.password)
+  if (passwordError) {
+    setResetFeedback(passwordError, 'error')
+    return
+  }
+
+  updatingPassword.value = true
+  resetFeedback.value = ''
+
+  try {
+    await $fetch('/api/auth/update-password', {
+      method: 'POST',
+      body: {
+        action: 'update-password',
+        password: passwordResetForm.value.password,
+        confirmPassword: passwordResetForm.value.confirmPassword
+      }
+    })
+
+    resetStep.value = 'idle'
+    clearResetForm()
+    setResetFeedback('Tu contrasena se actualizo correctamente.', 'success')
+    toast.success('Contrasena actualizada correctamente.')
+  } catch (e: any) {
+    console.error(e)
+    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos actualizar la contrasena.', 'error')
+    toast.error(e.data?.statusMessage || e.message || 'No pudimos actualizar la contrasena.')
+  } finally {
+    updatingPassword.value = false
+  }
+}
 
 const handleLogout = async () => {
   try {

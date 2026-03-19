@@ -14,7 +14,7 @@
           {{ error }}
         </div>
 
-
+        
         <div class="space-y-6 relative z-10 text-center py-6">
         <div class="bg-amber/10 border border-amber/20 text-text p-6 rounded-[8px] font-sans">
           <span class="material-symbols-outlined text-[48px] text-amber mb-4">lock</span>
@@ -25,18 +25,18 @@
           </p>
         </div>
         </div>
-                  <!--
+     <!--
         <AppInput label="Nombre completo" v-model="form.name" placeholder="John Doe" required />
         <AppInput label="Email" type="email" v-model="form.email" placeholder="john@example.com" required />
         <AppInput label="Contraseña" type="password" v-model="form.password" placeholder="••••••••" required />
         <AppInput label="Confirmar contraseña" type="password" v-model="form.confirmPassword" placeholder="••••••••" required />
-
+  
         <div class="pt-2">
           <AppButton type="submit" :loading="loading" class="w-full h-[45px]">
             Registrarse
           </AppButton>
         </div>
-      -->
+         -->
       </form>
 
       <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">

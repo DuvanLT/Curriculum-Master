@@ -1,30 +1,35 @@
 <template>
   <div id="cv-template" class="pdf-container" style="width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; color: #000; padding: 6mm 8mm; background-color: #fff; font-family: 'Helvetica', 'Arial', sans-serif; line-height: 1.25;">
     
-    <header style="text-align: right; margin-bottom: 12px;">
-      <h1 style="font-size: 18px; font-weight: 800; margin: 0; color: #000000; letter-spacing: -0.025em;">{{ profile.nombre }}</h1>
-      <p style="font-size: 13px; margin: 2px 0; color: #334155;"><span style="font-weight: bold; color: #000;">Ubicado:</span> {{ profile.ubicacion }}</p>
-      <p style="font-size: 12px; margin: 1px 0;">
-        <span style="font-weight: bold;">Correo:</span>
-        <a v-if="profile.email_profile" :href="emailHref" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">{{ profile.email_profile }}</a>
-      </p>
-      <p style="font-size: 12px; margin: 1px 0;"><span style="font-weight: bold;">Telefono:</span> {{ profile.telefono }}</p>
-      <p v-if="socialLinks.length" style="font-size: 14px; margin: 2px 0;">
-        <span style="font-weight: bold;">Redes:</span>
-        <template v-for="(link, index) in socialLinks" :key="link.label">
-          <span v-if="index > 0"> - </span>
-          <a :href="link.href" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
-            {{ link.label }}
+    <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+      <div v-if="cvImage" style="width: 40mm; height: 40mm; margin-right: 4mm; flex-shrink: 0;">
+        <img :src="cvImage" style="width: 100%; height: 100%; object-fit: contain;" alt="Foto de perfil">
+      </div>
+      <div style="flex-grow: 1; text-align: right;">
+        <h1 style="font-size: 18px; font-weight: 800; margin: 0; color: #000000; letter-spacing: -0.025em;">{{ profile.nombre }}</h1>
+        <p style="font-size: 13px; margin: 2px 0; color: #334155;"><span style="font-weight: bold; color: #000;">Ubicado:</span> {{ profile.ubicacion }}</p>
+        <p style="font-size: 12px; margin: 1px 0;">
+          <span style="font-weight: bold;">Correo:</span>
+          <a v-if="profile.email_profile" :href="emailHref" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">{{ profile.email_profile }}</a>
+        </p>
+        <p style="font-size: 12px; margin: 1px 0;"><span style="font-weight: bold;">Telefono:</span> {{ profile.telefono }}</p>
+        <p v-if="socialLinks.length" style="font-size: 14px; margin: 2px 0;">
+          <span style="font-weight: bold;">Redes:</span>
+          <template v-for="(link, index) in socialLinks" :key="link.label">
+            <span v-if="index > 0"> - </span>
+            <a :href="link.href" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
+              {{ link.label }}
+            </a>
+          </template>
+        </p>
+        <p style="font-size: 14px; margin: 3px 0; color: #0f172a;"><span style="font-weight: 800;">Rol:</span> {{ aiData.optimized_title || profile.titulo }}</p>
+        <p v-if="profile.web" style="font-size: 12px; margin: 1px 0;">
+          <span style="font-weight: bold;">Portafolio web:</span>
+          <a :href="webHref" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
+            {{ profile.web }}
           </a>
-        </template>
-      </p>
-      <p style="font-size: 14px; margin: 3px 0; color: #0f172a;"><span style="font-weight: 800;">Rol:</span> {{ aiData.optimized_title || profile.titulo }}</p>
-      <p v-if="profile.web" style="font-size: 12px; margin: 1px 0;">
-        <span style="font-weight: bold;">Portafolio web:</span>
-        <a :href="webHref" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
-          {{ profile.web }}
-        </a>
-      </p>
+        </p>
+      </div>
     </header>
 
     <hr style="border: 0; border-top: 2px solid #0f172a; margin-bottom: 10px;">
@@ -34,8 +39,8 @@
       <p style="font-size: 11.5px; color: #0f172a; text-align: justify; margin: 0; line-height: 1.35;">
         {{ aiData.summary || profile.resumen }}
       </p>
-      <div style="font-size: 11px; margin-top: 6px; color: #0f172a; background-color: #f8fafc; padding: 4px 6px; border-radius: 4px;">
-        <span style="font-weight: bold; color: #0f172a;">Habilidades:</span> {{ (aiData.top_skills || []).join(', ') }}
+      <div style="font-size: 11px; margin-top: 6px; color: #0f172a; padding: 4px 6px 4px 0px; border-radius: 4px;">
+        <span style="font-weight: bold; font-style: italic; color: #0f172a;">Habilidades:</span> {{ (aiData.top_skills || []).join(', ') }}
       </div>
     </section>
 
@@ -76,7 +81,7 @@
         </ul>
 
         <div style="font-size: 10.5px; color: #475569; font-style: italic;">
-          <span style="font-weight: bold; color: #334155;">Tecnologías:</span> {{ exp.skills_sugeridas?.join(', ') }}
+          <span style="font-weight: bold; color: #334155;">Habilidades:</span> {{ exp.skills_sugeridas?.join(', ') }}
         </div>
       </div>
     </section>
@@ -106,6 +111,10 @@ const props = defineProps({
   aiData: {
     type: Object,
     default: () => ({})
+  },
+  cvImage: {
+    type: String,
+    default: null
   }
 })
 

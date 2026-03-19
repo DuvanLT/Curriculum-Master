@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
       const resend = new Resend(config.resendApiKey)
 
       await resend.emails.send({
-        from: 'onboarding@resend.dev', // Default sender for testing
+        from: 'no-reply@wikisportco.com', // Default sender for testing
         to: email,
         subject: 'Código de verificación - Bring Jobs',
         html: `
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
            <div style="background-color: #f9f9f9; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
              <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #f59e0b;">${verificationCode}</span>
            </div>
-           <p style="font-size: 14px; color: #666; text-align: center;">Este código expirará pronto. Si no solicitaste este registro, puedes ignorar este correo.</p>
+           <p style="font-size: 14px; color: #666; text-align: center;">Si no solicitaste este registro, por favor ignora este correo.</p>
          </div>
        `
       })

@@ -74,7 +74,7 @@
             </AppButton>
             
             <p class="mt-2 text-[11px] font-mono text-text-muted">
-              MÃ¡ximo {{ MAX_STEPS }} tareas activas en tu roadmap.
+              Máximo {{ MAX_STEPS }} tareas activas en tu roadmap.
             </p>
             <div class="mt-6 pt-6 border-t border-border-dim">
               <div class="text-[11px] text-amber font-mono mb-2 uppercase tracking-widest flex items-center gap-1.5">

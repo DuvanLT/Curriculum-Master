@@ -11,6 +11,29 @@
         <div class="text-[11px] text-text-dim mb-3 leading-relaxed">
           La adaptacion prioriza las experiencias mas relevantes para la vacante y evita inventar porcentajes o resultados no sustentados por tu perfil maestro.
         </div>
+        <div class="mb-4 p-3 bg-dark-bg3 border border-border rounded-lg">
+          <div class="text-[12px] font-semibold text-text-main mb-1 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-amber">image</span>
+            Foto de perfil (Opcional)
+          </div>
+          <div class="text-[11px] text-text-dim mb-3">
+            <span class="text-amber">Nota:</span> Por motivos de privacidad y seguridad, no almacenamos tus fotografías en nuestros servidores. Por ello, te solicitaremos que subas tu imagen cada vez que generes un nuevo currículum.
+          </div>
+          <div class="flex items-center gap-3">
+            <label class="cursor-pointer bg-dark-bg2 hover:bg-border-dim border border-border px-3 py-2 rounded flex items-center gap-2 transition-colors">
+              <span class="material-symbols-outlined text-[18px]">upload</span>
+              <span class="text-[12px] font-medium">Subir Imagen</span>
+              <input type="file" @change="handleImageUpload" accept="image/*" class="hidden">
+            </label>
+            <div v-if="cvImage" class="relative group">
+              <img :src="cvImage" class="w-10 h-10 rounded-full object-cover border border-amber" alt="Preview">
+              <button @click="cvImage = null" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+
         <AppInput
           type="textarea"
           v-model="jd"
@@ -94,6 +117,7 @@
           :educations="educations"
           :experiences="experiences"
           :aiData="aiResult"
+          :cvImage="cvImage"
         />
       </div>
     </div>
@@ -110,6 +134,17 @@ const toast = useToast()
 const jd = ref('')
 const loading = ref(false)
 const aiResult = ref(null)
+const cvImage = ref(null)
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    if (cvImage.value) {
+      URL.revokeObjectURL(cvImage.value)
+    }
+    cvImage.value = URL.createObjectURL(file)
+  }
+}
 
 const optimizedExperiences = computed(() => {
   return Array.isArray(aiResult.value?.experiences) ? aiResult.value.experiences : []
