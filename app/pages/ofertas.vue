@@ -21,7 +21,7 @@
           @keyup.enter="searchJobs"
         />
         <div class="flex items-end">
-          <AppButton @click="searchJobs" :loading="loading" class="h-[42px] px-6">
+          <AppButton @click="searchJobs" :loading="loading" class="h-[38px] mb-3 px-6">
             <span class="material-symbols-outlined text-[18px] mr-1">search</span>
             Buscar
           </AppButton>

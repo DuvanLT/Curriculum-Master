@@ -6,7 +6,7 @@
         <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Análisis de Vacante</div>
         <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Pega la descripción completa de la vacante para analizar tu compatibilidad con el perfil.</div>
 
-      <AppCard title="Descripción de la Oferta (JD)">
+      <AppCard title="Descripción de la Oferta">
         <AppInput 
           type="textarea" 
           v-model="jd" 
