@@ -15,6 +15,36 @@ export const useDb = () => {
   return client
 }
 
+async function ensureUserColumn(db: ReturnType<typeof useDb>, name: string, type: string) {
+  const result = await db.execute('PRAGMA table_info(users)')
+  const columns = result.rows
+    .map((row: any) => String(row.name || row.column_name || '').trim())
+    .filter(Boolean)
+
+  if (columns.includes(name)) {
+    return
+  }
+
+  await db.execute(`ALTER TABLE users ADD COLUMN ${name} ${type}`)
+}
+
+const globalForOnboardingSchema = globalThis as typeof globalThis & {
+  __sidebarTourColumnPromise?: Promise<void>
+}
+
+export const ensureSidebarTourColumn = async () => {
+  if (!globalForOnboardingSchema.__sidebarTourColumnPromise) {
+    const db = useDb()
+    globalForOnboardingSchema.__sidebarTourColumnPromise = ensureUserColumn(db, 'sidebar_tour_completed_at', 'DATETIME')
+      .catch((error) => {
+        globalForOnboardingSchema.__sidebarTourColumnPromise = undefined
+        throw error
+      })
+  }
+
+  return globalForOnboardingSchema.__sidebarTourColumnPromise
+}
+
 export const initDb = async () => {
   const db = useDb()
   
@@ -42,6 +72,7 @@ export const initDb = async () => {
     { name: 'web', type: 'TEXT' },
     { name: 'educacion', type: 'TEXT' },
     { name: 'years', type: 'TEXT' },
+    { name: 'sidebar_tour_completed_at', type: 'DATETIME' },
     { name: 'is_verified', type: 'INTEGER DEFAULT 0' },
     { name: 'verification_code', type: 'TEXT' }
   ]

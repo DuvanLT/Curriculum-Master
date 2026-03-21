@@ -3,7 +3,7 @@
     <div>
       <div class="flex justify-between">
         <div>
-          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Perfil Maestro</div>
+          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Perfil Maestro <HelpButton /></div>
           <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Tu perfil maestro debe incluir tu informacion laboral, academica y profesional mas reciente.</div>
         </div>
         <div class="flex items-center gap-4">
@@ -20,23 +20,23 @@
       </div>
 
       <div class="stats-row grid grid-cols-4 gap-2.5 mb-5">
-        <div class="stat-card bg-dark-bg2 border border-border rounded-[5px] p-[14px]">
+        <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">{{ profile.years || 0 }}</div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">anos exp.</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Años de experiencia</div>
         </div>
-        <div class="stat-card bg-dark-bg2 border border-border rounded-[5px] p-[14px]">
+        <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">{{ experiences.length }}</div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">entradas</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Entradas</div>
         </div>
-        <div class="stat-card bg-dark-bg2 border border-border rounded-[5px] p-[14px]">
+        <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">{{ educations.length }}</div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">estudios</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Estudios</div>
         </div>
-        <div class="stat-card bg-dark-bg2 border border-border rounded-[5px] p-[14px]">
+        <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">
             {{ [...new Set(experiences.flatMap(e => e.skills || []))].length }}
           </div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">skills unicos</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Habilidades únicas</div>
         </div>
       </div>
 
@@ -74,7 +74,7 @@
           </div>
         </template>
 
-        <div v-if="addingEducation" class="bg-dark-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
+        <div v-if="addingEducation" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
           <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">- {{ editingEducationId ? 'EDITAR' : 'NUEVO' }} ESTUDIO</div>
 
           <div class="grid grid-cols-2 gap-3 mb-3">
@@ -98,7 +98,7 @@
         </div>
 
         <div v-else class="space-y-3">
-          <div v-for="edu in educations" :key="edu.id" class="border border-border rounded-[5px] p-[14px] bg-dark-bg3">
+          <div v-for="edu in educations" :key="edu.id" class="border border-border rounded-[5px] p-[14px] bg-[var(--bg)]-bg3">
             <div class="flex justify-between gap-4">
               <div>
                 <div class="text-[14px] text-text font-medium">{{ edu.titulo }}</div>
@@ -127,7 +127,7 @@
           </div>
         </template>
 
-        <div v-if="adding" class="bg-dark-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
+        <div v-if="adding" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
           <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">- {{ editingExpId ? 'EDITAR' : 'NUEVA' }} ENTRADA</div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
@@ -194,7 +194,7 @@
 
           <section v-if="projectExperiences.length">
             <div class="flex items-center justify-between mb-3">
-              <div class="text-[12px] font-mono text-sky-300 tracking-widest uppercase">Proyectos</div>
+              <div class="text-[12px] font-mono text-sky-500 tracking-widest uppercase">Proyectos</div>
               <div class="text-[11px] text-text-dim font-mono">{{ projectExperiences.length }} entradas</div>
             </div>
 

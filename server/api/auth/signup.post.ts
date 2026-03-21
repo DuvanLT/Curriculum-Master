@@ -77,11 +77,11 @@ export default defineEventHandler(async (event) => {
         subject: 'Código de verificación - Bring Jobs',
         html: `
          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-           <h1 style="color: #f59e0b; text-align: center;">Bring Jobs</h1>
+           <h1 style="color: #2563eb; text-align: center;">BringJobs</h1>
            <p style="font-size: 16px; color: #333;">¡Hola ${name || 'usuario'}!</p>
            <p style="font-size: 16px; color: #333;">Gracias por unirte a Bring Jobs. Para completar tu registro, utiliza el siguiente código de verificación:</p>
            <div style="background-color: #f9f9f9; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
-             <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #f59e0b;">${verificationCode}</span>
+             <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2563eb;">${verificationCode}</span>
            </div>
            <p style="font-size: 14px; color: #666; text-align: center;">Si no solicitaste este registro, por favor ignora este correo.</p>
          </div>

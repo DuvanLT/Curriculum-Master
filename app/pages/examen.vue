@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div class="max-w-3xl mx-auto py-4">
       <div class="mb-6">
-        <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Examen de Competencias</div>
+        <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Examen de Competencias <HelpButton /></div>
         <div class="page-sub text-[13px] text-text-dim mb-2 font-mono">
         Realiza esta evaluación de 16 preguntas para identificar tus habilidades clave y completar aún más tu currículum.
         </div>
@@ -37,7 +37,7 @@
               <span
                 v-for="skill in visibleResult.confirmed_skills"
                 :key="skill.key"
-                class="px-3 py-1 rounded-full border border-border bg-dark-bg3 text-[12px] text-text"
+                class="px-3 py-1 rounded-full border border-border bg-[var(--bg)]-bg3 text-[12px] text-text"
               >
                 {{ skill.label }}
               </span>
@@ -79,7 +79,7 @@
             </div>
           </div>
 
-          <div class="w-full h-2 rounded-full bg-dark-bg3 overflow-hidden mb-4">
+          <div class="w-full h-2 rounded-full bg-[var(--bg)]-bg3 overflow-hidden mb-4">
             <div class="h-full bg-amber transition-all duration-200" :style="{ width: `${progressPercent}%` }"></div>
           </div>
 
@@ -95,13 +95,13 @@
               class="w-full text-left rounded-[5px] border p-4 transition-all"
               :class="answers[currentQuestion.id] === option.id
                 ? 'border-amber bg-amber/10 text-text'
-                : 'border-border bg-dark-bg3 text-text-dim hover:border-amber/40 hover:text-text'"
+                : 'border-border bg-[var(--bg)]-bg3 text-text-dim hover:border-amber/40 hover:text-text'"
               @click="selectOption(currentQuestion.id, option.id)"
             >
               <div class="flex items-start gap-3">
                 <div
                   class="mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center shrink-0"
-                  :class="answers[currentQuestion.id] === option.id ? 'border-amber bg-amber text-black' : 'border-border'"
+                  :class="answers[currentQuestion.id] === option.id ? 'border-amber bg-amber text-white' : 'border-border'"
                 >
                   <span v-if="answers[currentQuestion.id] === option.id" class="material-symbols-outlined text-[14px]">check</span>
                 </div>

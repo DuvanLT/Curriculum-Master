@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout>
     <div class="overflow-hidden max-w-full">
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ofertas de Empleo</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ofertas de Empleo <HelpButton /></div>
       <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Powered by Jooble · Encuentra tu próximo reto profesional</div>
 
       <!-- Search Bar -->
@@ -62,7 +62,7 @@
           <div 
             v-for="(job, i) in jobs" 
             :key="i"
-            class="job-card relative bg-dark-bg2 border border-border rounded-lg p-5 hover:border-amber/40 transition-all group"
+            class="job-card relative bg-[var(--bg)]-bg2 border border-border rounded-lg p-5 hover:border-amber/40 transition-all group"
           >
             <div class="flex justify-between items-start mb-2">
               <div class="flex-1 min-w-0">

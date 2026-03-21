@@ -1,18 +1,18 @@
 <template>
   <NuxtLayout>
     <div class="h-full flex flex-col">
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ezra AI</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ezra AI <HelpButton /></div>
       <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Resuelve tus dudas sobre tu carrera profesional con Ezra IA, la reclutadora inteligente.</div>
 
       <AppCard class="flex-1 flex flex-col min-h-0 !mb-0">
-        <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-dark-bg3 mb-2.5 flex flex-col gap-2.5 min-h-[300px]" ref="chatContainer">
+        <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-[var(--bg)]-bg3 mb-2.5 flex flex-col gap-2.5 min-h-[300px]" ref="chatContainer">
           <div v-for="(msg, i) in msgs" :key="i" class="max-w-[85%] p-2.5 px-3.5 rounded-[5px] text-[13px] leading-relaxed"
-            :class="msg.role === 'user' ? 'msg-user bg-amber-dim text-amber-light self-end rounded-br-none' : 'msg-ai bg-dark-bg4 text-text self-start rounded-bl-none border border-border'">
+            :class="msg.role === 'user' ? 'msg-user bg-amber-dim text-amber-light self-end rounded-br-none' : 'msg-ai bg-[var(--bg)]-bg4 text-text self-start rounded-bl-none border border-border'">
             <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? 'Tú' : 'Ezra' }}</div>
             <div v-if="msg.role === 'user'">{{ msg.text }}</div>
             <div v-else class="markdown-content" v-html="renderMarkdown(msg.text)"></div>
           </div>
-          <div v-if="loading" class="self-start bg-dark-bg4 p-3 rounded-[5px] flex gap-1 items-center">
+          <div v-if="loading" class="self-start bg-[var(--bg)]-bg4 p-3 rounded-[5px] flex gap-1 items-center">
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>

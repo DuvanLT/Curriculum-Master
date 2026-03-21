@@ -1,18 +1,21 @@
 <template>
-  <header class="topbar flex items-center justify-between px-6 h-[52px] bg-dark-bg2 border-b border-border flex-shrink-0">
+  <header class="topbar flex items-center justify-between px-6 h-[52px] bg-[var(--bg)]-bg2 border-b border-border flex-shrink-0">
     <div class="flex items-center">
       <div class="logo font-head text-lg font-bold tracking-tighter text-text">
         Bring<span>Jobs</span>
       </div>
-      <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-dark-bg4 border border-border px-1.5 py-0.5 rounded">Beta Cerrada</span>
+      <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-[var(--bg)]-bg4 border border-border px-1.5 py-0.5 rounded">Beta Cerrada</span>
     </div>
-   <div class="flex items-center">
-    <a href="mailto:soporte@bringjobs.com">
-    <span class="text-[13px] text-text-dim font-mono hover:text-amber">soporte@bringjobs.com</span>
-    </a>
-</div>
+
+    <div class="topbar-actions">
+      <a href="mailto:soporte@bringjobs.com" class="support-link">
+        soporte@bringjobs.com
+      </a>
+    </div>
   </header>
 </template>
+
+
 
 <style scoped>
 .topbar {
@@ -25,6 +28,7 @@
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
+
 .logo {
   font-family: var(--font-head);
   font-size: 18px;
@@ -32,9 +36,11 @@
   letter-spacing: -0.5px;
   color: var(--text);
 }
+
 .logo span {
   color: var(--amber);
 }
+
 .logo-tag {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -45,11 +51,12 @@
   padding: 2px 6px;
   border-radius: 3px;
 }
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 6px var(--green);
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+
+
 </style>

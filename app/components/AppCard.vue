@@ -1,5 +1,5 @@
 <template>
-  <div class="card bg-dark-bg2 border border-border rounded-md p-5 mb-4">
+  <div class="card bg-[var(--bg)] border border-border rounded-md p-5 mb-4">
     <div v-if="title" class="card-title font-head text-[14px] font-semibold mb-4 text-text flex items-center gap-2">
       <span class="w-[3px] h-[14px] bg-amber rounded-sm"></span>
       {{ title }}

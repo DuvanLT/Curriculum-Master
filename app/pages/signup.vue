@@ -1,11 +1,11 @@
 <template>
-  <div class="auth-page min-h-screen flex items-center justify-center p-6 bg-dark-bg">
-    <div class="auth-card w-full max-w-[400px] bg-dark-bg2 border border-border rounded-[8px] p-8 shadow-2xl relative overflow-hidden">
+  <div class="auth-page min-h-screen flex items-center justify-center p-6 bg-[var(--bg)]">
+    <div class="auth-card w-full max-w-[400px] border border-border rounded-[8px] p-8 relative overflow-hidden">
       <!-- Decorative element -->
       <div class="absolute top-0 right-0 w-32 h-32 bg-amber opacity-5 blur-[80px] -mr-16 -mt-16"></div>
       
       <div class="text-center mb-8 relative z-10">
-        <h1 class="font-head text-[28px] font-bold text-white tracking-tighter mb-1">Bring<span class="text-amber">Jobs</span></h1>
+        <h1 class="font-head text-[28px] font-bold text-text tracking-tighter mb-1">Bring<span class="text-amber">Jobs</span></h1>
         <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">Crea tu cuenta</p>
       </div>
 
@@ -85,11 +85,12 @@ const handleSignup = async () => {
 <style scoped>
 .auth-page {
   background-image: 
-    radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+    radial-gradient(circle at 2px 2px, rgba(37, 99, 235, 0.08) 1px, transparent 0);
   background-size: 32px 32px;
 }
 .auth-card {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: var(--bg2);
+  box-shadow: var(--shadow-soft);
   transition: transform 0.3s ease;
 }
 .auth-card:hover {

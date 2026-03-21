@@ -3,7 +3,7 @@
     <div class="h-full flex flex-col gap-6 overflow-hidden max-w-full">
       <div class="flex justify-between items-end flex-shrink-0">
         <div>
-          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Mis Aplicaciones</div>
+          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Mis Aplicaciones <HelpButton /></div>
           <div class="page-sub text-[13px] text-text-dim font-mono">Realiza seguimiento a las ofertas a las que aplicaste y mantén el control de tus procesos de selección.</div>
         </div>
         <AppButton @click="showAddModal = true" variant="primary">
@@ -33,15 +33,15 @@
                 <div class="w-2 h-2 rounded-full" :class="statusBg(status)"></div>
                 <h3 class="text-[11px] font-mono uppercase tracking-widest text-text-dim">{{ status }}</h3>
               </div>
-              <span class="text-[10px] font-mono bg-dark-bg3 px-1.5 py-0.5 rounded border border-border text-text-dim">
+              <span class="text-[10px] font-mono bg-[var(--bg)]-bg3 px-1.5 py-0.5 rounded border border-border text-text-dim">
                 {{ groupedApps[status]?.length || 0 }}
               </span>
             </div>
   
             <!-- Column Content -->
-            <div class="flex-1 bg-dark-bg/20 border border-border/40 rounded-xl p-2 flex flex-col gap-3 min-h-[200px] overflow-y-auto scrollbar-none">
+            <div class="flex-1 bg-[var(--bg)]-bg/20 border border-border/40 rounded-xl p-2 flex flex-col gap-3 min-h-[200px] overflow-y-auto scrollbar-none">
               <div v-for="app in groupedApps[status]" :key="app.id" 
-                   class="bg-dark-bg3 border border-border rounded-lg p-4 group hover:border-amber/40 transition-all flex flex-col gap-3 relative shadow-sm">
+                   class="bg-[var(--bg)]-bg3 border border-border rounded-lg p-4 group hover:border-amber/40 transition-all flex flex-col gap-3 relative shadow-sm">
                 
                 <div class="flex justify-between items-start gap-2">
                   <div class="flex-1 min-w-0">
@@ -82,14 +82,14 @@
                     <button 
                       v-if="canMoveBackward(app.status)" 
                       @click="moveApp(app, -1)"
-                      class="w-5 h-5 flex items-center justify-center bg-dark-bg4 border border-border rounded hover:border-amber transition-colors"
+                      class="w-5 h-5 flex items-center justify-center bg-[var(--bg)]-bg4 border border-border rounded hover:border-amber transition-colors"
                     >
                       <span class="material-symbols-outlined text-[12px]">arrow_back</span>
                     </button>
                     <button 
                       v-if="canMoveForward(app.status)" 
                       @click="moveApp(app, 1)"
-                      class="w-5 h-5 flex items-center justify-center bg-dark-bg4 border border-border rounded hover:border-amber transition-colors"
+                      class="w-5 h-5 flex items-center justify-center bg-[var(--bg)]-bg4 border border-border rounded hover:border-amber transition-colors"
                     >
                       <span class="material-symbols-outlined text-[12px]">arrow_forward</span>
                     </button>
@@ -109,8 +109,8 @@
     </div>
 
     <!-- Add Modal -->
-    <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-bg/90 backdrop-blur-sm">
-      <div class="bg-dark-bg2 border border-border rounded-xl p-8 w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200">
+    <div v-if="showAddModal" class="add-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="add-modal-panel w-full max-w-md rounded-xl p-8 animate-in fade-in zoom-in duration-200">
         <h2 class="text-xl font-bold mb-6 font-head tracking-tight">Nueva Aplicación</h2>
         <div class="space-y-4">
           <div>
@@ -124,13 +124,13 @@
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">Estado Inicial</label>
-              <select v-model="newApp.status" class="w-full bg-dark-bg3 border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-amber outline-none transition-all">
+              <select v-model="newApp.status" class="panel-input">
                 <option v-for="s in statusOptions" :key="s" :value="s">{{ s }}</option>
               </select>
             </div>
             <div>
               <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">Fecha de aplicación</label>
-              <input type="date" v-model="newApp.date" class="w-full bg-dark-bg3 border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-amber outline-none transition-all" />
+              <input type="date" v-model="newApp.date" class="panel-input" />
             </div>
           </div>
           <!-- Conditional Interview Date in Modal -->
@@ -139,7 +139,7 @@
               <span class="material-symbols-outlined text-[16px]">target</span>
               Fecha de Entrevista
             </label>
-            <input type="date" v-model="newApp.interview_date" class="w-full bg-amber/5 border border-amber/30 rounded-lg px-3 py-2 text-sm text-text focus:border-amber outline-none transition-all" />
+            <input type="date" v-model="newApp.interview_date" class="panel-input panel-input-accent" />
           </div>
         </div>
         <div class="flex gap-3 mt-8">
@@ -178,7 +178,7 @@
         <input 
           type="date" 
           v-model="tempDate"
-          class="w-full bg-dark-bg3 border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-amber outline-none transition-all"
+          class="panel-input"
         />
       </div>
     </AppModal>
@@ -370,19 +370,51 @@ onMounted(fetchApps)
   height: 8px;
 }
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--bg4) 45%, transparent);
   border-radius: 10px;
 }
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: var(--amber); /* Making it very visible */
+  background: var(--amber);
   border-radius: 10px;
-  border: 2px solid var(--dark-bg);
+  border: 2px solid var(--bg2);
 }
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: var(--amber-dim);
+  background: var(--amber2);
 }
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+.add-modal-overlay {
+  background: var(--overlay);
+  backdrop-filter: blur(10px);
+}
+
+.add-modal-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+.panel-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+
+.panel-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(var(--amber-rgb), 0.14);
+}
+
+.panel-input-accent {
+  background: color-mix(in srgb, var(--amber-dim) 55%, white);
+  border-color: color-mix(in srgb, var(--amber) 20%, var(--border));
 }
 </style>

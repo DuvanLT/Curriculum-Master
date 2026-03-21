@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout>
     <div>
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Próximos Pasos</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Próximos Pasos <HelpButton /></div>
       <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Añade y completa tareas que te llevarán al éxito profesional.</div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -29,8 +29,8 @@
               <div 
                 v-for="step in steps" 
                 :key="step.id" 
-                class="flex items-center gap-3 p-3 bg-dark-bg3 border border-border rounded-[5px] group transition-all"
-                :class="{ 'opacity-60 border-transparent bg-dark-bg2': step.completed }"
+                class="flex items-center gap-3 p-3 bg-[var(--bg)]-bg3 border border-border rounded-[5px] group transition-all"
+                :class="{ 'opacity-60 border-transparent bg-[var(--bg)]-bg2': step.completed }"
               >
                 <div 
                   @click="toggleStep(step)" 

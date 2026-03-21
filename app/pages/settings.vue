@@ -38,7 +38,7 @@
       <div v-else-if="activeTab === 'privacy'">
         <AppCard title="Privacidad y Datos">
           <div class="space-y-6">
-            <div class="border border-border/60 bg-dark-bg3/50 rounded-xl p-6">
+            <div class="border border-border/60 bg-[var(--bg)]-bg3/50 rounded-xl p-6">
               <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div class="flex items-center gap-3 mb-3">
@@ -80,7 +80,7 @@
                       inputmode="numeric"
                       maxlength="6"
                       placeholder="000000"
-                      class="bg-dark-bg border-2 border-border focus:border-amber outline-none rounded-[12px] w-full py-4 text-center text-3xl font-bold tracking-[10px] text-amber transition-all"
+                      class="bg-[var(--bg)]-bg border-2 border-border focus:border-amber outline-none rounded-[12px] w-full py-4 text-center text-3xl font-bold tracking-[10px] text-amber transition-all"
                       @input="handleResetCodeInput"
                     />
 
@@ -141,7 +141,7 @@
               </p>
               <AppButton
                 variant="secondary"
-                class="!border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-white transition-all"
+                class="!border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-text-dim transition-all"
                 @click="showDeleteModal = true"
               >
                 Borrar mi cuenta definitivamente

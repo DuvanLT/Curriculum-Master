@@ -1,5 +1,5 @@
 <template>
-  <div class="exp-item border border-border rounded-[5px] p-[14px] mb-2.5 bg-dark-bg3 relative group">
+  <div class="exp-item border border-border rounded-[5px] p-[14px] mb-2.5 bg-[var(--bg)]-bg3 relative group">
     <div class="flex items-center gap-2 mb-2">
       <span class="px-2 py-0.5 rounded-[999px] text-[10px] font-mono uppercase tracking-wider" :class="badgeClass">
         {{ typeLabel }}
@@ -52,7 +52,7 @@ const typeLabel = computed(() => {
 
 const badgeClass = computed(() => {
   return props.experience?.type === 'project'
-    ? 'bg-sky-900/40 text-sky-300 border border-sky-700/60'
+    ? 'text-violet-500 bg-violet-100'
     : 'bg-amber-dim text-amber border border-amber-dim'
 })
 

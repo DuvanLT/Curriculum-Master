@@ -1,53 +1,366 @@
 <template>
-  <nav class="sidebar w-[200px] bg-dark-bg2 border-r border-border p-4 flex-shrink-0 flex flex-col">
+  <nav
+    ref="sidebarRef"
+    class="sidebar w-[200px] bg-[var(--bg)]-bg2 border-r border-border p-4 flex-shrink-0 flex flex-col relative"
+    :class="{ 'tour-sidebar-active': showTour }"
+  >
     <div class="nav-section mb-6">
       <div class="nav-label text-[10px] text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Principal</div>
-      <NuxtLink to="/analisis" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">search</span> Analizar Vacante
-      </NuxtLink>
-      <NuxtLink to="/generador" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">description</span> Constructor CV
-      </NuxtLink>
-      <NuxtLink to="/coach" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">smart_toy</span> Ezra
-      </NuxtLink>
-      <NuxtLink to="/pasos" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">fact_check</span> Mi Ruta
-      </NuxtLink>
-      <NuxtLink to="/entrevista" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">videocam</span>
-        <span class="nav-text">Practicar Entrevista</span>
-        <span class="badge-beta">BETA</span>
-      </NuxtLink>
-      <NuxtLink to="/aplicaciones" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">view_kanban</span> Mis Aplicaciones
-      </NuxtLink>
-      <NuxtLink to="/ofertas" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">work</span> Bolsa de Empleo
-      </NuxtLink>
-            <div class="nav-label text-[10px] mt-6 text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Configuracion</div>
-            <NuxtLink to="/settings" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">settings</span> Ajustes
-      </NuxtLink>
+
+      <div
+        v-for="item in primaryNavigationItems"
+        :key="item.id"
+        :ref="setTourItemRef(item.id)"
+        class="nav-item-shell"
+        :class="getTourShellClass(item.id)"
+      >
+        <NuxtLink
+          :to="item.to"
+          class="nav-item"
+          active-class="active"
+          :class="{ 'tour-item-active': isFocusedTourItem(item.id) }"
+          @click="preventNavigationDuringTour"
+        >
+          <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">{{ item.label }}</span>
+          <span v-if="item.badge" class="badge-beta">{{ item.badge }}</span>
+        </NuxtLink>
+      </div>
+
+      <div class="nav-label text-[10px] mt-6 text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Configuracion</div>
+
+      <div
+        v-for="item in settingsNavigationItems"
+        :key="item.id"
+        :ref="setTourItemRef(item.id)"
+        class="nav-item-shell"
+        :class="getTourShellClass(item.id)"
+      >
+        <NuxtLink
+          :to="item.to"
+          class="nav-item"
+          active-class="active"
+          :class="{ 'tour-item-active': isFocusedTourItem(item.id) }"
+          @click="preventNavigationDuringTour"
+        >
+          <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">{{ item.label }}</span>
+        </NuxtLink>
+      </div>
     </div>
 
-    <!-- User Section & Logout -->
     <div class="mt-auto pt-6 border-t border-border/50">
-      <NuxtLink v-if="user" to="/perfil" class="flex items-center gap-3 px-4 mb-4 group cursor-pointer no-underline">
-        <div class="w-8 h-8 rounded-full bg-amber/10 border border-amber/30 flex items-center justify-center text-amber font-bold text-[12px] shrink-0 group-hover:bg-amber/20 transition-all">
-          {{ user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase() }}
-        </div>
-        <div class="flex flex-col min-w-0">
-          <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || 'Sin Nombre' }}</div>
-          <div class="text-[9px] text-white truncate font-mono  group-hover:opacity-100 transition-opacity">Plan Beta</div>
-        </div>
-      </NuxtLink>
+      <div
+        v-if="user && profileNavigationItem"
+        :ref="setTourItemRef(profileNavigationItem.id)"
+        class="profile-shell"
+        :class="getTourShellClass(profileNavigationItem.id)"
+      >
+        <NuxtLink
+          to="/perfil"
+          class="user-profile-link flex items-center gap-3 px-4 mb-4 group cursor-pointer no-underline"
+          :class="{ 'tour-item-active': isFocusedTourItem(profileNavigationItem.id) }"
+          @click="preventNavigationDuringTour"
+        >
+          <div class="w-8 h-8 rounded-full bg-amber/10 border border-amber/30 flex items-center justify-center text-amber font-bold text-[12px] shrink-0 group-hover:bg-amber/20 transition-all">
+            {{ user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase() }}
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || 'Sin Nombre' }}</div>
+            <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">Plan Beta</div>
+          </div>
+        </NuxtLink>
+      </div>
     </div>
   </nav>
+
+  <Teleport to="body">
+    <Transition name="tour-fade">
+      <div v-if="showTour" class="tour-backdrop" @click="completeTour"></div>
+    </Transition>
+
+    <Transition name="tour-fade">
+      <div
+        v-if="showTour && currentTourItem"
+        ref="tourCardRef"
+        class="tour-card"
+        :style="tourCardStyle"
+      >
+        <div class="tour-card-header">
+          <div>
+            <div class="tour-kicker">Guia inicial</div>
+            <div class="tour-title">{{ currentTourItem.label }}</div>
+          </div>
+          <button type="button" class="tour-close" @click="completeTour" aria-label="Cerrar tutorial">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+
+        <div class="tour-step-row">
+          <div class="tour-step-icon">
+            <span class="material-symbols-outlined text-[18px]">{{ currentTourItem.icon }}</span>
+          </div>
+          <div class="text-[11px] text-text-dim font-mono uppercase tracking-widest">
+            Paso {{ tourStep + 1 }} de {{ tourItems.length }}
+          </div>
+        </div>
+
+        <p class="tour-copy">{{ currentTourItem.description }}</p>
+        <p class="tour-tip">{{ currentTourItem.tip }}</p>
+
+        <div class="tour-progress">
+          <span
+            v-for="(_, index) in tourItems"
+            :key="index"
+            class="tour-dot"
+            :class="{
+              'tour-dot-complete': index < tourStep,
+              'tour-dot-active': index === tourStep
+            }"
+          ></span>
+        </div>
+
+        <div class="tour-actions">
+          <button type="button" class="tour-link-btn" @click="completeTour">Omitir</button>
+          <div class="flex items-center gap-2">
+            <AppButton variant="secondary" size="sm" :disabled="tourStep === 0" @click="previousTourStep">
+              Anterior
+            </AppButton>
+            <AppButton size="sm" @click="nextTourStep">
+              {{ isLastTourStep ? 'Finalizar' : 'Siguiente' }}
+            </AppButton>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
-<script setup>
-const { user, logout } = useAuth()
+<script setup lang="ts">
+const { user } = useAuth()
+const {
+  primaryNavigationItems,
+  settingsNavigationItems,
+  profileNavigationItem,
+  sidebarTourSignal
+} = useNavigationHelp()
+
+const sidebarRef = ref<HTMLElement | null>(null)
+const showTour = ref(false)
+const tourStep = ref(0)
+const tourCardStyle = ref<Record<string, string>>({})
+const tourItemRefs = ref<Record<string, HTMLElement | null>>({})
+const tourCardRef = ref<HTMLElement | null>(null)
+const hasCompletedTour = ref(true)
+
+const tourItems = computed(() => {
+  const items = [
+    ...primaryNavigationItems.value,
+    ...settingsNavigationItems.value
+  ]
+
+  if (user.value && profileNavigationItem.value) {
+    items.push(profileNavigationItem.value)
+  }
+
+  return items
+})
+
+const currentTourItem = computed(() => tourItems.value[tourStep.value] ?? null)
+const isLastTourStep = computed(() => tourStep.value === tourItems.value.length - 1)
+
+const isFocusedTourItem = (id: string) => showTour.value && currentTourItem.value?.id === id
+
+const getTourShellClass = (id: string) => ({
+  'tour-shell-active': isFocusedTourItem(id),
+  'tour-shell-dimmed': showTour.value && currentTourItem.value?.id !== id
+})
+
+const setTourItemRef = (id: string) => (element: Element | null) => {
+  tourItemRefs.value[id] = element as HTMLElement | null
+
+  if (showTour.value && currentTourItem.value?.id === id) {
+    nextTick(() => updateTourCardPosition())
+  }
+}
+
+const updateTourCardPosition = () => {
+  if (!import.meta.client || !showTour.value || !currentTourItem.value) {
+    return
+  }
+
+  const currentElement = tourItemRefs.value[currentTourItem.value.id]
+  const sidebarElement = sidebarRef.value
+
+  if (!currentElement || !sidebarElement) {
+    return
+  }
+
+  const itemRect = currentElement.getBoundingClientRect()
+  const sidebarRect = sidebarElement.getBoundingClientRect()
+  const compactMode = window.innerWidth < 1100
+  const viewportPadding = compactMode ? 16 : 24
+  const cardWidth = Math.min(compactMode ? window.innerWidth - 32 : 340, 340)
+  const cardHeight = tourCardRef.value?.offsetHeight ?? 320
+
+  const left = compactMode
+    ? Math.max(viewportPadding, Math.min(sidebarRect.left, window.innerWidth - cardWidth - viewportPadding))
+    : Math.min(sidebarRect.right + 18, window.innerWidth - cardWidth - viewportPadding)
+
+  const preferredTop = compactMode ? sidebarRect.bottom + 16 : itemRect.top - 6
+  const maxTop = window.innerHeight - cardHeight - viewportPadding
+  const top = Math.max(viewportPadding, Math.min(preferredTop, maxTop))
+
+  tourCardStyle.value = {
+    top: `${top}px`,
+    left: `${left}px`,
+    width: `${cardWidth}px`
+  }
+}
+
+const loadTourStatus = async () => {
+  if (!import.meta.client || !user.value?.id) {
+    return
+  }
+
+  try {
+    const response = await $fetch<{ completed: boolean }>('/api/onboarding/sidebar-tour')
+    hasCompletedTour.value = Boolean(response.completed)
+  } catch (error) {
+    console.error('Error loading sidebar tour status:', error)
+    hasCompletedTour.value = true
+    return
+  }
+
+  if (!hasCompletedTour.value) {
+    await startTour()
+  }
+}
+
+const markTourAsCompleted = async () => {
+  if (!import.meta.client || !user.value?.id || hasCompletedTour.value) {
+    return
+  }
+
+  try {
+    await $fetch('/api/onboarding/sidebar-tour', {
+      method: 'PATCH'
+    })
+    hasCompletedTour.value = true
+  } catch (error) {
+    console.error('Error saving sidebar tour status:', error)
+  }
+}
+
+const startTour = async () => {
+  if (!tourItems.value.length) {
+    return
+  }
+
+  tourStep.value = 0
+  showTour.value = true
+  await nextTick()
+  updateTourCardPosition()
+}
+
+const completeTour = async () => {
+  showTour.value = false
+  await markTourAsCompleted()
+}
+
+const nextTourStep = () => {
+  if (isLastTourStep.value) {
+    completeTour()
+    return
+  }
+
+  tourStep.value += 1
+}
+
+const previousTourStep = () => {
+  if (tourStep.value === 0) {
+    return
+  }
+
+  tourStep.value -= 1
+}
+
+const preventNavigationDuringTour = (event: MouseEvent) => {
+  if (!showTour.value) {
+    return
+  }
+
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+const handleKeyboardShortcuts = (event: KeyboardEvent) => {
+  if (!showTour.value) {
+    return
+  }
+
+  if (event.key === 'Escape') {
+    completeTour()
+  }
+
+  if (event.key === 'ArrowRight') {
+    nextTourStep()
+  }
+
+  if (event.key === 'ArrowLeft') {
+    previousTourStep()
+  }
+}
+
+watch([showTour, tourStep, tourItems], async ([tourVisible]) => {
+  if (!tourVisible) {
+    return
+  }
+
+  await nextTick()
+  updateTourCardPosition()
+})
+
+watch(() => tourItems.value.length, length => {
+  if (!length) {
+    showTour.value = false
+    return
+  }
+
+  if (tourStep.value > length - 1) {
+    tourStep.value = length - 1
+  }
+})
+
+watch(sidebarTourSignal, async (value, oldValue) => {
+  if (value === oldValue) {
+    return
+  }
+
+  await startTour()
+})
+
+watch(() => user.value?.id, async (value, oldValue) => {
+  if (!value || value === oldValue || showTour.value) {
+    return
+  }
+
+  await loadTourStatus()
+})
+
+onMounted(async () => {
+  window.addEventListener('resize', updateTourCardPosition)
+  window.addEventListener('keydown', handleKeyboardShortcuts)
+
+  if (user.value?.id) {
+    await loadTourStatus()
+  }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateTourCardPosition)
+  window.removeEventListener('keydown', handleKeyboardShortcuts)
+})
 </script>
 
 <style scoped>
@@ -58,9 +371,15 @@ const { user, logout } = useAuth()
   padding: 16px 0;
   flex-shrink: 0;
 }
+
+.tour-sidebar-active {
+  z-index: 95;
+}
+
 .nav-section {
   margin-bottom: 24px;
 }
+
 .nav-label {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -69,6 +388,13 @@ const { user, logout } = useAuth()
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+
+.nav-item-shell,
+.profile-shell {
+  position: relative;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
 .nav-item {
   display: flex;
   align-items: center;
@@ -78,24 +404,211 @@ const { user, logout } = useAuth()
   font-size: 13px;
   color: var(--text2);
   border-left: 2px solid transparent;
-  transition: all .15s;
+  transition: all 0.15s;
   text-decoration: none;
 }
+
 .nav-item:hover {
   color: var(--text);
   background: var(--bg3);
 }
+
 .nav-item.active {
   color: var(--amber);
   border-left-color: var(--amber);
   background: var(--bg3);
 }
+
 .nav-icon {
   font-size: 18px;
   width: 20px;
   text-align: center;
 }
-.logout-btn:hover {
-  color: var(--red);
+
+.tour-shell-dimmed {
+  opacity: 0.42;
+}
+
+.tour-shell-active {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.tour-shell-active .nav-item,
+.tour-shell-active .user-profile-link {
+  background: linear-gradient(135deg, rgba(var(--amber-rgb), 0.14), rgba(255, 255, 255, 0.96));
+  border-color: rgba(var(--amber-rgb), 0.3);
+  box-shadow: 0 14px 30px rgba(var(--amber-rgb), 0.18);
+}
+
+.tour-item-active {
+  position: relative;
+}
+
+.user-profile-link {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+}
+
+.tour-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.tour-card {
+  position: fixed;
+  z-index: 96;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 255, 0.98));
+  border: 1px solid rgba(var(--amber-rgb), 0.16);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.2);
+}
+
+.tour-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tour-kicker {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  margin-bottom: 6px;
+}
+
+.tour-title {
+  font-size: 20px;
+  line-height: 1.1;
+  color: var(--text);
+  font-family: var(--font-head);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.tour-close {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text3);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.tour-close:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.tour-step-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.tour-step-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+  background: rgba(var(--amber-rgb), 0.12);
+}
+
+.tour-copy {
+  margin: 14px 0 8px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.tour-tip {
+  margin: 0;
+  color: var(--text2);
+  font-size: 12px;
+  line-height: 1.55;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(var(--amber-rgb), 0.08);
+}
+
+.tour-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.tour-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: all 0.18s ease;
+}
+
+.tour-dot-active {
+  width: 20px;
+  background: var(--amber);
+}
+
+.tour-dot-complete {
+  background: color-mix(in srgb, var(--amber) 60%, white);
+}
+
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.tour-link-btn {
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  padding: 0;
+}
+
+.tour-link-btn:hover {
+  color: var(--text);
+}
+
+.tour-fade-enter-active,
+.tour-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tour-fade-enter-from,
+.tour-fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 1100px) {
+  .tour-card {
+    max-width: calc(100vw - 32px);
+  }
 }
 </style>

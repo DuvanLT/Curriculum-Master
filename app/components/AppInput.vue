@@ -9,14 +9,14 @@
         @input="$emit('update:modelValue', $event.target.value)"
         :placeholder="placeholder"
         :rows="rows"
-        class="bg-dark-bg3 border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full resize-y min-h-[80px]"
+        class="bg-[var(--bg)] border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full resize-y min-h-[80px]"
       ></textarea>
       
       <select 
         v-else-if="type === 'select'"
         :value="modelValue"
         @change="$emit('update:modelValue', $event.target.value)"
-        class="bg-dark-bg3 border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full"
+        class="bg-[var(--bg)] border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full"
       >
         <slot />
       </select>
@@ -27,7 +27,7 @@
           :value="modelValue"
           @input="$emit('update:modelValue', $event.target.value)"
           :placeholder="placeholder"
-          class="bg-dark-bg3 border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full"
+          class="bg-[var(--bg)] border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full"
           :class="{ 'pr-9': type === 'password' }"
         />
         <button 

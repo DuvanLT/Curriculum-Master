@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout>
     <div>
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Generador de CV con IA</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Generador de CV con IA <HelpButton /></div>
       <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Potencia tu curriculum adaptando tu experiencia laboral a la oferta de empleo que te interesa, utilizando inteligencia artificial.</div>
 
       <AppCard title="Adaptar a una vacante">
@@ -11,7 +11,7 @@
         <div class="text-[11px] text-text-dim mb-3 leading-relaxed">
           La adaptacion prioriza las experiencias mas relevantes para la vacante y evita inventar porcentajes o resultados no sustentados por tu perfil maestro.
         </div>
-        <div class="mb-4 p-3 bg-dark-bg3 border border-border rounded-lg">
+        <div class="mb-4 p-3 bg-[var(--bg)]-bg3 border border-border rounded-lg">
           <div class="text-[12px] font-semibold text-text-main mb-1 flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px] text-amber">image</span>
             Foto de perfil (Opcional)
@@ -20,14 +20,14 @@
             <span class="text-amber">Nota:</span> Por motivos de privacidad y seguridad, no almacenamos tus fotografías en nuestros servidores. Por ello, te solicitaremos que subas tu imagen cada vez que generes un nuevo currículum.
           </div>
           <div class="flex items-center gap-3">
-            <label class="cursor-pointer bg-dark-bg2 hover:bg-border-dim border border-border px-3 py-2 rounded flex items-center gap-2 transition-colors">
+            <label class="cursor-pointer bg-[var(--bg)]-bg2 hover:bg-border-dim border border-border px-3 py-2 rounded flex items-center gap-2 transition-colors">
               <span class="material-symbols-outlined text-[18px]">upload</span>
               <span class="text-[12px] font-medium">Subir Imagen</span>
               <input type="file" @change="handleImageUpload" accept="image/*" class="hidden">
             </label>
             <div v-if="cvImage" class="relative group">
               <img :src="cvImage" class="w-10 h-10 rounded-full object-cover border border-amber" alt="Preview">
-              <button @click="cvImage = null" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+              <button @click="cvImage = null" class="absolute -top-1 -right-1 bg-red-500 text-text-dim rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
                 ×
               </button>
             </div>
@@ -52,7 +52,7 @@
       <div v-if="aiResult" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <div class="md:col-span-2">
           <AppCard title="Vista Previa de Optimizacion">
-            <div class="p-3 bg-dark-bg2 rounded border border-border">
+            <div class="p-3 bg-[var(--bg)]-bg2 rounded border border-border">
               <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
                 RESUMEN OPTIMIZADO
               </div>
@@ -64,7 +64,7 @@
                 TOP SKILLS PARA ESTA POSICION
               </div>
               <div class="flex flex-wrap gap-2 mb-2">
-                <span v-for="skill in aiResult.top_skills" :key="skill" class="text-[11px] bg-dark-bg3 border border-border px-2 py-0.5 rounded text-text-dim">
+                <span v-for="skill in aiResult.top_skills" :key="skill" class="text-[11px] bg-[var(--bg)]-bg3 border border-border px-2 py-0.5 rounded text-text-dim">
                   {{ skill }}
                 </span>
               </div>
@@ -73,7 +73,7 @@
                 <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
                   EXPERIENCIAS PRIORIZADAS
                 </div>
-                <div v-for="exp in optimizedExperiences" :key="exp.id" class="mb-4 border border-border rounded p-3 bg-dark-bg3">
+                <div v-for="exp in optimizedExperiences" :key="exp.id" class="mb-4 border border-border rounded p-3 bg-[var(--bg)]-bg3">
                   <div class="flex flex-wrap items-center gap-2 mb-2">
                     <div class="text-[13px] font-semibold text-text-main">
                       {{ exp.cargo }} - {{ exp.empresa }}
