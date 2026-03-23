@@ -26,7 +26,7 @@
         </div>
         </div>
        -->
-        <AppInput label="Nombre completo" v-model="form.name" placeholder="John Doe" required />
+        <AppInput label="Nombre completo" v-model="form.name" placeholder="John Arias" required />
         <AppInput label="Email" type="email" v-model="form.email" placeholder="john@example.com" required />
         <AppInput label="Contraseña" type="password" v-model="form.password" placeholder="••••••••" required />
         <AppInput label="Confirmar contraseña" type="password" v-model="form.confirmPassword" placeholder="••••••••" required />

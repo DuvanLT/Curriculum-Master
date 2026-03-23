@@ -84,10 +84,10 @@ export default defineEventHandler(async (event) => {
     await sendAuthCodeEmail({
       to: email,
       name,
-      subject: 'Codigo para cambiar tu contrasena - Bring Jobs',
-      intro: 'Usa este codigo de 6 digitos para confirmar el cambio de contrasena desde la app.',
+      subject: 'Codigo para cambiar tu contraseña - Bring Jobs',
+      intro: 'Usa este codigo de 6 digitos para confirmar el cambio de contraseña desde la app.',
       code,
-      footer: 'Si no solicitaste cambiar tu contrasena, ignora este correo. El codigo vence en 15 minutos.'
+      footer: 'Si no solicitaste cambiar tu contraseña, ignora este correo. El codigo vence en 15 minutos.'
     })
 
     return {
