@@ -48,7 +48,7 @@
         <div class="grid grid-cols-3 gap-3 mb-3">
           <AppInput label="Email del perfil" type="email" v-model="profile.email_profile" placeholder="juan@email.com" />
           <AppInput label="Telefono" v-model="profile.telefono" placeholder="+57 321..." />
-          <AppInput label="Anos de experiencia total" type="number" v-model="profile.years" placeholder="7" />
+          <AppInput label="Años de experiencia total" type="number" v-model="profile.years" placeholder="7" />
         </div>
         <div class="grid grid-cols-3 gap-3 mb-3">
           <AppInput label="LinkedIn (URL)" v-model="profile.linkedin" placeholder="linkedin.com/in/..." />
@@ -58,7 +58,7 @@
         <div class="grid grid-cols-1 gap-3 mb-3">
           <AppInput label="Ubicacion" v-model="profile.ubicacion" placeholder="Cali, Colombia" />
         </div>
-        <AppInput label="Resumen profesional" type="textarea" v-model="profile.resumen" placeholder="Desarrollador backend con 7+ anos de experiencia..." />
+        <AppInput label="Resumen profesional" type="textarea" v-model="profile.resumen" placeholder="Desarrollador backend con 7+ años de experiencia..." />
         <AppButton :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
           Guardar cambios
         </AppButton>
