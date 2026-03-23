@@ -26,10 +26,10 @@
         </div>
         </div>
        -->
-        <AppInput label="Nombre completo" v-model="form.name" placeholder="John Arias" required />
-        <AppInput label="Email" type="email" v-model="form.email" placeholder="john@example.com" required />
-        <AppInput label="Contraseña" type="password" v-model="form.password" placeholder="••••••••" required />
-        <AppInput label="Confirmar contraseña" type="password" v-model="form.confirmPassword" placeholder="••••••••" required />
+        <AppInput label="Nombre completo" v-model="form.name" placeholder="John Arias" required maxlength="50" minlength="5" />
+        <AppInput label="Email" type="email" v-model="form.email" placeholder="john@example.com" required maxlength="50" minlength="3" />
+        <AppInput label="Contraseña" type="password" v-model="form.password" placeholder="••••••••" required maxlength="20" minlength="8" />
+        <AppInput label="Confirmar contraseña" type="password" v-model="form.confirmPassword" placeholder="••••••••" required maxlength="20" minlength="8" />
   
         <div class="pt-2">
           <AppButton type="submit" :loading="loading" class="w-full h-[45px]">

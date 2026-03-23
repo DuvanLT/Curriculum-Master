@@ -1,6 +1,13 @@
 <template>
   <div class="form-group flex flex-col gap-1.5 mb-3">
-    <label v-if="label" class="text-[12px] text-text-dim font-mono uppercase tracking-wider">{{ label }}</label>
+    <div v-if="label || (maxlength && showCounter)" class="flex justify-between items-end">
+      <label v-if="label" class="text-[12px] text-text-dim font-mono uppercase tracking-wider">{{ label }}</label>
+      <span v-if="maxlength && showCounter" 
+            class="text-[10px] font-mono mb-0.5 transition-colors duration-200"
+            :class="isInvalid ? 'text-red-500 font-bold' : 'text-text-dim/60'">
+        {{ modelValue?.length || 0 }}/{{ maxlength }}
+      </span>
+    </div>
     
     <div class="relative w-full">
       <textarea 
@@ -9,6 +16,9 @@
         @input="$emit('update:modelValue', $event.target.value)"
         :placeholder="placeholder"
         :rows="rows"
+        :maxlength="maxlength"
+        :minlength="minlength"
+        v-bind="$attrs"
         class="bg-[var(--bg)] border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full resize-y min-h-[80px]"
       ></textarea>
       
@@ -27,6 +37,9 @@
           :value="modelValue"
           @input="$emit('update:modelValue', $event.target.value)"
           :placeholder="placeholder"
+          :maxlength="maxlength"
+          :minlength="minlength"
+          v-bind="$attrs"
           class="bg-[var(--bg)] border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full"
           :class="{ 'pr-9': type === 'password' }"
         />
@@ -53,7 +66,10 @@ const props = defineProps({
   modelValue: [String, Number],
   type: { type: String, default: 'text' },
   placeholder: String,
-  rows: { type: Number, default: 3 }
+  rows: { type: Number, default: 3 },
+  maxlength: [Number, String],
+  minlength: [Number, String],
+  showCounter: { type: Boolean, default: true }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -64,6 +80,12 @@ const inputType = computed(() => {
     return showPassword.value ? 'text' : 'password'
   }
   return props.type
+})
+
+const isInvalid = computed(() => {
+  if (!props.minlength) return false
+  const len = props.modelValue?.toString().length || 0
+  return len > 0 && len < parseInt(props.minlength)
 })
 </script>
 

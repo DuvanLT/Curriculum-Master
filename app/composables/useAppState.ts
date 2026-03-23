@@ -199,9 +199,10 @@ export const useAppState = () => {
 
   const updateEducation = async (id: string | number, updatedData: any) => {
     const index = educations.value.findIndex(e => e.id === id);
-    if (index !== -1) {
+    const existing = educations.value[index];
+    if (index !== -1 && existing) {
       educations.value[index] = {
-        ...educations.value[index],
+        ...existing,
         ...updatedData
       };
       syncEducationSummary()
@@ -258,11 +259,12 @@ export const useAppState = () => {
 
   const updateExperience = async (id: string | number, updatedData: any) => {
     const index = experiences.value.findIndex(e => e.id === id);
-    if (index !== -1) {
+    const existing = experiences.value[index];
+    if (index !== -1 && existing) {
       experiences.value[index] = {
-        ...experiences.value[index],
+        ...existing,
         ...updatedData,
-        type: updatedData.type === 'project' ? 'project' : (experiences.value[index].type || 'work'),
+        type: updatedData.type === 'project' ? 'project' : (existing.type || 'work'),
         skills: Array.isArray(updatedData.skills)
           ? updatedData.skills
           : (typeof updatedData.skills === 'string'
