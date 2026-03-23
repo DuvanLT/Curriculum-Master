@@ -102,19 +102,19 @@
                 <div v-if="resetStep === 'verified'" class="border border-amber/20 bg-amber/5 rounded-xl p-5">
                   <div class="flex items-center gap-2 text-amber mb-4">
                     <span class="material-symbols-outlined text-[18px]">verified</span>
-                    <p class="text-[13px] font-medium">Codigo validado. Ya puedes definir una nueva contrasena.</p>
+                    <p class="text-[13px] font-medium">Codigo validado. Ya puedes definir una nueva contraseña.</p>
                   </div>
 
                   <div class="grid gap-2 lg:grid-cols-2">
                     <AppInput
                       v-model="passwordResetForm.password"
-                      label="Nueva contrasena"
+                      label="Nueva contraseña"
                       type="password"
                       placeholder="********"
                     />
                     <AppInput
                       v-model="passwordResetForm.confirmPassword"
-                      label="Confirmar contrasena"
+                      label="Confirmar contraseña"
                       type="password"
                       placeholder="********"
                     />
@@ -125,7 +125,7 @@
                   </p>
 
                   <AppButton :loading="updatingPassword" @click="handleUpdatePassword">
-                    Guardar nueva contrasena
+                    Guardar nueva contraseña
                   </AppButton>
                 </div>
               </div>
@@ -257,7 +257,7 @@ const handleVerifyPasswordResetCode = async () => {
 
     resetStep.value = 'verified'
     setResetFeedback('Codigo validado correctamente.', 'success')
-    toast.success('Ahora puedes definir tu nueva contrasena.')
+    toast.success('Ahora puedes definir tu nueva contraseña.')
   } catch (e: any) {
     console.error(e)
     setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos validar el codigo.', 'error')
@@ -269,7 +269,7 @@ const handleVerifyPasswordResetCode = async () => {
 
 const handleUpdatePassword = async () => {
   if (passwordResetForm.value.password !== passwordResetForm.value.confirmPassword) {
-    setResetFeedback('Las contrasenas no coinciden.', 'error')
+    setResetFeedback('Las contraseñas no coinciden.', 'error')
     return
   }
 
@@ -294,12 +294,12 @@ const handleUpdatePassword = async () => {
 
     resetStep.value = 'idle'
     clearResetForm()
-    setResetFeedback('Tu contrasena se actualizo correctamente.', 'success')
-    toast.success('Contrasena actualizada correctamente.')
+    setResetFeedback('Tu contraseña se actualizo correctamente.', 'success')
+    toast.success('contraseña actualizada correctamente.')
   } catch (e: any) {
     console.error(e)
-    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos actualizar la contrasena.', 'error')
-    toast.error(e.data?.statusMessage || e.message || 'No pudimos actualizar la contrasena.')
+    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos actualizar la contraseña.', 'error')
+    toast.error(e.data?.statusMessage || e.message || 'No pudimos actualizar la contraseña.')
   } finally {
     updatingPassword.value = false
   }

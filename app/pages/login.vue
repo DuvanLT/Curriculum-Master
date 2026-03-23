@@ -28,6 +28,10 @@
         ¿No tienes cuenta? 
         <NuxtLink to="/signup" class="text-amber hover:underline font-medium ml-1">Regístrate gratis</NuxtLink>
       </div>
+      <div class="mt-2 text-center text-[13px] text-text-dim relative z-10">
+        ¿Olvidaste tu contraseña? 
+        <NuxtLink to="/recuperar" class="text-amber hover:underline font-medium ml-1">Recuperala</NuxtLink>
+      </div>
     </div>
   </div>
 </template>

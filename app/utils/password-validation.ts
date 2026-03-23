@@ -4,7 +4,7 @@ export const passwordRequirementsText = 'Minimo 8 caracteres, una mayuscula, un 
 
 export function getPasswordValidationError(password: string) {
   if (!password || password.length < 8) {
-    return 'La contrasena debe tener al menos 8 caracteres.'
+    return 'La contraseña debe tener al menos 8 caracteres.'
   }
 
   const hasUppercase = /[A-Z]/.test(password)
@@ -12,7 +12,7 @@ export function getPasswordValidationError(password: string) {
   const hasSymbol = PASSWORD_SYMBOL_REGEX.test(password)
 
   if (!hasUppercase || !hasNumber || !hasSymbol) {
-    return 'La contrasena debe incluir al menos una mayuscula, un numero y un simbolo especial.'
+    return 'La contraseña debe incluir al menos una mayuscula, un numero y un simbolo especial.'
   }
 
   return ''

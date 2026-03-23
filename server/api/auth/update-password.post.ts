@@ -147,14 +147,14 @@ export default defineEventHandler(async (event) => {
     if (!password || !confirmPassword) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Debes completar y confirmar la nueva contrasena.'
+        statusMessage: 'Debes completar y confirmar la nueva contraseña.'
       })
     }
 
     if (password !== confirmPassword) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Las contrasenas no coinciden.'
+        statusMessage: 'Las contraseñas no coinciden.'
       })
     }
 
@@ -194,6 +194,6 @@ export default defineEventHandler(async (event) => {
 
   throw createError({
     statusCode: 400,
-    statusMessage: 'Accion de cambio de contrasena no valida.'
+    statusMessage: 'Accion de cambio de contraseña no valida.'
   })
 })
