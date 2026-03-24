@@ -42,8 +42,8 @@
 
       <AppCard title="Datos Personales">
         <div class="grid grid-cols-2 gap-3 mb-3">
-          <AppInput label="Nombre completo" v-model="profile.nombre" placeholder="Juan Garcia" />
-          <AppInput label="Titulo / Cargo actual" v-model="profile.titulo" placeholder="Senior Backend Developer" />
+          <AppInput label="Nombre completo" v-model="profile.nombre" maxlength="50" placeholder="Juan Garcia" />
+          <AppInput label="Titulo / Cargo actual" v-model="profile.titulo" maxlength="30" placeholder="Senior Backend Developer" />
         </div>
         <div class="grid grid-cols-3 gap-3 mb-3">
           <AppInput label="Email del perfil" type="email" v-model="profile.email_profile" placeholder="juan@email.com" />
@@ -56,9 +56,9 @@
           <AppInput label="Otra" v-model="profile.otros" placeholder="Tu red social profesional" />
         </div>
         <div class="grid grid-cols-1 gap-3 mb-3">
-          <AppInput label="Ubicacion" v-model="profile.ubicacion" placeholder="Cali, Colombia" />
+          <AppInput label="Ubicacion" maxlength="50" v-model="profile.ubicacion" placeholder="Cali, Colombia" />
         </div>
-        <AppInput label="Resumen profesional" type="textarea" v-model="profile.resumen" placeholder="Desarrollador backend con 7+ años de experiencia..." />
+        <AppInput label="Resumen profesional" :maxlength="500" type="textarea" v-model="profile.resumen" placeholder="Desarrollador backend con 7+ años de experiencia..." />
         <AppButton :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
           Guardar cambios
         </AppButton>
@@ -85,7 +85,7 @@
             <AppInput label="Fecha inicio" v-model="newEducation.inicio" placeholder="Ene 2022" />
             <AppInput label="Fecha fin o estado" v-model="newEducation.fin" placeholder="Actual / Dic 2026" />
           </div>
-          <AppInput label="Descripcion" type="textarea" v-model="newEducation.descripcion" placeholder="Enfasis, grado, proyectos destacados, menciones o contexto adicional..." />
+          <AppInput label="Descripcion" minlength="50" maxlength="1000" type="textarea" v-model="newEducation.descripcion" placeholder="Enfasis, grado, proyectos destacados, menciones o contexto adicional..." />
 
           <div class="flex gap-3">
             <AppButton @click="saveEducation" class="flex-1">{{ editingEducationId ? 'Actualizar' : 'Guardar' }} estudio</AppButton>
@@ -147,6 +147,8 @@
           <AppInput
             :label="newExp.type === 'project' ? 'Que resolviste o construiste' : 'Logros cuantificables'"
             type="textarea"
+            minlength="50"
+            maxlength="1000"
             v-model="newExp.logros"
             :placeholder="newExp.type === 'project' ? 'Construyi un dashboard, automatice un flujo, cree un MVP...' : 'Reduje el tiempo de respuesta, mejore procesos, lidere entregas...'"
           />

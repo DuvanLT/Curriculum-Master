@@ -25,7 +25,7 @@ const navigationHelpItems: NavigationHelpItem[] = [
     to: '/analisis',
     label: 'Analizar Vacante',
     icon: 'search',
-    description: 'Compara una vacante con tu perfil para ver match, palabras claves faltantes y recomendaciones.',
+    description: 'Descubre qué tan compatible eres con el puesto, qué detalles le faltan a tu CV y cómo mejorarlo para destacar.',
     tip: 'Ideal para decidir rapido si vale la pena postularte o adaptar tu CV.',
     group: 'primary'
   },
@@ -72,7 +72,7 @@ const navigationHelpItems: NavigationHelpItem[] = [
     label: 'Mis Aplicaciones',
     icon: 'view_kanban',
     description: 'Lleva el control de las vacantes guardadas, fechas y estado de cada postulacion.',
-    tip: 'Piensalo como tu pipeline personal de seguimiento.',
+    tip: 'Piensalo como tu linea de tiempo laboral personal de postulaciones.',
     group: 'primary'
   },
   {
