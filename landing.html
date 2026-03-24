@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV-Builder | Optimiza tu Carrera con IA</title>
+    <meta name="description"
+        content="La plataforma todo-en-uno para crear, optimizar y triunfar en tus aplicaciones laborales. Análisis ATS, Coach de IA y más.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#1e293b',
+                        accent: '#818cf8',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5, #818cf8, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.1), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(129, 140, 248, 0.1), transparent 40%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-secondary font-sans antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg transform rotate-6">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold tracking-tight text-secondary">Bring<span
+                            class="text-primary">Jobs</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 font-medium italic">
+                    <a href="#features" class="hover:text-primary transition">Funciones</a>
+                    <a href="#how-it-works" class="hover:text-primary transition">Cómo funciona</a>
+                    <a href="#testimonials" class="hover:text-primary transition">Comunidad</a>
+                </div>
+                <div>
+                    <a href="#"
+                        class="bg-primary hover:bg-opacity-90 text-white px-6 py-3 rounded-full font-bold shadow-xl transition-all transform hover:scale-105 active:scale-95">
+                        Empezar Gratis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 hero-gradient">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight">
+                    Domina el <span class="gradient-text">Mercado Laboral</span> <br> con Inteligencia Artificial
+                </h1>
+                <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                    Optimiza tu CV para superar sistemas ATS, obtén coaching personalizado y prepárate para entrevistas
+                    reales, todo en una sola plataforma.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <a href="#"
+                        class="bg-primary text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-primary/20 transition-all transform hover:-translate-y-1">
+                        Crea tu CV Ahora
+                    </a>
+                    <a href="#how-it-works"
+                        class="bg-white text-secondary border border-gray-200 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all transform hover:-translate-y-1">
+                        Ver cómo funciona
+                    </a>
+                </div>
+                <div class="mt-16 relative">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-20">
+                        <div class="w-96 h-96 bg-primary rounded-full blur-3xl"></div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                        alt="Dashboard Preview"
+                        class="relative rounded-3xl shadow-2xl border border-white/20 mx-auto max-w-4xl transform hover:scale-[1.01] transition-transform duration-500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Bento Grid Section -->
+    <section id="features" class="py-24 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-6xl font-black mb-4 italic">Todo lo que necesitas, <span class="text-primary italic">en un solo lugar</span></h2>
+                <p class="text-gray-500 text-lg">Potencia tu búsqueda de empleo con herramientas de última generación.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-6 auto-rows-[300px]">
+                
+                <!-- Main Feature: ATS Analysis (Huge Card) -->
+                <div class="md:col-span-2 md:row-span-2 group relative bg-indigo-600 rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+                    <div class="p-8 h-full flex flex-col justify-between relative z-10 text-white">
+                        <div>
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            </div>
+                            <h3 class="text-3xl font-bold italic mb-4">Análisis ATS 2.0</h3>
+                            <p class="text-indigo-100 text-lg max-w-sm">No dejes que los algoritmos te descarten. Nuestra IA compara tu CV con la descripción del puesto y te da las palabras clave ganadoras.</p>
+                        </div>
+                        <div class="mt-8 bg-white/10 rounded-2xl p-4 border border-white/20">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider">Compatibilidad</span>
+                                <span class="text-2xl font-black italic">94%</span>
+                            </div>
+                            <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                                <div class="bg-white h-full rounded-full" style="width: 94%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Abstract image/gradient -->
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+                </div>
+
+                <!-- Feature 2: CV Import (Square) -->
+                <div class="md:col-span-2 md:row-span-1 group relative bg-blue-500 rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-500 hover:scale-[1.02]">
+                    <div class="p-8 h-full flex items-center space-x-6 text-white relative z-10">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold italic mb-2">Importación Mágica</h3>
+                            <p class="text-blue-100 text-sm italic">Sube un PDF y mira el caos convertirse en orden automáticamente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Career Coach (Small Vertical) -->
+                <div class="md:col-span-1 md:row-span-2 group relative bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-500 hover:scale-[1.02]">
+                    <div class="p-8 h-full flex flex-col justify-between text-white relative z-10">
+                        <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold italic mb-4">IA Career Coach</h3>
+                            <p class="text-gray-400 text-sm">Tu mentor privado para negociación salarial y estrategia.</p>
+                        </div>
+                        <div class="mt-6 flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full border-2 border-slate-900 bg-gray-400"></div>
+                            <div class="w-8 h-8 rounded-full border-2 border-slate-900 bg-gray-500"></div>
+                            <div class="w-8 h-8 rounded-full border-2 border-slate-900 bg-primary flex items-center justify-center text-[10px] font-bold">+1k</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4: Interview Simulator (Wide Rectangle) -->
+                <div class="md:col-span-1 md:row-span-1 group relative bg-green-500 rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-500 hover:scale-[1.02]">
+                    <div class="p-8 h-full flex flex-col justify-center text-white relative z-10">
+                        <h3 class="text-xl font-bold italic mb-2">Simulador IA</h3>
+                        <p class="text-green-100 text-xs italic">Practica entrevistas reales hoy mismo.</p>
+                        <div class="mt-4 flex items-center space-x-2 text-xs font-bold bg-black/10 self-start px-3 py-1 rounded-full">
+                            <span class="w-2 h-2 bg-white rounded-full animate-ping"></span>
+                            <span>LIVE COACHING</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 5: Job Tracker (Square) -->
+                <div class="md:col-span-2 md:row-span-1 group relative bg-gray-100 rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-500 hover:scale-[1.02] border border-gray-200">
+                    <div class="p-8 h-full flex items-center justify-between relative z-10">
+                        <div class="max-w-[60%]">
+                            <h3 class="text-xl font-bold italic text-secondary mb-2">Gestor de Aplicaciones</h3>
+                            <p class="text-gray-500 text-sm italic">Organiza tus sueños por etapas: Pendiente, Entrevista, Oferta.</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg"></div>
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg"></div>
+                            <div class="w-10 h-10 bg-orange-100 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 6: Generator (Small) -->
+                <div class="md:col-span-1 md:row-span-1 group relative bg-purple-600 rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-500 hover:scale-[1.02]">
+                    <div class="p-8 h-full flex flex-col justify-center items-center text-center text-white relative z-10">
+                        <div class="mb-2">
+                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold italic">Generator</h3>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- The Flow: How it Works -->
+    <section id="how-it-works" class="py-24 bg-gray-50 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <h2 class="text-3xl lg:text-5xl font-extrabold mb-4 italic">El Flujo hacia el <span
+                        class="text-primary italic">Éxito</span></h2>
+                <p class="text-gray-500 text-lg">Cuatro pasos simples para transformar tu carrera.</p>
+            </div>
+
+            <div class="relative">
+                <!-- Progress Line -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-primary/10 hidden lg:block">
+                </div>
+
+                <div class="space-y-24">
+                    <!-- Step 1 -->
+                    <div class="relative flex flex-col lg:flex-row items-center">
+                        <div class="lg:w-1/2 lg:pr-16 text-center lg:text-right mb-8 lg:mb-0">
+                            <span class="text-primary font-black text-6xl opacity-20 block mb-2">01</span>
+                            <h3 class="text-3xl font-bold mb-4 italic">Carga y Diagnóstico</h3>
+                            <p class="text-gray-600 text-lg">Importa tu CV actual. Nuestra IA analiza la estructura,
+                                legibilidad y compatibilidad técnica de inmediato.</p>
+                        </div>
+                        <div
+                            class="absolute left-1/2 transform -translate-x-1/2 w-12 h-12 bg-primary rounded-full border-4 border-white shadow-lg hidden lg:flex items-center justify-center z-10">
+                            <span class="text-white font-bold">1</span>
+                        </div>
+                        <div class="lg:w-1/2 lg:pl-16">
+                            <div
+                                class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 transform hover:rotate-2 transition duration-500">
+                                <div class="flex items-center space-x-4 mb-4">
+                                    <div class="w-12 h-12 bg-gray-100 rounded-lg animate-pulse"></div>
+                                    <div class="flex-1 space-y-2">
+                                        <div class="h-4 bg-gray-100 rounded w-3/4 animate-pulse"></div>
+                                        <div class="h-3 bg-gray-100 rounded w-1/2 animate-pulse"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="h-2 bg-primary/20 rounded w-full"></div>
+                                    <div class="h-2 bg-primary/40 rounded w-5/6"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="relative flex flex-col lg:flex-row-reverse items-center">
+                        <div class="lg:w-1/2 lg:pl-16 text-center lg:text-left mb-8 lg:mb-0">
+                            <span class="text-primary font-black text-6xl opacity-20 block mb-2">02</span>
+                            <h3 class="text-3xl font-bold mb-4 italic text-right">Optimización de Perfil</h3>
+                            <p class="text-gray-600 text-lg text-right">Ajusta tu experiencia usando nuestras
+                                sugerencias dinámicas. Mejora tu 'ATS Score' incluyendo las habilidades que buscan los
+                                reclutadores.</p>
+                        </div>
+                        <div
+                            class="absolute left-1/2 transform -translate-x-1/2 w-12 h-12 bg-primary rounded-full border-4 border-white shadow-lg hidden lg:flex items-center justify-center z-10">
+                            <span class="text-white font-bold">2</span>
+                        </div>
+                        <div class="lg:w-1/2 lg:pr-16">
+                            <div
+                                class="bg-indigo-600 p-8 rounded-3xl shadow-2xl transform hover:-rotate-2 transition duration-500 text-white">
+                                <div class="flex justify-between items-end mb-6">
+                                    <div>
+                                        <p class="text-indigo-200 text-sm">Puntaje Actual</p>
+                                        <p class="text-4xl font-bold">87/100</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span
+                                            class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-bold">+12
+                                            pts</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span>Relevancia de Palabras Clave</span>
+                                        <span>92%</span>
+                                    </div>
+                                    <div class="w-full bg-white/20 h-2 rounded-full">
+                                        <div class="bg-white h-full rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="relative flex flex-col lg:flex-row items-center">
+                        <div class="lg:w-1/2 lg:pr-16 text-center lg:text-right mb-8 lg:mb-0">
+                            <span class="text-primary font-black text-6xl opacity-20 block mb-2">03</span>
+                            <h3 class="text-3xl font-bold mb-4 italic">Entrenamiento y Coaching</h3>
+                            <p class="text-gray-600 text-lg">No vayas a ciegas. Practica entrevistas específicas para el
+                                cargo y consulta a tu coach de IA sobre cómo negociar tu oferta.</p>
+                        </div>
+                        <div
+                            class="absolute left-1/2 transform -translate-x-1/2 w-12 h-12 bg-primary rounded-full border-4 border-white shadow-lg hidden lg:flex items-center justify-center z-10">
+                            <span class="text-white font-bold">3</span>
+                        </div>
+                        <div class="lg:w-1/2 lg:pl-16">
+                            <div
+                                class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex items-start space-x-4">
+                                <div
+                                    class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-2xl text-sm italic">
+                                    "Basado en la descripción de Software Engineer, ¿cómo explicarías tu experiencia con
+                                    microservicios?"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="relative flex flex-col lg:flex-row-reverse items-center">
+                        <div class="lg:w-1/2 lg:pl-16 text-center lg:text-left mb-8 lg:mb-0">
+                            <span class="text-primary font-black text-6xl opacity-20 block mb-2">04</span>
+                            <h3 class="text-3xl font-bold mb-4 italic text-right">Aplicación y Seguimiento</h3>
+                            <p class="text-gray-600 text-lg text-right">Envía tu CV optimizado y gestiona todo el
+                                proceso desde el tracker. Nunca pierdas de vista una oportunidad.</p>
+                        </div>
+                        <div
+                            class="absolute left-1/2 transform -translate-x-1/2 w-12 h-12 bg-primary rounded-full border-4 border-white shadow-lg hidden lg:flex items-center justify-center z-10">
+                            <span class="text-white font-bold">4</span>
+                        </div>
+                        <div class="lg:w-1/2 lg:pr-16">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
+                                    <p class="text-xs text-green-700 font-bold uppercase mb-1">Entrevista hoy</p>
+                                    <p class="text-sm font-bold text-green-900 italic">Google Cloud</p>
+                                </div>
+                                <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                                    <p class="text-xs text-orange-700 font-bold uppercase mb-1">Pendiente</p>
+                                    <p class="text-sm font-bold text-orange-900 italic">Amazon SDE</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="py-20 bg-secondary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center uppercase">
+                <div>
+                    <p class="text-4xl lg:text-5xl font-black mb-2 italic text-primary">150k+</p>
+                    <p class="text-gray-400 text-sm tracking-widest">CVs Optimizados</p>
+                </div>
+                <div>
+                    <p class="text-4xl lg:text-5xl font-black mb-2 italic text-primary">85%</p>
+                    <p class="text-gray-400 text-sm tracking-widest">Tasa de Entrevistas</p>
+                </div>
+                <div>
+                    <p class="text-4xl lg:text-5xl font-black mb-2 italic text-primary">2.4x</p>
+                    <p class="text-gray-400 text-sm tracking-widest">Mejora Salarial</p>
+                </div>
+                <div>
+                    <p class="text-4xl lg:text-5xl font-black mb-2 italic text-primary">12+</p>
+                    <p class="text-gray-400 text-sm tracking-widest">Países</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-24 bg-white relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div
+                class="bg-primary p-12 lg:p-20 rounded-[3rem] text-center shadow-3xl transform hover:scale-[1.02] transition duration-500">
+                <h2 class="text-4xl lg:text-6xl font-black mb-8 text-white italic">¿Listo para el siguiente nivel?</h2>
+                <p class="text-indigo-100 text-xl mb-12 max-w-xl mx-auto">
+                    Únete a miles de profesionales que ya están usando CV-Master para conseguir el trabajo de sus
+                    sueños.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <a href="#"
+                        class="bg-white text-primary px-10 py-5 rounded-3xl font-black text-xl shadow-xl hover:bg-gray-100 transition truncate italic">
+                        Crea tu Cuenta Gratis
+                    </a>
+                </div>
+                <p class="mt-8 text-indigo-200 text-sm italic">Sin tarjeta de crédito. Resultados inmediatos.</p>
+            </div>
+        </div>
+        <!-- Decorative blobs -->
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 pt-20 pb-10 border-t border-gray-100 italic">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-2">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-black text-secondary">Bring<span
+                                class="text-primary">Jobs</span></span>
+                    </div>
+                    <p class="text-gray-500 max-w-xs leading-relaxed">
+                        Liderando la revolución de la búsqueda de empleo impulsada por IA con BringJobs.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-secondary mb-6 italic">Producto</h4>
+                    <ul class="space-y-4 text-gray-500">
+                        <li><a href="#" class="hover:text-primary transition">Precios</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Soporte</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-secondary mb-6 italic">Legal</h4>
+                    <ul class="space-y-4 text-gray-500">
+                        <li><a href="#" class="hover:text-primary transition">Privacidad</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Términos</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                <p>&copy; 2026 BringJobs Inc. Todos los derechos reservados.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-primary transition">Twitter</a>
+                    <a href="#" class="hover:text-primary transition">LinkedIn</a>
+                    <a href="#" class="hover:text-primary transition">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
