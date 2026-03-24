@@ -119,7 +119,7 @@
       </div>
 
       <!-- History Sidebar -->
-      <div class="flex flex-col gap-4">
+      <div class="lg:sticky lg:top-6 self-start flex flex-col gap-4">
         <div class="text-[11px] font-mono text-text-dim uppercase tracking-widest pl-2">Análisis Recientes</div>
         <div v-if="historyLoading" class="flex justify-center py-8">
           <div class="spinner"></div>
