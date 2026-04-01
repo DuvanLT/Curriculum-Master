@@ -208,6 +208,33 @@ DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
       }
     }
 
+    // Persist generated CV for dashboard history
+    try {
+      const db = useDb()
+      // Extract company and position from JD text (structured format: "Empresa: X", "Título: Y")
+      let cvCompany = 'General'
+      let cvPosition = result.optimized_title || profile?.titulo || 'CV Optimizado'
+      if (jd) {
+        const companyMatch = jd.match(/Empresa:\s*(.+)/i)
+        if (companyMatch) cvCompany = companyMatch[1].trim()
+        const titleMatch = jd.match(/T[ií]tulo:\s*(.+)/i)
+        if (titleMatch) cvPosition = titleMatch[1].trim()
+      }
+      await db.execute({
+        sql: 'INSERT INTO generated_cvs (id, user_id, company, position, jd_text, cv_json) VALUES (?, ?, ?, ?, ?, ?)',
+        args: [
+          crypto.randomUUID(),
+          userId,
+          cvCompany,
+          cvPosition,
+          jd || null,
+          JSON.stringify(result)
+        ]
+      })
+    } catch (cvErr) {
+      console.error('Error persisting generated CV:', cvErr)
+    }
+
     return result
   } catch (e: any) {
     console.error('OpenAI Error:', e)

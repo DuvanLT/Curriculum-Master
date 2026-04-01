@@ -4,6 +4,7 @@
       <div class="absolute top-0 right-0 w-64 h-64 bg-amber opacity-5 blur-[100px] -mr-32 -mt-32"></div>
       <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-500 opacity-5 blur-[80px] -ml-24 -mb-24"></div>
 
+      <!-- Loading overlay -->
       <div v-if="importing" class="absolute inset-0 z-50 bg-[var(--bg)]-bg2/80 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">
         <div class="magic-loader mb-6">
           <div class="magic-circle"></div>
@@ -11,11 +12,67 @@
             <span class="material-symbols-outlined text-amber animate-pulse">auto_fix_high</span>
           </div>
         </div>
-        <h3 class="text-xl font-bold text-text mb-2 font-head tracking-tight">Haciendo la magia...</h3>
-        <p class="text-[13px] text-text-dim font-mono max-w-[320px]">Estamos analizando tu trayectoria para extraer experiencias, proyectos y estudios con mas contexto.</p>
+        <h3 class="text-xl font-bold text-text mb-2 font-head tracking-tight">{{ auditRunning ? 'Analizando tu CV...' : 'Haciendo la magia...' }}</h3>
+        <p class="text-[13px] text-text-dim font-mono max-w-[320px]">{{ auditRunning ? 'Un momento, estamos generando tu diagnóstico inicial.' : 'Estamos analizando tu trayectoria para extraer experiencias, proyectos y estudios con mas contexto.' }}</p>
       </div>
 
-      <div class="relative z-10">
+      <!-- Audit Result Screen -->
+      <div v-if="auditResult && !importing" class="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-400">
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
+            :style="{ background: `color-mix(in srgb, ${scoreColor} 12%, var(--bg3))`, border: `2px solid color-mix(in srgb, ${scoreColor} 30%, var(--border))` }"
+          >
+            <span class="font-head font-bold text-2xl" :style="{ color: scoreColor }">{{ auditResult.score }}</span>
+          </div>
+          <h2 class="font-head text-2xl font-bold text-text tracking-tight mb-1">Diagnóstico Inicial de tu CV</h2>
+          <p class="text-[12px] font-mono text-text-dim">Puntuación general de calidad · <span :style="{ color: scoreColor }">{{ scoreLabel }}</span></p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <!-- Fortalezas -->
+          <div class="rounded-xl p-4 border" style="background: color-mix(in srgb, var(--green) 5%, var(--bg3)); border-color: color-mix(in srgb, var(--green) 20%, var(--border))">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-[16px]" style="color: var(--green)">thumb_up</span>
+              <span class="text-[11px] font-mono uppercase tracking-widest" style="color: var(--green)">Lo que haces bien</span>
+            </div>
+            <ul class="space-y-2">
+              <li v-for="(f, i) in auditResult.fortalezas" :key="i" class="flex gap-2 items-start">
+                <span class="material-symbols-outlined text-[14px] mt-0.5 flex-shrink-0" style="color: var(--green)">check</span>
+                <span class="text-[13px] text-text leading-snug">{{ f }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Debilidades / Lo que BringJobs mejorara -->
+          <div class="rounded-xl p-4 border" style="background: color-mix(in srgb, var(--amber) 5%, var(--bg3)); border-color: color-mix(in srgb, var(--amber) 20%, var(--border))">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-[16px] text-amber">rocket_launch</span>
+              <span class="text-[11px] font-mono uppercase tracking-widest text-amber">Lo que BringJobs mejorará contigo</span>
+            </div>
+            <ul class="space-y-2">
+              <li v-for="(d, i) in auditResult.debilidades" :key="i" class="flex gap-2 items-start">
+                <span class="material-symbols-outlined text-[14px] mt-0.5 flex-shrink-0 text-amber">auto_fix_high</span>
+                <span class="text-[13px] text-text leading-snug">{{ d }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Recomendacion -->
+        <div class="rounded-xl p-4 border mb-6" style="background: color-mix(in srgb, var(--blue) 5%, var(--bg3)); border-color: color-mix(in srgb, var(--blue) 20%, var(--border))">
+          <div class="flex gap-2 items-start">
+            <span class="material-symbols-outlined text-[18px] flex-shrink-0" style="color: var(--blue)">lightbulb</span>
+            <p class="text-[13px] text-text leading-relaxed">{{ auditResult.recomendacion }}</p>
+          </div>
+        </div>
+
+        <AppButton variant="primary" size="lg" class="w-full !h-14 font-bold" @click="goToDashboard">
+          <span class="material-symbols-outlined text-[18px] mr-2">dashboard</span>
+          Ir a mi Dashboard
+        </AppButton>
+      </div>
+
+      <div v-if="!auditResult" class="relative z-10">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-12 h-12 bg-amber/10 rounded-xl flex items-center justify-center">
             <span class="material-symbols-outlined text-amber text-3xl">auto_fix_high</span>
@@ -97,12 +154,35 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { mergeImportedProfile, bulkEducation, bulkExperience, saveProfile } = useAppState()
+interface AuditResult {
+  score: number
+  fortalezas: string[]
+  debilidades: string[]
+  recomendacion: string
+}
+
+const { mergeImportedProfile, bulkEducation, bulkExperience, saveProfile, profile, experiences } = useAppState()
 const toast = useToast()
 
 const importing = ref(false)
+const auditRunning = ref(false)
 const selectedFile = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
+const auditResult = ref<AuditResult | null>(null)
+
+const scoreColor = computed(() => {
+  const s = auditResult.value?.score ?? 0
+  if (s >= 70) return 'var(--green)'
+  if (s >= 45) return 'var(--amber)'
+  return 'var(--red)'
+})
+
+const scoreLabel = computed(() => {
+  const s = auditResult.value?.score ?? 0
+  if (s >= 70) return 'Perfil sólido'
+  if (s >= 45) return 'Perfil con potencial'
+  return 'Necesita mejoras'
+})
 
 const handleFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -137,18 +217,37 @@ const runMagicImport = async () => {
       await saveProfile()
     }
 
-    toast.success('Hemos procesado tu CV con exito.')
-    await navigateTo('/perfil')
+    // Run CV audit with the freshly imported data
+    auditRunning.value = true
+    try {
+      const audit = await $fetch<AuditResult>('/api/cv-audit', {
+        method: 'POST',
+        body: {
+          profile: profile.value,
+          experiences: experiences.value
+        }
+      })
+      auditResult.value = audit
+    } catch (auditErr) {
+      console.error('Audit failed, skipping:', auditErr)
+      // Audit is optional — don't block the user
+      await navigateTo('/dashboard')
+    }
   } catch (e: any) {
     console.error(e)
     toast.error('Hubo un error al procesar tu archivo. Por favor intenta de nuevo.')
   } finally {
     importing.value = false
+    auditRunning.value = false
   }
 }
 
+const goToDashboard = () => {
+  navigateTo('/dashboard')
+}
+
 const skipImport = () => {
-  navigateTo('/perfil')
+  navigateTo('/dashboard')
 }
 </script>
 

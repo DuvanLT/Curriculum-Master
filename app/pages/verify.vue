@@ -43,7 +43,7 @@
         </AppButton>
         
         <div class="text-center">
-          <button @click.prevent="logout" class="text-[12px] text-text-dim hover:text-text transition-colors underline">
+          <button @click.prevent="handleLogout" class="text-[12px] text-text-dim hover:text-text transition-colors underline">
             Cerrar sesión e intentar otro correo
           </button>
         </div>
@@ -58,6 +58,11 @@ const code = ref('')
 const loading = ref(false)
 const error = ref('')
 const success = ref(false)
+
+const handleLogout = async () => {
+  await logout()
+  window.location.href = '/login'
+}
 
 const handleVerify = async () => {
   if (code.value.length !== 6) {

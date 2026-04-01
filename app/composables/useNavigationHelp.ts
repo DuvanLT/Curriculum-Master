@@ -21,6 +21,15 @@ interface HelpMatcher extends SectionHelp {
 
 const navigationHelpItems: NavigationHelpItem[] = [
   {
+    id: 'dashboard',
+    to: '/dashboard',
+    label: 'Dashboard',
+    icon: 'dashboard',
+    description: 'Vista general de tu perfil profesional, métricas de búsqueda y análisis de mercado.',
+    tip: 'Tu centro de comando para entender cómo va tu proceso de búsqueda laboral.',
+    group: 'primary'
+  },
+  {
     id: 'analisis',
     to: '/analisis',
     label: 'Analizar Vacante',

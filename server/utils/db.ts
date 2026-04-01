@@ -157,4 +157,27 @@ export const initDb = async () => {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS generated_cvs (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      company TEXT,
+      position TEXT,
+      jd_text TEXT,
+      cv_json TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS churn_feedback (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      comment TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
 }

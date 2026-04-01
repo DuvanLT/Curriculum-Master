@@ -151,18 +151,71 @@
         </AppCard>
       </div>
 
-      <AppModal
-        :show="showDeleteModal"
-        :loading="deletingAccount"
-        title="Eliminar Cuenta"
-        confirm-text="Si, eliminar permanentemente"
-        cancel-text="Cancelar"
-        confirm-variant="primary"
-        @close="showDeleteModal = false"
-        @confirm="handleDeleteAccount"
-      >
-        <p>Estas absolutamente seguro? Todos tus datos seran eliminados de nuestros servidores para siempre.</p>
-      </AppModal>
+      <!-- Churn Feedback Modal -->
+      <Transition name="modal">
+        <div v-if="showDeleteModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div class="absolute inset-0" style="background: var(--overlay); backdrop-filter: blur(10px)" @click="closeDeleteModal"></div>
+
+          <div class="relative w-full max-w-md rounded-xl p-8 overflow-hidden" style="background: var(--bg2); border: 1px solid var(--border); box-shadow: var(--shadow-soft)">
+
+            <!-- Step 1: Reason -->
+            <div v-if="deleteStep === 1">
+              <h2 class="text-xl font-bold mb-1 font-head tracking-tight text-text">¿Por qué te vas?</h2>
+              <p class="text-[13px] text-text-dim mb-6">Tu respuesta nos ayuda a mejorar BringJobs para todos.</p>
+
+              <div class="flex flex-col gap-2 mb-5">
+                <label
+                  v-for="opt in churnReasons"
+                  :key="opt.value"
+                  class="churn-option"
+                  :class="{ 'churn-option-selected': churnReason === opt.value }"
+                >
+                  <input type="radio" :value="opt.value" v-model="churnReason" class="hidden" />
+                  <span class="material-symbols-outlined text-[18px] flex-shrink-0">{{ opt.icon }}</span>
+                  <span class="text-[13px]">{{ opt.label }}</span>
+                </label>
+              </div>
+
+              <div v-if="churnReason" class="mb-6">
+                <textarea
+                  v-model="churnComment"
+                  placeholder="Opcional: cuéntanos más..."
+                  rows="2"
+                  class="churn-textarea w-full"
+                ></textarea>
+              </div>
+
+              <div class="flex gap-3">
+                <AppButton class="flex-1" variant="secondary" @click="closeDeleteModal">Cancelar</AppButton>
+                <AppButton class="flex-1" variant="primary" :disabled="!churnReason" @click="deleteStep = 2">Continuar</AppButton>
+              </div>
+            </div>
+
+            <!-- Step 2: Final Confirm -->
+            <div v-else-if="deleteStep === 2">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-outlined text-red-500 text-3xl">warning</span>
+                <h2 class="text-xl font-bold font-head tracking-tight text-red-500">Eliminar cuenta</h2>
+              </div>
+              <p class="text-[13px] text-text-muted mb-6 leading-relaxed">
+                ¿Estás absolutamente seguro? Todos tus datos serán eliminados de nuestros servidores para siempre. Esta acción no se puede deshacer.
+              </p>
+              <div class="flex gap-3">
+                <AppButton class="flex-1" variant="secondary" @click="deleteStep = 1">Atrás</AppButton>
+                <AppButton
+                  class="flex-1 !border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-white"
+                  variant="secondary"
+                  :loading="deletingAccount"
+                  @click="handleDeleteAccount"
+                >
+                  Sí, eliminar
+                </AppButton>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </Transition>
     </div>
   </NuxtLayout>
 </template>
@@ -181,7 +234,26 @@ const toast = useToast()
 
 const activeTab = ref('session')
 const showDeleteModal = ref(false)
+const deleteStep = ref(1)
+const churnReason = ref('')
+const churnComment = ref('')
 const deletingAccount = ref(false)
+
+const churnReasons = [
+  { value: 'no_lo_necesito', label: 'Ya no busco trabajo activamente', icon: 'check_circle' },
+  { value: 'falta_funciones', label: 'Le faltan funciones que necesito', icon: 'build' },
+  { value: 'dificil_de_usar', label: 'Es difícil de usar', icon: 'sentiment_dissatisfied' },
+  { value: 'encontre_alternativa', label: 'Encontré una alternativa mejor', icon: 'swap_horiz' },
+  { value: 'privacidad', label: 'Preocupaciones de privacidad', icon: 'shield' },
+  { value: 'otro', label: 'Otro motivo', icon: 'more_horiz' },
+]
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deleteStep.value = 1
+  churnReason.value = ''
+  churnComment.value = ''
+}
 const resetStep = ref<PasswordResetStep>('idle')
 const resetCode = ref('')
 const resetFeedback = ref('')
@@ -316,19 +388,72 @@ const handleLogout = async () => {
 
 const handleDeleteAccount = async () => {
   deletingAccount.value = true
+  
   try {
     await $fetch<any>('/api/profile', {
-      method: 'DELETE'
+      method: 'DELETE',
+      body: {
+        reason: churnReason.value,
+        comment: churnComment.value || null
+      }
     })
-
-    await logout()
-    await navigateTo('/login', { replace: true })
   } catch (e: any) {
     console.error(e)
     toast.error('Error al intentar eliminar la cuenta: ' + (e.statusMessage || e.message))
-  } finally {
     deletingAccount.value = false
     showDeleteModal.value = false
+    return
   }
+
+  try {
+    await logout()
+  } catch (e) {
+    console.error('Logout error:', e)
+  }
+
+  // Use a hard redirect to ensure the user is taken to login and all state is wiped
+  window.location.href = '/login'
 }
 </script>
+
+<style scoped>
+.churn-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-dim);
+}
+
+.churn-option:hover {
+  border-color: var(--amber);
+  color: var(--text);
+}
+
+.churn-option-selected {
+  background: color-mix(in srgb, var(--amber) 10%, transparent);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.churn-textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text);
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.churn-textarea:focus {
+  border-color: var(--amber);
+}
+</style>
