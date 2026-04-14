@@ -18,11 +18,28 @@ export default defineEventHandler(async (event) => {
     apiKey: config.openaiApiKey
   })
 
+  const buildSpeech = async (input: string) => {
+    const speechResponse = await openai.audio.speech.create({
+      model: config.openaiTtsModel || 'tts-1-hd',
+      voice: config.openaiTtsVoice || 'nova',
+      input,
+      speed: 0.92,
+      response_format: 'mp3'
+    })
+
+    const audioBuffer = Buffer.from(await speechResponse.arrayBuffer())
+
+    return {
+      audio: audioBuffer.toString('base64'),
+      audioMimeType: 'audio/mpeg'
+    }
+  }
+
   // If it's the final analysis
   if (isFinal) {
     try {
-      const conversationStr = messages.length > 0 
-        ? JSON.stringify(messages) 
+      const conversationStr = messages.length > 0
+        ? JSON.stringify(messages)
         : "No hubo conversación; el usuario finalizó inmediatamente."
 
       const finalPrompt = `
@@ -48,7 +65,7 @@ export default defineEventHandler(async (event) => {
       if (!content) {
         throw new Error('No se recibió contenido de la IA')
       }
-      
+
       try {
         const result = JSON.parse(content)
         return result
@@ -56,9 +73,9 @@ export default defineEventHandler(async (event) => {
         throw new Error('La IA devolvió un formato inválido')
       }
     } catch (e: any) {
-      throw createError({ 
-        statusCode: 500, 
-        statusMessage: e.message || 'Error en análisis final' 
+      throw createError({
+        statusCode: 500,
+        statusMessage: e.message || 'Error en análisis final'
       })
     }
   }
@@ -110,8 +127,18 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    let speech = null
+
+    try {
+      speech = await buildSpeech(content)
+    } catch (ttsError) {
+      console.error('Interview TTS Error:', ttsError)
+    }
+
     return {
-      text: content
+      text: content,
+      audio: speech?.audio || null,
+      audioMimeType: speech?.audioMimeType || null
     }
   } catch (e: any) {
     console.error('Interview API Error:', e)

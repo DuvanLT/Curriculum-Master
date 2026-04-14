@@ -6,6 +6,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private keys (available only on server)
     openaiApiKey: '',
+    openaiTtsModel: 'tts-1-hd',
+    openaiTtsVoice: 'nova',
     tursoUrl: '',
     tursoToken: '',
     apiToken: '',

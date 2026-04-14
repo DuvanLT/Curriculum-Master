@@ -172,6 +172,8 @@ const chatContainer = ref<HTMLElement | null>(null)
 
 let recognition: any = null
 let mediaStream: MediaStream | null = null
+let currentAudio: HTMLAudioElement | null = null
+let currentAudioUrl: string | null = null
 
 onMounted(async () => {
   await fetchProfile()
@@ -179,6 +181,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  cleanupAudio()
   stopInterview()
 })
 
@@ -236,6 +239,7 @@ const stopInterview = () => {
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop())
   }
+  cleanupAudio()
   streamActive.value = false
   active.value = false
   if (recognition) recognition.stop()
@@ -343,9 +347,43 @@ const finishAndAnalyze = async (force = false) => {
   }
 }
 
-const speak = (text: string) => {
+const cleanupAudio = () => {
+  if (currentAudio) {
+    currentAudio.pause()
+    currentAudio = null
+  }
+
+  if (currentAudioUrl) {
+    URL.revokeObjectURL(currentAudioUrl)
+    currentAudioUrl = null
+  }
+}
+
+const speak = async (text: string, audioBase64?: string | null, audioMimeType?: string | null) => {
+  cleanupAudio()
+
+  if (audioBase64 && audioMimeType) {
+    try {
+      const binary = atob(audioBase64)
+      const bytes = new Uint8Array(binary.length)
+
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i)
+      }
+
+      const blob = new Blob([bytes], { type: audioMimeType })
+      currentAudioUrl = URL.createObjectURL(blob)
+      currentAudio = new Audio(currentAudioUrl)
+      await currentAudio.play()
+      return
+    } catch (error) {
+      console.error('OpenAI audio playback failed, using browser speech fallback:', error)
+      cleanupAudio()
+    }
+  }
+
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel() // Stop current speaking
+    window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = 'es-ES'
     utterance.rate = 1.0
@@ -363,7 +401,7 @@ const sendResponse = async (text: string) => {
   scrollToBottom()
 
   try {
-    const data = await $fetch('/api/interview', {
+    const data = await $fetch<{ text: string; audio?: string | null; audioMimeType?: string | null }>('/api/interview', {
       method: 'POST',
       body: {
         messages: msgs.value,
@@ -373,7 +411,7 @@ const sendResponse = async (text: string) => {
     })
     
     msgs.value.push({ role: 'ai', text: data.text })
-    speak(data.text)
+    await speak(data.text, data.audio, data.audioMimeType)
   } catch (e) {
     console.error('Interview Error:', e)
     msgs.value.push({ role: 'ai', text: 'Lo siento, hubo un problema con la simulación. Reintenta por favor.' })

@@ -1,8 +1,3 @@
-<script setup>
-const { loggedIn } = useAuth()
-if (!loggedIn.value) {
-  navigateTo('/login')
-} else {
-  navigateTo('/dashboard')
-}
+<script setup lang="ts">
+await navigateTo('/login', { replace: true })
 </script>
