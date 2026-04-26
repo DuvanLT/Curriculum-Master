@@ -3,18 +3,18 @@
     <div class="h-full flex flex-col gap-6 overflow-hidden max-w-full">
       <div class="flex justify-between items-end flex-shrink-0">
         <div>
-          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Mis Aplicaciones <HelpButton /></div>
-          <div class="page-sub text-[13px] text-text-dim font-mono">Realiza seguimiento a las ofertas a las que aplicaste y mantén el control de tus procesos de selección.</div>
+          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('aplicaciones.title') }} <HelpButton /></div>
+          <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('aplicaciones.subtitle') }}</div>
         </div>
         <AppButton @click="showAddModal = true" variant="primary">
-          + Nueva Aplicación
+          {{ $t('aplicaciones.new_app_btn') }}
         </AppButton>
       </div>
 
       <div v-if="loading" class="flex-1 flex items-center justify-center">
         <div class="text-center">
           <div class="spinner mb-2"></div>
-          <div class="text-[12px] text-text-dim font-mono uppercase tracking-widest">Cargando tablero...</div>
+          <div class="text-[12px] text-text-dim font-mono uppercase tracking-widest">{{ $t('aplicaciones.loading_board') }}</div>
         </div>
       </div>
 
@@ -31,7 +31,7 @@
             <div class="flex items-center justify-between px-2 mb-1">
               <div class="flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full" :class="statusBg(status)"></div>
-                <h3 class="text-[11px] font-mono uppercase tracking-widest text-text-dim">{{ status }}</h3>
+                <h3 class="text-[11px] font-mono uppercase tracking-widest text-text-dim">{{ $t(`aplicaciones.status_${status}`) }}</h3>
               </div>
               <span class="text-[10px] font-mono bg-[var(--bg)]-bg3 px-1.5 py-0.5 rounded border border-border text-text-dim">
                 {{ groupedApps[status]?.length || 0 }}
@@ -52,7 +52,7 @@
                   <button 
                     @click.stop="requestDelete(app.id)" 
                     class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-md hover:bg-red/10 text-text-dim hover:text-red transition-all"
-                    title="Eliminar aplicación"
+                    :title="$t('aplicaciones.delete_app_title')"
                   >
                     <span class="material-symbols-outlined text-[14px]">close</span>
                   </button>
@@ -63,13 +63,13 @@
                   <div v-if="app.interview_date" class="flex items-center gap-2 bg-amber/10 border border-amber/20 rounded px-2 py-1.5">
                     <span class="material-symbols-outlined text-amber text-[18px]">calendar_month</span>
                     <div class="flex-1">
-                      <div class="text-[9px] uppercase font-mono text-amber/60 leading-none mb-0.5">Fecha Entrevista</div>
+                      <div class="text-[9px] uppercase font-mono text-amber/60 leading-none mb-0.5">{{ $t('aplicaciones.interview_date') }}</div>
                       <div class="text-[11px] font-bold text-amber">{{ formatDate(app.interview_date) }}</div>
                     </div>
                     <button @click="promptDate(app)" class="material-symbols-outlined text-[14px] text-amber/50 hover:text-amber">edit</button>
                   </div>
                   <button v-else @click="promptDate(app)" class="w-full border border-dashed border-amber/30 rounded py-2 text-[10px] font-mono text-amber/60 hover:bg-amber/5 transition-colors">
-                    + Programar Fecha
+                    {{ $t('aplicaciones.schedule_date') }}
                   </button>
                 </div>
   
@@ -100,7 +100,7 @@
               <!-- Empty State for Column -->
               <div v-if="!groupedApps[status]?.length" class="flex-1 flex flex-col items-center justify-center py-10 opacity-20 filter grayscale">
                 <span class="material-symbols-outlined text-3xl mb-1">inventory_2</span>
-                <div class="text-[9px] font-mono uppercase tracking-tighter">Sin items</div>
+                <div class="text-[9px] font-mono uppercase tracking-tighter">{{ $t('aplicaciones.empty_column') }}</div>
               </div>
             </div>
           </div>
@@ -111,25 +111,25 @@
     <!-- Add Modal -->
     <div v-if="showAddModal" class="add-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="add-modal-panel w-full max-w-md rounded-xl p-8 animate-in fade-in zoom-in duration-200">
-        <h2 class="text-xl font-bold mb-6 font-head tracking-tight">Nueva Aplicación</h2>
+        <h2 class="text-xl font-bold mb-6 font-head tracking-tight">{{ $t('aplicaciones.modal_new_title') }}</h2>
         <div class="space-y-4">
           <div>
-            <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">Empresa</label>
-            <AppInput v-model="newApp.company" placeholder="Ej: Google, Facebook..." />
+            <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">{{ $t('aplicaciones.company_label') }}</label>
+            <AppInput v-model="newApp.company" :placeholder="$t('aplicaciones.company_placeholder')" />
           </div>
           <div>
-            <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">Puesto</label>
-            <AppInput v-model="newApp.position" placeholder="Ej: Senior Frontend Dev..." />
+            <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">{{ $t('aplicaciones.position_label') }}</label>
+            <AppInput v-model="newApp.position" :placeholder="$t('aplicaciones.position_placeholder')" />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">Estado Inicial</label>
+              <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">{{ $t('aplicaciones.status_label') }}</label>
               <select v-model="newApp.status" class="panel-input">
-                <option v-for="s in statusOptions" :key="s" :value="s">{{ s }}</option>
+                <option v-for="s in statusOptions" :key="s" :value="s">{{ $t(`aplicaciones.status_${s}`) }}</option>
               </select>
             </div>
             <div>
-              <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">Fecha de aplicación</label>
+              <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">{{ $t('aplicaciones.app_date_label') }}</label>
               <input type="date" v-model="newApp.date" class="panel-input" />
             </div>
           </div>
@@ -137,14 +137,14 @@
           <div v-if="newApp.status === 'Entrevista'" class="animate-in slide-in-from-top-2 duration-200">
             <label class="text-[11px] text-amber uppercase font-mono mb-1.5 block font-bold flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[16px]">target</span>
-              Fecha de Entrevista
+              {{ $t('aplicaciones.interview_date_label') }}
             </label>
             <input type="date" v-model="newApp.interview_date" class="panel-input panel-input-accent" />
           </div>
         </div>
         <div class="flex gap-3 mt-8">
-          <AppButton class="flex-1" variant="secondary" @click="showAddModal = false">Cancelar</AppButton>
-          <AppButton class="flex-1" variant="primary" @click="addNewApp" :disabled="!newApp.company || !newApp.position">Guardar</AppButton>
+          <AppButton class="flex-1" variant="secondary" @click="showAddModal = false">{{ $t('aplicaciones.cancel') }}</AppButton>
+          <AppButton class="flex-1" variant="primary" @click="addNewApp" :disabled="!newApp.company || !newApp.position">{{ $t('aplicaciones.save') }}</AppButton>
         </div>
       </div>
     </div>
@@ -152,29 +152,33 @@
     <AppModal 
       :show="appToDelete !== null" 
       confirm-variant="danger"
-      confirm-text="Eliminar"
+      :confirm-text="$t('aplicaciones.modal_delete_confirm')"
       @close="appToDelete = null"
       @confirm="confirmDelete"
     >
-      <template #title>Eliminar Aplicación</template>
-      ¿Estás seguro de que deseas eliminar esta aplicación? Esta acción no se puede deshacer.
+      <template #title>{{ $t('aplicaciones.modal_delete_title') }}</template>
+      {{ $t('aplicaciones.modal_delete_text') }}
     </AppModal>
 
     <!-- Interview Date Edit Modal -->
     <AppModal 
       :show="appToEditDate !== null" 
-      confirm-text="Guardar Fecha"
+      :confirm-text="$t('aplicaciones.modal_date_confirm')"
       @close="appToEditDate = null"
       @confirm="saveDate"
     >
       <template #title>
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-amber">target</span>
-          Programar Entrevista
+          {{ $t('aplicaciones.modal_date_title') }}
         </div>
       </template>
       <div class="flex flex-col gap-4">
-        <p class="text-[13px] text-text-muted">Ingresa la fecha para tu entrevista con <b>{{ appToEditDate?.company }}</b>.</p>
+        <i18n-t keypath="aplicaciones.modal_date_text" tag="p" class="text-[13px] text-text-muted">
+          <template #company>
+            <b>{{ appToEditDate?.company }}</b>
+          </template>
+        </i18n-t>
         <input 
           type="date" 
           v-model="tempDate"
@@ -213,6 +217,7 @@ const applications = ref<Application[]>([])
 const loading = ref(false)
 const showAddModal = ref(false)
 const toast = useToast()
+const { t } = useI18n()
 const statusOptions: ApplicationStatus[] = ['Pendiente', 'Aplicado', 'Entrevista', 'Oferta', 'Rechazado']
 
 const newApp = ref<NewApplication>({
@@ -266,7 +271,7 @@ const addNewApp = async () => {
     })
     applications.value.unshift(res as Application)
     showAddModal.value = false
-    toast.success(`Aplicación para ${newApp.value.company} guardada.`)
+    toast.success(t('aplicaciones.toast_add_success', { company: newApp.value.company }))
     newApp.value = {
       company: '',
       position: '',
@@ -276,7 +281,7 @@ const addNewApp = async () => {
     }
   } catch (e) {
     console.error('Error saving application:', e)
-    toast.error('Error al guardar la aplicación')
+    toast.error(t('aplicaciones.toast_add_error'))
   }
 }
 
@@ -309,7 +314,7 @@ const promptDate = (app: Application) => {
 const saveDate = () => {
   if (appToEditDate.value) {
     updateStatus(appToEditDate.value.id, appToEditDate.value.status, tempDate.value)
-    toast.success('Fecha de entrevista actualizada')
+    toast.success(t('aplicaciones.toast_date_success'))
     appToEditDate.value = null
   }
 }
@@ -349,11 +354,11 @@ const confirmDelete = async () => {
       method: 'DELETE',
       body: { id }
     })
-    toast.success('Aplicación eliminada.')
+    toast.success(t('aplicaciones.toast_delete_success'))
   } catch (e) {
     console.error('Error deleting application:', e)
     applications.value = originalApps // Rollback if error
-    toast.error('No se pudo eliminar la aplicación.')
+    toast.error(t('aplicaciones.toast_delete_error'))
   }
 }
 

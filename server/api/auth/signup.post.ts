@@ -8,7 +8,8 @@ export default defineEventHandler(async (event) => {
    })*/
 
   const body = await readBody(event)
-  const { email, password, name } = body
+  const { email, password, name, locale = 'es' } = body
+  const isEn = locale === 'en'
 
   // Email validation regex (basic pattern)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -71,19 +72,28 @@ export default defineEventHandler(async (event) => {
       const { Resend } = await import('resend')
       const resend = new Resend(config.resendApiKey)
 
+      const emailSubject = isEn ? 'Verification Code - BringJobs' : 'Código de verificación - Bring Jobs'
+      const emailTitle = isEn ? `Hello ${name || 'user'}!` : `¡Hola ${name || 'usuario'}!`
+      const emailBody = isEn 
+        ? 'Thanks for joining BringJobs. To complete your registration, use the following verification code:'
+        : 'Gracias por unirte a Bring Jobs. Para completar tu registro, utiliza el siguiente código de verificación:'
+      const emailFooter = isEn
+        ? 'If you did not request this registration, please ignore this email.'
+        : 'Si no solicitaste este registro, por favor ignora este correo.'
+
       await resend.emails.send({
-        from: 'no-reply@wikisportco.com', // Default sender for testing
+        from: 'no-reply@wikisportco.com',
         to: email,
-        subject: 'Código de verificación - Bring Jobs',
+        subject: emailSubject,
         html: `
          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
            <h1 style="color: #2563eb; text-align: center;">BringJobs</h1>
-           <p style="font-size: 16px; color: #333;">¡Hola ${name || 'usuario'}!</p>
-           <p style="font-size: 16px; color: #333;">Gracias por unirte a Bring Jobs. Para completar tu registro, utiliza el siguiente código de verificación:</p>
+           <p style="font-size: 16px; color: #333;">${emailTitle}</p>
+           <p style="font-size: 16px; color: #333;">${emailBody}</p>
            <div style="background-color: #f9f9f9; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
              <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2563eb;">${verificationCode}</span>
            </div>
-           <p style="font-size: 14px; color: #666; text-align: center;">Si no solicitaste este registro, por favor ignora este correo.</p>
+           <p style="font-size: 14px; color: #666; text-align: center;">${emailFooter}</p>
          </div>
        `
       })

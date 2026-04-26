@@ -8,9 +8,6 @@
     </div>
 
     <div class="topbar-actions">
-    <!--  <a href="mailto:soporte@bringjobs.com" class="support-link">
-        soporte@bringjobs.com
-      </a>-->
     </div>
   </header>
 </template>
@@ -57,6 +54,5 @@
   align-items: center;
   gap: 10px;
 }
-
 
 </style>

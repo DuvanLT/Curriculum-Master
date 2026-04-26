@@ -1,28 +1,28 @@
 <template>
   <NuxtLayout>
     <div>
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Generador de CV con IA <HelpButton /></div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Potencia tu curriculum adaptando tu experiencia laboral a la oferta de empleo que te interesa, utilizando inteligencia artificial.</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('generador.title') }} <HelpButton /></div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('generador.subtitle') }}</div>
 
-      <AppCard title="Adaptar a una vacante">
+      <AppCard :title="$t('generador.card_title')">
         <div class="text-[12px] text-text-muted mb-3">
-          Copia y pega la descripcion de la oferta para que la IA optimice tus logros y palabras clave.
+          {{ $t('generador.card_desc') }}
         </div>
         <div class="text-[11px] text-text-dim mb-3 leading-relaxed">
-          La adaptacion prioriza las experiencias mas relevantes para la vacante y evita inventar porcentajes o resultados no sustentados por tu perfil maestro.
+          {{ $t('generador.card_note') }}
         </div>
         <div class="mb-4 p-3 bg-[var(--bg)]-bg3 border border-border rounded-lg">
           <div class="text-[12px] font-semibold text-text-main mb-1 flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px] text-amber">image</span>
-            Foto de perfil (Opcional)
+            {{ $t('generador.photo_title') }}
           </div>
           <div class="text-[11px] text-text-dim mb-3">
-            <span class="text-amber">Nota:</span> Por motivos de privacidad y seguridad, no almacenamos tus fotografías en nuestros servidores. Por ello, te solicitaremos que subas tu imagen cada vez que generes un nuevo currículum.
+            <span class="text-amber">{{ $t('generador.photo_note_label') }}</span> {{ $t('generador.photo_note') }}
           </div>
           <div class="flex items-center gap-3">
             <label class="cursor-pointer bg-[var(--bg)]-bg2 hover:bg-border-dim border border-border px-3 py-2 rounded flex items-center gap-2 transition-colors">
               <span class="material-symbols-outlined text-[18px]">upload</span>
-              <span class="text-[12px] font-medium">Subir Imagen</span>
+              <span class="text-[12px] font-medium">{{ $t('generador.upload_image') }}</span>
               <input type="file" @change="handleImageUpload" accept="image/*" class="hidden">
             </label>
             <div v-if="cvImage" class="relative group">
@@ -38,30 +38,30 @@
           type="textarea"
           v-model="jd"
           :rows="4"
-          placeholder="Ej: Buscamos un Disenador con experiencia en Adobe Photoshop, Illustrator y Figma..."
+          :placeholder="$t('generador.placeholder')"
         />
         <div class="flex items-center gap-2 mt-4">
           <AppButton @click="generateAI" :disabled="loading" class="flex-1 sm:flex-none">
             <span v-if="loading" class="spinner mr-2"></span>
             <span v-else class="material-symbols-outlined text-[18px] mr-2">smart_toy</span>
-            {{ loading ? 'Optimizando CV...' : 'Generar PDF con IA' }}
+            {{ loading ? $t('generador.btn_generating') : $t('generador.btn_generate') }}
           </AppButton>
         </div>
       </AppCard>
 
       <div v-if="aiResult" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <div class="md:col-span-2">
-          <AppCard title="Vista Previa de Optimizacion">
+          <AppCard :title="$t('generador.preview_title')">
             <div class="p-3 bg-[var(--bg)]-bg2 rounded border border-border">
               <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
-                RESUMEN OPTIMIZADO
+                {{ $t('generador.optimized_summary') }}
               </div>
               <p class="text-[13px] text-text-muted leading-relaxed italic mb-4">
                 "{{ aiResult.summary }}"
               </p>
 
               <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
-                TOP SKILLS PARA ESTA POSICION
+                {{ $t('generador.top_skills') }}
               </div>
               <div class="flex flex-wrap gap-2 mb-2">
                 <span v-for="skill in aiResult.top_skills" :key="skill" class="text-[11px] bg-[var(--bg)]-bg3 border border-border px-2 py-0.5 rounded text-text-dim">
@@ -71,7 +71,7 @@
 
               <div v-if="optimizedExperiences.length" class="mt-5">
                 <div class="text-[12px] font-mono text-amber border-b border-border-dim pb-2 mb-3 tracking-widest uppercase">
-                  EXPERIENCIAS PRIORIZADAS
+                  {{ $t('generador.prioritized_experiences') }}
                 </div>
                 <div v-for="exp in optimizedExperiences" :key="exp.id" class="mb-4 border border-border rounded p-3 bg-[var(--bg)]-bg3">
                   <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -92,7 +92,7 @@
         </div>
 
         <div>
-          <AppCard title="Consejos Pro">
+          <AppCard :title="$t('generador.pro_tips_title')">
             <template #title-icon>
               <span class="material-symbols-outlined text-amber">lightbulb</span>
             </template>
@@ -103,7 +103,7 @@
             </ul>
             <AppButton variant="ghost" class="w-full mt-4 !text-[12px]" @click="exportToPDF">
               <span class="material-symbols-outlined text-[16px] mr-1">download</span>
-              Descargar PDF Final
+              {{ $t('generador.download_pdf') }}
             </AppButton>
           </AppCard>
         </div>
@@ -131,6 +131,7 @@ definePageMeta({
 
 const { profile, educations, experiences, ensureProfileLoaded, loading: profileLoading } = useAppState()
 const toast = useToast()
+const { t, locale } = useI18n()
 const jd = ref('')
 const loading = ref(false)
 const aiResult = ref(null)
@@ -161,12 +162,12 @@ const generateAI = async () => {
   await ensureProfileLoaded()
 
   if (profileLoading.value) {
-    toast.error('Estamos cargando tu Perfil Maestro. Intenta de nuevo en un momento.')
+    toast.error(t('generador.toast_loading_profile'))
     return
   }
 
   if (!profile.value.nombre) {
-    toast.error('Completa tu Perfil Maestro antes de generar el CV.')
+    toast.error(t('generador.toast_complete_profile'))
     return
   }
 
@@ -177,13 +178,14 @@ const generateAI = async () => {
       body: {
         profile: profile.value,
         experiences: experiences.value,
-        jd: jd.value
+        jd: jd.value,
+        locale: locale.value
       }
     })
     aiResult.value = data
   } catch (e) {
     console.error('Error generating CV:', e)
-    toast.error('Error al conectar con la IA. Revisa tu API key.')
+    toast.error(t('generador.toast_ai_error'))
   } finally {
     loading.value = false
   }
@@ -194,13 +196,13 @@ const exportToPDF = async () => {
 
   const element = document.getElementById('pdf-area')
   if (!element) {
-    toast.error('No se pudo preparar el CV para impresion.')
+    toast.error(t('generador.toast_pdf_error'))
     return
   }
 
   const printWindow = window.open('', '_blank', 'width=900,height=1200')
   if (!printWindow) {
-    toast.error('El navegador bloqueo la ventana de impresion.')
+    toast.error(t('generador.toast_popup_blocked'))
     return
   }
 

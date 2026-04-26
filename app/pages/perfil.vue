@@ -3,18 +3,18 @@
     <div>
       <div class="flex justify-between">
         <div>
-          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Perfil Maestro <HelpButton /></div>
-          <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Tu perfil maestro debe incluir tu informacion laboral, academica y profesional mas reciente.</div>
+          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('profile.title') }} <HelpButton /></div>
+          <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('profile.subtitle') }}</div>
         </div>
         <div class="flex items-center gap-4">
         <div class="text-[11px] font-mono uppercase tracking-widest" :class="hasUnsavedChanges ? 'text-amber' : 'text-text-dim'">
-          {{ hasUnsavedChanges ? 'Cambios sin guardar' : 'Sin cambios pendientes' }}
+          {{ hasUnsavedChanges ? $t('profile.unsaved_changes') : $t('profile.no_changes') }}
         </div>
         <NuxtLink to="/examen" class="nav-item" active-class="active">
-          <AppButton variant="ghost">Descubrir habilidades</AppButton>
+          <AppButton variant="ghost">{{ $t('profile.btn_discover_skills') }}</AppButton>
         </NuxtLink>
         <NuxtLink to="/importar-cv" class="nav-item" active-class="active">
-          <AppButton variant="ghost">Importar CV</AppButton>
+          <AppButton variant="ghost">{{ $t('profile.btn_import_cv') }}</AppButton>
         </NuxtLink>
         </div>
       </div>
@@ -22,79 +22,79 @@
       <div class="stats-row grid grid-cols-4 gap-2.5 mb-5">
         <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">{{ profile.years || 0 }}</div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Años de experiencia</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">{{ $t('profile.stat_years') }}</div>
         </div>
         <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">{{ experiences.length }}</div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Entradas</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">{{ $t('profile.stat_entries') }}</div>
         </div>
         <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">{{ educations.length }}</div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Estudios</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">{{ $t('profile.stat_studies') }}</div>
         </div>
         <div class="stat-card bg-[var(--bg)]-bg2 border border-border rounded-[5px] p-[14px]">
           <div class="stat-val font-head text-[22px] font-bold text-amber leading-none">
             {{ [...new Set(experiences.flatMap(e => e.skills || []))].length }}
           </div>
-          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">Habilidades únicas</div>
+          <div class="stat-lbl text-[11px] text-text-dim font-mono mt-1">{{ $t('profile.stat_skills') }}</div>
         </div>
       </div>
 
-      <AppCard title="Datos Personales">
+      <AppCard :title="$t('profile.section_personal')">
         <div class="grid grid-cols-2 gap-3 mb-3">
-          <AppInput label="Nombre completo" v-model="profile.nombre" maxlength="50" placeholder="Juan Garcia" />
-          <AppInput label="Titulo / Cargo actual" v-model="profile.titulo" maxlength="30" placeholder="Senior Backend Developer" />
+          <AppInput :label="$t('profile.label_name')" v-model="profile.nombre" maxlength="50" :placeholder="$t('profile.placeholder_name')" />
+          <AppInput :label="$t('profile.label_title')" v-model="profile.titulo" maxlength="30" :placeholder="$t('profile.placeholder_title')" />
         </div>
         <div class="grid grid-cols-3 gap-3 mb-3">
-          <AppInput label="Email del perfil" type="email" v-model="profile.email_profile" placeholder="juan@email.com" />
-          <AppInput label="Telefono" v-model="profile.telefono" placeholder="+57 321..." />
-          <AppInput label="Años de experiencia total" type="number" v-model="profile.years" placeholder="7" />
+          <AppInput :label="$t('profile.label_email')" type="email" v-model="profile.email_profile" placeholder="juan@email.com" />
+          <AppInput :label="$t('profile.label_phone')" v-model="profile.telefono" placeholder="+57 321..." />
+          <AppInput :label="$t('profile.label_years')" type="number" v-model="profile.years" placeholder="7" />
         </div>
         <div class="grid grid-cols-3 gap-3 mb-3">
-          <AppInput label="LinkedIn (URL)" v-model="profile.linkedin" placeholder="linkedin.com/in/..." />
-          <AppInput label="Web / Portafolio" v-model="profile.web" placeholder="miweb.com" />
-          <AppInput label="Otra" v-model="profile.otros" placeholder="Tu red social profesional" />
+          <AppInput :label="$t('profile.label_linkedin')" v-model="profile.linkedin" placeholder="linkedin.com/in/..." />
+          <AppInput :label="$t('profile.label_web')" v-model="profile.web" placeholder="miweb.com" />
+          <AppInput :label="$t('profile.label_other')" v-model="profile.otros" :placeholder="$t('profile.placeholder_other')" />
         </div>
         <div class="grid grid-cols-1 gap-3 mb-3">
-          <AppInput label="Ubicacion" maxlength="50" v-model="profile.ubicacion" placeholder="Cali, Colombia" />
+          <AppInput :label="$t('profile.label_location')" maxlength="50" v-model="profile.ubicacion" :placeholder="$t('profile.placeholder_location')" />
         </div>
-        <AppInput label="Resumen profesional" :maxlength="500" type="textarea" v-model="profile.resumen" placeholder="Desarrollador backend con 7+ años de experiencia..." />
+        <AppInput :label="$t('profile.label_summary')" :maxlength="500" type="textarea" v-model="profile.resumen" :placeholder="$t('profile.placeholder_summary')" />
         <AppButton :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
-          Guardar cambios
+          {{ $t('profile.btn_save_changes') }}
         </AppButton>
       </AppCard>
 
-      <AppCard title="Formacion Academica">
+      <AppCard :title="$t('profile.section_education')">
         <template #title-action>
           <div class="ml-auto">
             <AppButton size="sm" @click="toggleEducationForm">
               <span class="material-symbols-outlined text-[16px] mr-1">{{ addingEducation ? 'close' : 'school' }}</span>
-              {{ addingEducation ? 'Cancelar' : 'Agregar estudio' }}
+              {{ addingEducation ? $t('profile.btn_cancel') : $t('profile.btn_add_study') }}
             </AppButton>
           </div>
         </template>
 
         <div v-if="addingEducation" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
-          <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">- {{ editingEducationId ? 'EDITAR' : 'NUEVO' }} ESTUDIO</div>
+          <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">{{ editingEducationId ? $t('profile.lbl_edit_study') : $t('profile.lbl_new_study') }}</div>
 
           <div class="grid grid-cols-2 gap-3 mb-3">
-            <AppInput label="Titulo" v-model="newEducation.titulo" placeholder="Ingenieria de Sistemas" />
-            <AppInput label="Institucion" v-model="newEducation.institucion" placeholder="UNIACC / Universidad X" />
+            <AppInput :label="$t('profile.label_edu_title')" v-model="newEducation.titulo" placeholder="Ingenieria de Sistemas" />
+            <AppInput :label="$t('profile.label_edu_institution')" v-model="newEducation.institucion" placeholder="UNIACC / Universidad X" />
           </div>
           <div class="grid grid-cols-2 gap-3 mb-3">
-            <AppInput label="Fecha inicio" v-model="newEducation.inicio" placeholder="Ene 2022" />
-            <AppInput label="Fecha fin o estado" v-model="newEducation.fin" placeholder="Actual / Dic 2026" />
+            <AppInput :label="$t('profile.label_edu_start')" v-model="newEducation.inicio" placeholder="Ene 2022" />
+            <AppInput :label="$t('profile.label_edu_end')" v-model="newEducation.fin" :placeholder="$t('profile.placeholder_edu_end')" />
           </div>
-          <AppInput label="Descripcion" minlength="50" maxlength="1000" type="textarea" v-model="newEducation.descripcion" placeholder="Enfasis, grado, proyectos destacados, menciones o contexto adicional..." />
+          <AppInput :label="$t('profile.label_edu_desc')" minlength="50" maxlength="1000" type="textarea" v-model="newEducation.descripcion" :placeholder="$t('profile.placeholder_edu_desc')" />
 
           <div class="flex gap-3">
-            <AppButton @click="saveEducation" class="flex-1">{{ editingEducationId ? 'Actualizar' : 'Guardar' }} estudio</AppButton>
-            <AppButton v-if="editingEducationId" variant="secondary" @click="resetEducationForm">Cancelar edicion</AppButton>
+            <AppButton @click="saveEducation" class="flex-1">{{ editingEducationId ? $t('profile.btn_update_study') : $t('profile.btn_save_study') }}</AppButton>
+            <AppButton v-if="editingEducationId" variant="secondary" @click="resetEducationForm">{{ $t('profile.btn_cancel_edit') }}</AppButton>
           </div>
         </div>
 
         <div v-if="educations.length === 0 && !addingEducation" class="text-center py-10 text-text-dim font-mono text-[12px]">
-          No hay estudios registrados. Agrega tu primera formacion academica.
+          {{ $t('profile.empty_education') }}
         </div>
 
         <div v-else class="space-y-3">
@@ -106,10 +106,10 @@
                 <div v-if="edu.descripcion" class="text-[12px] text-text-dim mt-2 leading-relaxed">{{ edu.descripcion }}</div>
               </div>
               <div class="text-right shrink-0">
-                <div class="text-[11px] text-text-dim font-mono">{{ edu.inicio || 'N/A' }} - {{ edu.fin || 'Actual' }}</div>
+                <div class="text-[11px] text-text-dim font-mono">{{ edu.inicio || $t('profile.lbl_na') }} - {{ edu.fin || $t('profile.lbl_actual') }}</div>
                 <div class="flex gap-2 mt-2 justify-end">
-                  <AppButton variant="secondary" size="sm" @click="startEditingEducation(edu)">Editar</AppButton>
-                  <AppButton variant="danger" size="sm" @click="removeEducationEntry(edu.id)">Eliminar</AppButton>
+                  <AppButton variant="secondary" size="sm" @click="startEditingEducation(edu)">{{ $t('profile.btn_edit') }}</AppButton>
+                  <AppButton variant="danger" size="sm" @click="removeEducationEntry(edu.id)">{{ $t('profile.btn_delete') }}</AppButton>
                 </div>
               </div>
             </div>
@@ -117,72 +117,72 @@
         </div>
       </AppCard>
 
-      <AppCard title="Historial de Experiencias">
+      <AppCard :title="$t('profile.section_experience')">
         <template #title-action>
           <div class="ml-auto">
             <AppButton size="sm" @click="toggleExperienceForm">
               <span class="material-symbols-outlined text-[16px] mr-1">{{ adding ? 'close' : 'add' }}</span>
-              {{ adding ? 'Cancelar' : 'Agregar' }}
+              {{ adding ? $t('profile.btn_cancel') : $t('profile.btn_add') }}
             </AppButton>
           </div>
         </template>
 
         <div v-if="adding" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
-          <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">- {{ editingExpId ? 'EDITAR' : 'NUEVA' }} ENTRADA</div>
+          <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">{{ editingExpId ? $t('profile.lbl_edit_exp') : $t('profile.lbl_new_exp') }}</div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-            <AppInput label="Tipo" type="select" v-model="newExp.type">
-              <option value="work">Experiencia laboral</option>
-              <option value="project">Proyecto</option>
+            <AppInput :label="$t('profile.label_exp_type')" type="select" v-model="newExp.type">
+              <option value="work">{{ $t('profile.type_work') }}</option>
+              <option value="project">{{ $t('profile.type_project') }}</option>
             </AppInput>
-            <AppInput :label="newExp.type === 'project' ? 'Rol en el proyecto' : 'Cargo / Titulo'" v-model="newExp.cargo" placeholder="Senior Developer" />
-            <AppInput :label="newExp.type === 'project' ? 'Nombre del proyecto' : 'Empresa'" v-model="newExp.empresa" placeholder="Empresa S.A.S o nombre del proyecto" />
+            <AppInput :label="newExp.type === 'project' ? $t('profile.label_exp_role_project') : $t('profile.label_exp_role_work')" v-model="newExp.cargo" placeholder="Senior Developer" />
+            <AppInput :label="newExp.type === 'project' ? $t('profile.label_exp_company_project') : $t('profile.label_exp_company_work')" v-model="newExp.empresa" :placeholder="$t('profile.placeholder_exp_company')" />
           </div>
 
           <div class="grid grid-cols-2 gap-3 mb-3">
-            <AppInput label="Fecha inicio" v-model="newExp.inicio" placeholder="Ene 2020" />
-            <AppInput :label="newExp.type === 'project' ? 'Fecha fin o estado' : 'Fecha fin (vacio = actual)'" v-model="newExp.fin" placeholder="Dic 2023" />
+            <AppInput :label="$t('profile.label_exp_start')" v-model="newExp.inicio" placeholder="Ene 2020" />
+            <AppInput :label="newExp.type === 'project' ? $t('profile.label_exp_end_project') : $t('profile.label_exp_end_work')" v-model="newExp.fin" placeholder="Dic 2023" />
           </div>
 
           <AppInput
-            :label="newExp.type === 'project' ? 'Que resolviste o construiste' : 'Logros cuantificables'"
+            :label="newExp.type === 'project' ? $t('profile.label_exp_achievements_project') : $t('profile.label_exp_achievements_work')"
             type="textarea"
             minlength="50"
             maxlength="1000"
             v-model="newExp.logros"
-            :placeholder="newExp.type === 'project' ? 'Construyi un dashboard, automatice un flujo, cree un MVP...' : 'Reduje el tiempo de respuesta, mejore procesos, lidere entregas...'"
+            :placeholder="newExp.type === 'project' ? $t('profile.placeholder_achievements_project') : $t('profile.placeholder_achievements_work')"
           />
 
           <div class="text-[11px] text-text-dim -mt-2 mb-3 leading-relaxed">
-            Escribe una descripcion con buen contexto. Lo ideal es superar los 300 caracteres incluyendo problema, responsabilidad, stack, entregable o resultado.
+            {{ $t('profile.help_exp_desc') }}
           </div>
 
-          <AppInput label="Habilidades usadas (separadas por coma)" v-model="newExp.skills" placeholder="Ej: Power BI, Analisis, Excel, Python" />
+          <AppInput :label="$t('profile.label_exp_skills')" v-model="newExp.skills" :placeholder="$t('profile.placeholder_exp_skills')" />
 
           <div class="text-[11px] text-text-dim mb-3 leading-relaxed">
-            Usa "Experiencia laboral" para roles reales en empresa, contrato o freelance continuo. Usa "Proyecto" para portafolio, iniciativa personal, practica academica o entregable puntual.
+            {{ $t('profile.help_exp_type') }}
           </div>
 
           <div class="flex gap-3">
-            <AppButton @click="saveExp" class="flex-1">{{ editingExpId ? 'Actualizar' : 'Guardar' }} entrada</AppButton>
-            <AppButton v-if="editingExpId" variant="secondary" @click="resetExpForm">Cancelar edicion</AppButton>
+            <AppButton @click="saveExp" class="flex-1">{{ editingExpId ? $t('profile.btn_update_exp') : $t('profile.btn_save_exp') }}</AppButton>
+            <AppButton v-if="editingExpId" variant="secondary" @click="resetExpForm">{{ $t('profile.btn_cancel_edit') }}</AppButton>
           </div>
         </div>
 
         <div v-if="loading" class="text-center py-10">
           <div class="spinner inline-block"></div>
-          <div class="text-[12px] text-text-dim font-mono mt-2">Cargando perfil...</div>
+          <div class="text-[12px] text-text-dim font-mono mt-2">{{ $t('profile.loading') }}</div>
         </div>
 
         <div v-else-if="experiences.length === 0 && !adding" class="text-center py-10 text-text-dim font-mono text-[12px]">
-          No hay experiencias ni proyectos. Agrega tu primera entrada.
+          {{ $t('profile.empty_experience') }}
         </div>
 
         <div v-else class="space-y-5">
           <section v-if="workExperiences.length">
             <div class="flex items-center justify-between mb-3">
-              <div class="text-[12px] font-mono text-amber tracking-widest uppercase">Experiencia laboral</div>
-              <div class="text-[11px] text-text-dim font-mono">{{ workExperiences.length }} entradas</div>
+              <div class="text-[12px] font-mono text-amber tracking-widest uppercase">{{ $t('profile.lbl_work_exp') }}</div>
+              <div class="text-[11px] text-text-dim font-mono">{{ $t('profile.lbl_entries_count', { count: workExperiences.length }) }}</div>
             </div>
 
             <ExperienceItem
@@ -196,8 +196,8 @@
 
           <section v-if="projectExperiences.length">
             <div class="flex items-center justify-between mb-3">
-              <div class="text-[12px] font-mono text-sky-500 tracking-widest uppercase">Proyectos</div>
-              <div class="text-[11px] text-text-dim font-mono">{{ projectExperiences.length }} entradas</div>
+              <div class="text-[12px] font-mono text-sky-500 tracking-widest uppercase">{{ $t('profile.lbl_projects') }}</div>
+              <div class="text-[11px] text-text-dim font-mono">{{ $t('profile.lbl_entries_count', { count: projectExperiences.length }) }}</div>
             </div>
 
             <ExperienceItem
@@ -213,14 +213,14 @@
 
       <AppModal
         :show="showConfirmDeleteExp"
-        title="Eliminar Entrada"
-        confirm-text="Si, eliminar"
-        cancel-text="Cancelar"
+        :title="$t('profile.modal_del_title')"
+        :confirm-text="$t('profile.modal_del_confirm')"
+        :cancel-text="$t('profile.btn_cancel')"
         confirm-variant="primary"
         @close="showConfirmDeleteExp = false"
         @confirm="handleRemoveExperience"
       >
-        <p>Estas seguro de que quieres eliminar esta entrada? Esta accion no se puede deshacer.</p>
+        <p>{{ $t('profile.modal_del_desc') }}</p>
       </AppModal>
     </div>
   </NuxtLayout>
@@ -233,6 +233,7 @@ definePageMeta({
 
 const { profile, educations, experiences, loading, fetchProfile, saveProfile } = useAppState()
 const toast = useToast()
+const { t } = useI18n()
 
 const adding = ref(false)
 const addingEducation = ref(false)
@@ -308,10 +309,10 @@ const handleManualSave = async () => {
   try {
     await saveProfile()
     hasUnsavedChanges.value = false
-    toast.success('Perfil guardado correctamente')
+    toast.success(t('profile.toast_save_success'))
   } catch (error) {
     console.error(error)
-    toast.error('No se pudieron guardar los cambios')
+    toast.error(t('profile.toast_save_error'))
   } finally {
     savingProfile.value = false
     nextTick(() => {
@@ -341,13 +342,13 @@ const saveEducation = () => {
         ...newEducation.value
       }
     }
-    toast.success('Estudio actualizado')
+    toast.success(t('profile.toast_edu_updated'))
   } else {
     educations.value.unshift({
       id: createLocalId(),
       ...newEducation.value
     })
-    toast.success('Estudio agregado')
+    toast.success(t('profile.toast_edu_added'))
   }
 
   resetEducationForm()
@@ -374,7 +375,7 @@ const startEditingEducation = (edu: any) => {
 
 const removeEducationEntry = (id: string | number) => {
   educations.value = educations.value.filter(edu => edu.id !== id)
-  toast.success('Estudio eliminado')
+  toast.success(t('profile.toast_edu_deleted'))
 }
 
 const toggleExperienceForm = () => {
@@ -393,7 +394,7 @@ const saveExp = () => {
 
   const normalizedDescription = newExp.value.logros.replace(/\s+/g, ' ').trim()
   if (normalizedDescription.length < 300) {
-    toast.error('La descripcion debe tener al menos 300 caracteres para dar suficiente contexto.')
+    toast.error(t('profile.toast_exp_desc_length'))
     return
   }
 
@@ -407,7 +408,7 @@ const saveExp = () => {
         skills: normalizeSkills(newExp.value.skills)
       }
     }
-    toast.success(newExp.value.type === 'project' ? 'Proyecto actualizado' : 'Experiencia actualizada')
+    toast.success(newExp.value.type === 'project' ? t('profile.toast_proj_updated') : t('profile.toast_exp_updated'))
   } else {
     experiences.value.unshift({
       id: createLocalId(),
@@ -419,7 +420,7 @@ const saveExp = () => {
       logros: newExp.value.logros || '',
       skills: normalizeSkills(newExp.value.skills)
     })
-    toast.success(newExp.value.type === 'project' ? 'Proyecto agregado' : 'Experiencia agregada')
+    toast.success(newExp.value.type === 'project' ? t('profile.toast_proj_added') : t('profile.toast_exp_added'))
   }
 
   resetExpForm()
@@ -454,7 +455,7 @@ const confirmRemoveExperience = (id: string | number) => {
 const handleRemoveExperience = () => {
   if (expToDelete.value) {
     experiences.value = experiences.value.filter(exp => exp.id !== expToDelete.value)
-    toast.success('Entrada eliminada')
+    toast.success(t('profile.toast_exp_deleted'))
   }
   showConfirmDeleteExp.value = false
   expToDelete.value = null

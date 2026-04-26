@@ -61,13 +61,15 @@ export default defineEventHandler(async (event) => {
   const session = await requireVerifiedUserSession(event) as any
   const body = await readBody(event)
   const action = String(body?.action || '')
+  const locale = String(body?.locale || 'es')
+  const isEn = locale === 'en'
   const email = String(session.user?.email || '').trim()
   const name = String(session.user?.name || '').trim() || null
 
   if (!email) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'No encontramos un correo valido para esta cuenta.'
+      statusMessage: isEn ? 'We could not find a valid email for this account.' : 'No encontramos un correo valido para esta cuenta.'
     })
   }
 
@@ -84,10 +86,10 @@ export default defineEventHandler(async (event) => {
     await sendAuthCodeEmail({
       to: email,
       name,
-      subject: 'Codigo para cambiar tu contraseña - Bring Jobs',
-      intro: 'Usa este codigo de 6 digitos para confirmar el cambio de contraseña desde la app.',
+      subject: isEn ? 'Code to change your password - Bring Jobs' : 'Codigo para cambiar tu contraseña - Bring Jobs',
+      intro: isEn ? 'Use this 6-digit code to confirm the password change from the app.' : 'Usa este codigo de 6 digitos para confirmar el cambio de contraseña desde la app.',
       code,
-      footer: 'Si no solicitaste cambiar tu contraseña, ignora este correo. El codigo vence en 15 minutos.'
+      footer: isEn ? 'If you did not request to change your password, ignore this email. The code expires in 15 minutes.' : 'Si no solicitaste cambiar tu contraseña, ignora este correo. El codigo vence en 15 minutos.'
     })
 
     return {
@@ -102,7 +104,7 @@ export default defineEventHandler(async (event) => {
   if (!state.code || !state.expiresAt) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Primero solicita un codigo de recuperacion.'
+      statusMessage: isEn ? 'First, request a recovery code.' : 'Primero solicita un codigo de recuperacion.'
     })
   }
 
@@ -115,7 +117,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 400,
-      statusMessage: 'El codigo ya vencio. Solicita uno nuevo.'
+      statusMessage: isEn ? 'The code has expired. Request a new one.' : 'El codigo ya vencio. Solicita uno nuevo.'
     })
   }
 
@@ -125,7 +127,7 @@ export default defineEventHandler(async (event) => {
     if (state.code !== code) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Codigo de recuperacion incorrecto.'
+        statusMessage: isEn ? 'Incorrect recovery code.' : 'Codigo de recuperacion incorrecto.'
       })
     }
 
@@ -147,14 +149,14 @@ export default defineEventHandler(async (event) => {
     if (!password || !confirmPassword) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Debes completar y confirmar la nueva contraseña.'
+        statusMessage: isEn ? 'You must fill and confirm the new password.' : 'Debes completar y confirmar la nueva contraseña.'
       })
     }
 
     if (password !== confirmPassword) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Las contraseñas no coinciden.'
+        statusMessage: isEn ? 'Passwords do not match.' : 'Las contraseñas no coinciden.'
       })
     }
 
@@ -168,7 +170,7 @@ export default defineEventHandler(async (event) => {
 
       throw createError({
         statusCode: 403,
-        statusMessage: 'Primero valida el codigo de recuperacion.'
+        statusMessage: isEn ? 'First validate the recovery code.' : 'Primero valida el codigo de recuperacion.'
       })
     }
 
@@ -192,8 +194,8 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  throw createError({
-    statusCode: 400,
-    statusMessage: 'Accion de cambio de contraseña no valida.'
-  })
+    throw createError({
+      statusCode: 400,
+      statusMessage: isEn ? 'Invalid password change action.' : 'Accion de cambio de contraseña no valida.'
+    })
 })

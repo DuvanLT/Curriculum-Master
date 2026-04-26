@@ -5,7 +5,7 @@
     :class="{ 'tour-sidebar-active': showTour }"
   >
     <div class="nav-section mb-6">
-      <div class="nav-label text-[10px] text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Principal</div>
+      <div class="nav-label text-[10px] text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">{{ $t('sidebar.main') }}</div>
 
       <div
         v-for="item in primaryNavigationItems"
@@ -27,7 +27,7 @@
         </NuxtLink>
       </div>
 
-      <div class="nav-label text-[10px] mt-6 text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">Configuracion</div>
+      <div class="nav-label text-[10px] mt-6 text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">{{ $t('sidebar.settings') }}</div>
 
       <div
         v-for="item in settingsNavigationItems"
@@ -66,8 +66,8 @@
             {{ user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase() }}
           </div>
           <div class="flex flex-col min-w-0">
-            <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || 'Sin Nombre' }}</div>
-            <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">Plan Beta</div>
+            <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || $t('sidebar.unnamed') }}</div>
+            <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">{{ $t('sidebar.plan_beta') }}</div>
           </div>
         </NuxtLink>
       </div>
@@ -88,7 +88,7 @@
       >
         <div class="tour-card-header">
           <div>
-            <div class="tour-kicker">Guia inicial</div>
+            <div class="tour-kicker">{{ $t('sidebar.tour_kicker') }}</div>
             <div class="tour-title">{{ currentTourItem.label }}</div>
           </div>
           <button type="button" class="tour-close" @click="completeTour" aria-label="Cerrar tutorial">
@@ -100,9 +100,7 @@
           <div class="tour-step-icon">
             <span class="material-symbols-outlined text-[18px]">{{ currentTourItem.icon }}</span>
           </div>
-          <div class="text-[11px] text-text-dim font-mono uppercase tracking-widest">
-            Paso {{ tourStep + 1 }} de {{ tourItems.length }}
-          </div>
+            {{ $t('sidebar.tour_step', { step: tourStep + 1, total: tourItems.length }) }}
         </div>
 
         <p class="tour-copy">{{ currentTourItem.description }}</p>
@@ -121,13 +119,13 @@
         </div>
 
         <div class="tour-actions">
-          <button type="button" class="tour-link-btn" @click="completeTour">Omitir</button>
+          <button type="button" class="tour-link-btn" @click="completeTour">{{ $t('sidebar.tour_skip') }}</button>
           <div class="flex items-center gap-2">
             <AppButton variant="secondary" size="sm" :disabled="tourStep === 0" @click="previousTourStep">
-              Anterior
+              {{ $t('sidebar.tour_prev') }}
             </AppButton>
             <AppButton size="sm" @click="nextTourStep">
-              {{ isLastTourStep ? 'Finalizar' : 'Siguiente' }}
+              {{ isLastTourStep ? $t('sidebar.tour_finish') : $t('sidebar.tour_next') }}
             </AppButton>
           </div>
         </div>
@@ -176,8 +174,8 @@ const getTourShellClass = (id: string) => ({
   'tour-shell-dimmed': showTour.value && currentTourItem.value?.id !== id
 })
 
-const setTourItemRef = (id: string) => (element: Element | null) => {
-  tourItemRefs.value[id] = element as HTMLElement | null
+const setTourItemRef = (id: string) => (element: any) => {
+  tourItemRefs.value[id] = (element?.$el ?? element) as HTMLElement | null
 
   if (showTour.value && currentTourItem.value?.id === id) {
     nextTick(() => updateTourCardPosition())

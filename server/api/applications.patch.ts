@@ -1,5 +1,7 @@
+import { requireVerifiedUserSession } from '../utils/verified-session'
+
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
+  const session = await requireVerifiedUserSession(event)
   const body = await readBody(event)
   const { id, status, interview_date } = body
   

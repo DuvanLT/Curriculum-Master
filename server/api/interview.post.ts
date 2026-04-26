@@ -1,11 +1,21 @@
 import OpenAI from 'openai'
 import { requireVerifiedUserSession } from '../utils/verified-session'
+import { checkUserAIRateLimit } from '../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  await requireVerifiedUserSession(event)
+  const session = await requireVerifiedUserSession(event)
+  checkUserAIRateLimit(session.user.id)
   const body = await readBody(event)
-  const { messages, profile, experiences, isFinal } = body
+  const { profile, experiences, isFinal, locale = 'es' } = body
+  const isEn = locale === 'en'
+
+  // Truncate messages to last 50 and cap each at 3000 chars
+  const rawMessages = Array.isArray(body.messages) ? body.messages.slice(-50) : []
+  const messages = rawMessages.map((m: any) => ({
+    ...m,
+    text: typeof m.text === 'string' ? m.text.slice(0, 3000) : ''
+  }))
 
   if (!config.openaiApiKey) {
     throw createError({
@@ -42,7 +52,20 @@ export default defineEventHandler(async (event) => {
         ? JSON.stringify(messages)
         : "No hubo conversación; el usuario finalizó inmediatamente."
 
-      const finalPrompt = `
+      const finalPrompt = isEn
+        ? `
+        The interview has ended. Based on the following conversation, generate a feedback summary and 3-4 "next steps" (concrete tasks) for the candidate to improve.
+        
+        CONVERSATION:
+        ${conversationStr}
+
+        RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE EXACT SPANISH KEYS):
+        {
+          "summary": "Brief summary of performance and areas for improvement",
+          "next_steps": ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
+        }
+      `
+        : `
         La entrevista ha terminado. Basándote en la siguiente conversación, genera un resumen de feedback y 3-4 "próximos pasos" (tareas concretas) para que el candidato mejore.
         
         CONVERSACIÓN:
@@ -80,7 +103,31 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const systemPrompt = `
+  const systemPrompt = isEn
+    ? `
+    You are a Senior Technical Recruiter with years of experience at leading tech companies (like FAANG).
+    Your mission is to conduct a highly realistic technical or behavioral interview simulation.
+
+    CANDIDATE CONTEXT:
+    Name: ${profile?.nombre || 'Candidate'}
+    Title: ${profile?.titulo || 'Professional'}
+    Summary: ${profile?.resumen || ''}
+    Years Exp: ${profile?.years || '0'}
+    Education: ${profile?.educacion || ''}
+
+    EXPERIENCES:
+    ${JSON.stringify(experiences || [])}
+
+    BEHAVIORAL INSTRUCTIONS:
+    1. Maintain a professional, observant, and sometimes challenging tone (like a real recruiter).
+    2. Ask questions based on the candidate's real experience. 
+    3. If the candidate gives short or vague answers, politely press for details (use the STAR method).
+    4. The goal is NOT just to be nice, but to assess if the candidate is suitable.
+    5. Ask one question at a time.
+    6. Language: You must speak in English.
+    7. Keep your interventions concise so the interview flows smoothly.
+  `
+    : `
     Eres un Reclutador Técnico Senior con años de experiencia en empresas de tecnología líderes (tipo FAANG).
     Tu misión es realizar una simulación de entrevista técnica o de comportamiento (behavioral) altamente realista.
 

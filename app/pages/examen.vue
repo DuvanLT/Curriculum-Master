@@ -2,9 +2,9 @@
   <NuxtLayout>
     <div class="max-w-3xl mx-auto py-4">
       <div class="mb-6">
-        <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Examen de Competencias <HelpButton /></div>
+        <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ t('examen.title') }} <HelpButton /></div>
         <div class="page-sub text-[13px] text-text-dim mb-2 font-mono">
-        Realiza esta evaluación de 16 preguntas para identificar tus habilidades clave y completar aún más tu currículum.
+        {{ t('examen.subtitle') }}
         </div>
       </div>
 
@@ -17,11 +17,11 @@
           <div>
             <div class="card-title font-head text-[14px] font-semibold mb-2 text-text flex items-center gap-2">
               <span class="w-[3px] h-[14px] bg-amber rounded-sm"></span>
-              {{ result ? 'Resultado mas reciente' : 'Resultado anterior' }}
+              {{ result ? t('examen.result_latest') : t('examen.result_previous') }}
             </div>
-            <div class="text-[17px] font-head font-bold text-text tracking-tight">{{ visibleResult.profile_label }}</div>
+            <div class="text-[17px] font-head font-bold text-text tracking-tight">{{ translatedProfileLabel(visibleResult.profile_label) }}</div>
             <div v-if="visibleResult.completed_at" class="text-[11px] text-text-dim font-mono mt-1">
-              Ultimo intento: {{ formatDate(visibleResult.completed_at) }}
+              {{ t('examen.last_attempt', { date: formatDate(visibleResult.completed_at) }) }}
             </div>
           </div>
 
@@ -32,50 +32,50 @@
 
         <div v-if="isResultExpanded" class="flex flex-col gap-4 mt-5">
           <div v-if="visibleResult.confirmed_skills.length">
-            <div class="text-[11px] font-mono uppercase tracking-widest text-amber mb-2">Habilidades detectadas</div>
+            <div class="text-[11px] font-mono uppercase tracking-widest text-amber mb-2">{{ t('examen.skills_detected') }}</div>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="skill in visibleResult.confirmed_skills"
                 :key="skill.key"
                 class="px-3 py-1 rounded-full border border-border bg-[var(--bg)]-bg3 text-[12px] text-text"
               >
-                {{ skill.label }}
+                {{ t('examen.skill_' + skill.key) }}
               </span>
             </div>
           </div>
 
           <div class="rounded-[5px] border border-amber/30 bg-amber/10 p-4 text-[13px] text-text leading-relaxed">
-           ¡Excelente! Ahora que conoces tus principales fortalezas, intégralas en la descripción de las experiencias laborales donde las pusiste en práctica.
+           {{ t('examen.result_tip') }}
           </div>
 
           <div class="flex flex-wrap gap-3">
-            <AppButton v-if="result" @click="loadExamData(true)" :loading="loading">Presentar otro examen</AppButton>
+            <AppButton v-if="result" @click="loadExamData(true)" :loading="loading">{{ t('examen.btn_retry') }}</AppButton>
           </div>
         </div>
       </AppCard>
 
-      <AppCard v-if="loading && !questions.length" title="Preparando examen">
+      <AppCard v-if="loading && !questions.length" :title="t('examen.preparing')">
         <div class="text-center py-10">
           <div class="spinner inline-block"></div>
-          <div class="text-[12px] text-text-dim font-mono mt-2">Cargando 16 preguntas nuevas...</div>
+          <div class="text-[12px] text-text-dim font-mono mt-2">{{ t('examen.loading_questions') }}</div>
         </div>
       </AppCard>
 
-      <AppCard v-else-if="loadError && !questions.length" title="No pudimos cargar el examen">
+      <AppCard v-else-if="loadError && !questions.length" :title="t('examen.load_error_title')">
         <div class="text-[13px] text-text-dim leading-relaxed mb-4">
           {{ loadError }}
         </div>
-        <AppButton @click="loadExamData(true)" :loading="loading">Intentar de nuevo</AppButton>
+        <AppButton @click="loadExamData(true)" :loading="loading">{{ t('examen.btn_try_again') }}</AppButton>
       </AppCard>
 
-      <AppCard v-else-if="!result && currentQuestion" :title="`Pregunta ${currentIndex + 1} de ${questions.length}`">
+      <AppCard v-else-if="!result && currentQuestion" :title="t('examen.question_of', { current: currentIndex + 1, total: questions.length })">
         <div class="mb-4">
           <div class="flex items-center justify-between gap-3 mb-3">
             <div class="text-[11px] font-mono uppercase tracking-widest text-amber">
               {{ categoryLabel }}
             </div>
             <div class="text-[11px] text-text-dim font-mono">
-              Respondidas {{ answeredCount }}/{{ questions.length }}
+              {{ t('examen.answered_of', { answered: answeredCount, total: questions.length }) }}
             </div>
           </div>
 
@@ -84,7 +84,7 @@
           </div>
 
           <div class="text-[20px] font-head font-bold leading-tight text-text tracking-tight mb-5">
-            {{ currentQuestion.text }}
+            {{ t('examen.' + currentQuestion.id) }}
           </div>
 
           <div class="space-y-3">
@@ -105,14 +105,14 @@
                 >
                   <span v-if="answers[currentQuestion.id] === option.id" class="material-symbols-outlined text-[14px]">check</span>
                 </div>
-                <div class="text-[14px] leading-relaxed">{{ option.text }}</div>
+                <div class="text-[14px] leading-relaxed">{{ t('examen.' + option.id) }}</div>
               </div>
             </button>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-          <AppButton variant="ghost" @click="goToPreviousQuestion" :disabled="currentIndex === 0">Anterior</AppButton>
+          <AppButton variant="ghost" @click="goToPreviousQuestion" :disabled="currentIndex === 0">{{ t('examen.btn_prev') }}</AppButton>
 
           <div class="flex flex-wrap gap-3">
             <AppButton
@@ -120,7 +120,7 @@
               @click="goToNextQuestion"
               :disabled="!selectedOptionId"
             >
-              Siguiente
+              {{ t('examen.btn_next') }}
             </AppButton>
             <AppButton
               v-else
@@ -128,7 +128,7 @@
               :disabled="answeredCount !== questions.length"
               :loading="submitting"
             >
-              Finalizar examen
+              {{ t('examen.btn_finish') }}
             </AppButton>
           </div>
         </div>
@@ -141,6 +141,8 @@
 definePageMeta({
   middleware: 'auth'
 })
+
+const { t, locale } = useI18n()
 
 type ExamSkill = {
   key: string
@@ -164,6 +166,19 @@ type ExamQuestion = {
   }>
 }
 
+const profileLabelMap: Record<string, string> = {
+  'Perfil Estratégico Analítico': 'profile_strategic_analytical',
+  'Perfil Líder Colaborativo': 'profile_collaborative_leader',
+  'Perfil Ejecutor de Alto Impacto': 'profile_high_impact_executor',
+  'Perfil Innovador Adaptativo': 'profile_adaptive_innovator',
+  'Perfil Profesional Versátil': 'profile_versatile'
+}
+
+const translatedProfileLabel = (label: string) => {
+  const key = profileLabelMap[label]
+  return key ? t('examen.' + key) : label
+}
+
 const toast = useToast()
 const loading = ref(false)
 const submitting = ref(false)
@@ -173,13 +188,6 @@ const answers = ref<Record<string, string>>({})
 const currentIndex = ref(0)
 const latestAttempt = ref<ExamResult | null>(null)
 const result = ref<ExamResult | null>(null)
-
-const categoryLabels: Record<string, string> = {
-  situacional: 'Situacional',
-  estrategico: 'Estrategico',
-  colaborativo: 'Colaborativo',
-  adaptativo: 'Adaptativo'
-}
 
 const currentQuestion = computed(() => questions.value[currentIndex.value] || null)
 const resultAccordionOpen = ref(false)
@@ -195,7 +203,8 @@ const progressPercent = computed(() => {
 })
 const categoryLabel = computed(() => {
   const question = currentQuestion.value
-  return question ? (categoryLabels[question.category] || 'Pregunta') : 'Pregunta'
+  if (!question) return t('examen.cat_default')
+  return t('examen.cat_' + question.category, t('examen.cat_default'))
 })
 const visibleResult = computed(() => result.value || latestAttempt.value)
 const isResultExpanded = computed(() => Boolean(result.value) || resultAccordionOpen.value)
@@ -204,7 +213,7 @@ const formatDate = (value: string) => {
   if (!value) return ''
 
   try {
-    return new Intl.DateTimeFormat('es-CO', {
+    return new Intl.DateTimeFormat(locale.value === 'es' ? 'es-CO' : 'en-US', {
       dateStyle: 'medium',
       timeStyle: 'short'
     }).format(new Date(value))
@@ -247,13 +256,13 @@ const loadExamData = async (silent = false) => {
     resultAccordionOpen.value = false
 
     if (!questions.value.length) {
-      loadError.value = 'No encontramos preguntas disponibles para este examen.'
+      loadError.value = t('examen.toast_no_questions')
     } else if (silent) {
-      toast.success('Cargamos un nuevo set de 16 preguntas.')
+      toast.success(t('examen.toast_new_set'))
     }
   } catch (error: any) {
     resetExamState()
-    loadError.value = error?.data?.statusMessage || error?.message || 'No se pudo preparar el examen.'
+    loadError.value = error?.data?.statusMessage || error?.message || t('examen.toast_load_error')
     toast.error(loadError.value)
   } finally {
     loading.value = false
@@ -285,7 +294,7 @@ const goToPreviousQuestion = () => {
 
 const submitExam = async () => {
   if (answeredCount.value !== questions.value.length || !questions.value.length) {
-    toast.error('Debes responder todas las preguntas antes de enviar el examen.')
+    toast.error(t('examen.toast_answer_all'))
     return
   }
 
@@ -310,10 +319,10 @@ const submitExam = async () => {
     answers.value = {}
     currentIndex.value = 0
     resultAccordionOpen.value = true
-    toast.success('Tu examen fue guardado correctamente.')
+    toast.success(t('examen.toast_saved'))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } catch (error: any) {
-    toast.error(error?.data?.statusMessage || error?.message || 'No se pudo guardar el examen.')
+    toast.error(error?.data?.statusMessage || error?.message || t('examen.toast_save_error'))
   } finally {
     submitting.value = false
   }
@@ -323,3 +332,4 @@ onMounted(() => {
   loadExamData()
 })
 </script>
+

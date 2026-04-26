@@ -65,13 +65,15 @@ export default defineEventHandler(async (event) => {
   const session = await getUserSession(event) as any
   const body = await readBody(event)
   const action = String(body?.action || '')
+  const locale = String(body?.locale || 'es')
+  const isEn = locale === 'en'
 
   if (action === 'request-code') {
     const email = String(body?.email || '').trim().toLowerCase()
     if (!email) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'El correo electrónico es requerido.'
+        statusMessage: isEn ? 'Email is required.' : 'El correo electrónico es requerido.'
       })
     }
 
@@ -83,12 +85,12 @@ export default defineEventHandler(async (event) => {
 
     const user = userResult.rows[0] as any
     if (!user) {
-      // For security reasons, we could pretend success, but given the app context, 
-      // let's be explicit or follow the existing pattern.
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'No encontramos una cuenta con ese correo electrónico.'
-      })
+      // Prevent user enumeration: return the same response as success
+      return {
+        success: true,
+        step: 'code-sent',
+        expiresAt: new Date(Date.now() + PASSWORD_RESET_CODE_WINDOW_MS).toISOString()
+      }
     }
 
     const code = generateSixDigitCode()
@@ -105,10 +107,10 @@ export default defineEventHandler(async (event) => {
     await sendAuthCodeEmail({
       to: email,
       name: user.name,
-      subject: 'Código para recuperar tu contraseña - Bring Jobs',
-      intro: 'Has solicitado recuperar tu contraseña. Usa este código de 6 dígitos para continuar.',
+      subject: isEn ? 'Code to recover your password - Bring Jobs' : 'Código para recuperar tu contraseña - Bring Jobs',
+      intro: isEn ? 'You have requested to recover your password. Use this 6-digit code to continue.' : 'Has solicitado recuperar tu contraseña. Usa este código de 6 dígitos para continuar.',
       code,
-      footer: 'Si no solicitaste recuperar tu contraseña, ignora este correo. El código vence en 15 minutos.'
+      footer: isEn ? 'If you did not request to recover your password, ignore this email. The code expires in 15 minutes.' : 'Si no solicitaste recuperar tu contraseña, ignora este correo. El código vence en 15 minutos.'
     })
 
     return {
@@ -123,7 +125,7 @@ export default defineEventHandler(async (event) => {
   if (!state.code || !state.expiresAt || !state.userId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Primero solicita un código de recuperación.'
+      statusMessage: isEn ? 'First, request a recovery code.' : 'Primero solicita un código de recuperación.'
     })
   }
 
@@ -138,7 +140,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 400,
-      statusMessage: 'El código ya venció. Solicita uno nuevo.'
+      statusMessage: isEn ? 'The code has expired. Request a new one.' : 'El código ya venció. Solicita uno nuevo.'
     })
   }
 
@@ -148,7 +150,7 @@ export default defineEventHandler(async (event) => {
     if (state.code !== code) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Código de recuperación incorrecto.'
+        statusMessage: isEn ? 'Incorrect recovery code.' : 'Código de recuperación incorrecto.'
       })
     }
 
@@ -170,14 +172,14 @@ export default defineEventHandler(async (event) => {
     if (!password || !confirmPassword) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Debes completar y confirmar la nueva contraseña.'
+        statusMessage: isEn ? 'You must fill and confirm the new password.' : 'Debes completar y confirmar la nueva contraseña.'
       })
     }
 
     if (password !== confirmPassword) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Las contraseñas no coinciden.'
+        statusMessage: isEn ? 'Passwords do not match.' : 'Las contraseñas no coinciden.'
       })
     }
 
@@ -186,7 +188,7 @@ export default defineEventHandler(async (event) => {
     if (!isVerificationStillValid(state.verifiedAt)) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Primero valida el código de recuperación.'
+        statusMessage: isEn ? 'First validate the recovery code.' : 'Primero valida el código de recuperación.'
       })
     }
 
@@ -200,7 +202,7 @@ export default defineEventHandler(async (event) => {
     if (user && await bcrypt.compare(password, user.password)) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'La nueva contraseña no puede ser igual a la anterior.'
+        statusMessage: isEn ? 'The new password cannot be the same as the old one.' : 'La nueva contraseña no puede ser igual a la anterior.'
       })
     }
 
@@ -228,6 +230,6 @@ export default defineEventHandler(async (event) => {
 
   throw createError({
     statusCode: 400,
-    statusMessage: 'Acción no válida.'
+    statusMessage: isEn ? 'Invalid action.' : 'Acción no válida.'
   })
 })

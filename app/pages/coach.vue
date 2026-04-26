@@ -1,14 +1,14 @@
 <template>
   <NuxtLayout>
     <div class="h-full flex flex-col">
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ezra AI <HelpButton /></div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Resuelve tus dudas sobre tu carrera profesional con Ezra IA, la reclutadora inteligente.</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('coach.title') }} <HelpButton /></div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('coach.subtitle') }}</div>
 
       <AppCard class="flex-1 flex flex-col min-h-0 !mb-0">
         <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-[var(--bg)]-bg3 mb-2.5 flex flex-col gap-2.5 min-h-[300px]" ref="chatContainer">
           <div v-for="(msg, i) in msgs" :key="i" class="max-w-[85%] p-2.5 px-3.5 rounded-[5px] text-[13px] leading-relaxed"
             :class="msg.role === 'user' ? 'msg-user bg-amber-dim text-amber-light self-end rounded-br-none' : 'msg-ai bg-[var(--bg)]-bg4 text-text self-start rounded-bl-none border border-border'">
-            <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? 'Tú' : 'Ezra' }}</div>
+            <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? $t('coach.user_label') : $t('coach.ai_label') }}</div>
             <div v-if="msg.role === 'user'">{{ msg.text }}</div>
             <div v-else class="markdown-content" v-html="renderMarkdown(msg.text)"></div>
           </div>
@@ -22,12 +22,12 @@
         <div class="flex gap-2">
           <AppInput 
             v-model="input" 
-            placeholder="Haz una pregunta sobre tu carrera..." 
+            :placeholder="$t('coach.placeholder')" 
             class="!mb-0 flex-1"
             @keyup.enter="send()"
           />
           <AppButton @click="send()" :disabled="loading || !input.trim()">
-            Enviar
+            {{ $t('coach.send') }}
           </AppButton>
         </div>
 
@@ -52,24 +52,32 @@ definePageMeta({
 })
 
 const { profile, experiences, fetchProfile } = useAppState()
+const { t, locale } = useI18n()
 
 onMounted(() => {
   fetchProfile()
 })
 
 const msgs = ref([
-  { role: 'ai', text: '¡Hola! Soy Ezra. Puedo ayudarte con estrategia de búsqueda de empleo, gaps laborales, negociación salarial o preparación para entrevistas. ¿En qué trabajamos hoy?' }
+  { role: 'ai', text: t('coach.welcome') }
 ])
+
+// Update welcome message when locale changes
+watch(locale, () => {
+  if (msgs.value.length > 0 && msgs.value[0].role === 'ai') {
+    msgs.value[0].text = t('coach.welcome')
+  }
+})
 const input = ref('')
 const loading = ref(false)
 const chatContainer = ref(null)
 
-const suggestions = [
-  '¿Cómo explico un gap laboral de 6 meses?',
-  '¿Qué habilidades blandas resaltar en un trabajo en equipo?',
-  '¿Cómo negocio mi salario?',
-  '¿Cómo destaco una transición de carrera?'
-]
+const suggestions = computed(() => [
+  t('coach.suggestion_gap'),
+  t('coach.suggestion_soft_skills'),
+  t('coach.suggestion_salary'),
+  t('coach.suggestion_transition')
+])
 
 const scrollToBottom = () => {
   nextTick(() => {
@@ -94,14 +102,15 @@ const send = async (text) => {
       body: {
         messages: msgs.value,
         profile: profile.value,
-        experiences: experiences.value
+        experiences: experiences.value,
+        locale: locale.value
       }
     })
     
     msgs.value.push({ role: 'assistant', text: data.text })
   } catch (e) {
     console.error('Coach Error:', e)
-    msgs.value.push({ role: 'ai', text: 'Lo siento, hubo un problema técnico al conectar con el Coach. Por favor, intenta de nuevo en un momento.' })
+    msgs.value.push({ role: 'ai', text: t('coach.error') })
   } finally {
     loading.value = false
     scrollToBottom()

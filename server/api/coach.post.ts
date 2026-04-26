@@ -1,11 +1,22 @@
 import OpenAI from 'openai'
 import { requireVerifiedUserSession } from '../utils/verified-session'
+import { checkUserAIRateLimit } from '../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  await requireVerifiedUserSession(event)
+  const session = await requireVerifiedUserSession(event)
+  const userId = session.user.id
+  checkUserAIRateLimit(userId)
   const body = await readBody(event)
-  const { messages, profile: rawProfile, experiences: rawExperiences } = body
+  const { profile: rawProfile, experiences: rawExperiences, locale = 'es' } = body
+  const isEn = locale === 'en'
+
+  // Truncate messages to last 30 and cap individual message length
+  const rawMessages = Array.isArray(body.messages) ? body.messages.slice(-30) : []
+  const messages = rawMessages.map((m: any) => ({
+    ...m,
+    text: typeof m.text === 'string' ? m.text.slice(0, 5000) : ''
+  }))
 
   const profile = rawProfile || { nombre: 'Usuario', titulo: 'Profesional', resumen: '', years: '0', educacion: '' }
   const experiences = rawExperiences || []
@@ -21,7 +32,31 @@ export default defineEventHandler(async (event) => {
     apiKey: config.openaiApiKey
   })
 
-  const systemPrompt = `
+  const systemPrompt = isEn
+    ? `
+    You are Ezra, an expert in the tech job market. 
+    Your mission is to help the user land their dream job, improve their professional profile, prepare for interviews, and negotiate their salary.
+
+    USER CONTEXT:
+    Name: ${profile.nombre}
+    Title: ${profile.titulo}
+    Summary: ${profile.resumen}
+    Years Exp: ${profile.years}
+    Education: ${profile.educacion}
+    Web/Portfolio: ${profile.web || 'N/A'}
+
+    EXPERIENCES:
+    ${JSON.stringify(experiences)}
+
+    INSTRUCTIONS:
+    1. Respond in a constructive, motivating, yet realistic and professional manner.
+    2. YOU MUST USE the user's profile context and experiences to give personalized advice. If the user asks "who am I" or about their profile, describe it based on the provided information.
+    3. If the user asks about interviews, offer to do a "Mock Interview".
+    4. If the user asks about salary, ask for more context about the country and role before giving ranges.
+    5. Format: ALWAYS RESPOND USING STRUCTURED MARKDOWN. Use bold text to highlight key concepts. For lists, always use new lines and bullets/dashes. Make sure to leave a blank line between paragraphs and before lists so the formatting renders correctly.
+    6. Language: You must reply in English.
+  `
+    : `
     Eres un Ezra experto en el mercado laboral tecnológico. 
     Tu misión es ayudar al usuario a conseguir el trabajo de sus sueños, mejorar su perfil profesional, preparar entrevistas y negociar su salario.
 

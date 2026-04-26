@@ -24,26 +24,28 @@ export default defineEventHandler(async (event) => {
   const completedAt = new Date().toISOString()
   const attemptId = crypto.randomUUID()
 
-  await db.execute({
-    sql: `
-      INSERT INTO competency_exam_attempts
-      (id, user_id, status, profile_label, total_questions, answers_count, scores_json, confirmed_skills_json, completed_at)
-      VALUES (?, ?, 'completed', ?, ?, ?, ?, ?, ?)
-    `,
-    args: [
-      attemptId,
-      session.user.id,
-      result.profileLabel,
-      EXAM_QUESTION_COUNT,
-      result.answers.length,
-      JSON.stringify(result.scores),
-      JSON.stringify(result.confirmedSkills),
-      completedAt
-    ]
-  })
+  const statements = [
+    {
+      sql: `
+        INSERT INTO competency_exam_attempts
+        (id, user_id, status, profile_label, total_questions, answers_count, scores_json, confirmed_skills_json, completed_at)
+        VALUES (?, ?, 'completed', ?, ?, ?, ?, ?, ?)
+      `,
+      args: [
+        attemptId,
+        session.user.id,
+        result.profileLabel,
+        EXAM_QUESTION_COUNT,
+        result.answers.length,
+        JSON.stringify(result.scores),
+        JSON.stringify(result.confirmedSkills),
+        completedAt
+      ]
+    }
+  ]
 
   for (const answer of result.answers) {
-    await db.execute({
+    statements.push({
       sql: `
         INSERT INTO competency_exam_answers
         (id, attempt_id, question_id, option_id, skill_key, score_value)
@@ -59,6 +61,8 @@ export default defineEventHandler(async (event) => {
       ]
     })
   }
+
+  await db.batch(statements, 'write')
 
   return {
     success: true,

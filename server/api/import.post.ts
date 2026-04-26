@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
 import { extractText, resolvePDFJSImport } from 'unpdf'
 import { requireVerifiedUserSession } from '../utils/verified-session'
+import { checkUserAIRateLimit } from '../utils/rate-limit'
 
 if (typeof globalThis.DOMMatrix === 'undefined') {
   globalThis.DOMMatrix = class { } as any
@@ -64,18 +65,33 @@ function dedupeEntries(entries: any[]) {
   })
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  await requireVerifiedUserSession(event)
+  const session = await requireVerifiedUserSession(event)
+  checkUserAIRateLimit(session.user.id)
 
   await resolvePDFJSImport()
 
   let text = ''
+  let locale = 'es'
 
   const contentType = getHeader(event, 'content-type')
   if (contentType?.includes('multipart/form-data')) {
     const formData = await readMultipartFormData(event)
     const file = formData?.find(f => f.name === 'file')
+    const localeField = formData?.find(f => f.name === 'locale')
+    if (localeField) {
+      locale = localeField.data.toString()
+    }
+
+    if (file && file.data.length > MAX_FILE_SIZE) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'File is too large (max 5MB).'
+      })
+    }
 
     if (file && (file.type === 'application/pdf' || file.name?.endsWith('.pdf'))) {
       try {
@@ -95,7 +111,12 @@ export default defineEventHandler(async (event) => {
   } else {
     const body = await readBody(event)
     text = body.text
+    if (body.locale) {
+      locale = body.locale
+    }
   }
+
+  const isEn = locale === 'en'
 
   if (!text || text.trim().length < 10) {
     throw createError({
@@ -108,7 +129,61 @@ export default defineEventHandler(async (event) => {
     apiKey: config.openaiApiKey
   })
 
-  const systemPrompt = `
+  const systemPrompt = isEn 
+    ? `
+You are an expert in recruitment and professional data extraction.
+Your task is to receive text from a LinkedIn profile or a CV and extract the structured information needed to populate a master profile.
+
+IMPORTANT:
+- Extract as much detail as possible.
+- If the text is in Spanish, translate the descriptive fields to English.
+- The "years" field must be an integer representing the approximate total years of work experience.
+- Distinguish between work experience and projects.
+- Use "type": "work" for real work experience at a company, contract, freelance, or professional role.
+- Use "type": "project" for personal, academic, portfolio projects, hackathons, non-work internships, or one-off initiatives.
+- If an entry is not clearly work experience, do not add its time to the "years" field.
+- The "logros" field for each experience should have enough context and preferably exceed 300 characters when the source info allows it.
+- You can use between 2 and 4 lines as a format guide, but prioritize richness of context over a strict number of line breaks.
+- Each block of "logros" must provide context, responsibility, stack, action, deliverable, or result.
+- Do not return poor single-sentence descriptions if the source text allows extracting more detail.
+- If you don't find a section, leave it as an empty string "".
+
+RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE EXACT SPANISH KEYS):
+{
+  "nombre": "Full name",
+  "titulo": "Current position / Professional title",
+  "ubicacion": "City, Country or professional location",
+  "email_profile": "email",
+  "telefono": "phone number",
+  "years": 5,
+  "linkedin": "https://www.linkedin.com/in/username/",
+  "otros": "https://professional_page/username or any other relevant professional link",
+  "web": "https://www.username.com",
+  "educacion": "Short legacy summary of education",
+  "educations": [
+    {
+      "titulo": "Name of the study",
+      "institucion": "Institution",
+      "inicio": "Month Year",
+      "fin": "Month Year or Present",
+      "descripcion": "Focus, degree, emphasis or additional context"
+    }
+  ],
+  "resumen": "Professional summary of 2-3 lines",
+  "experiences": [
+    {
+      "type": "work",
+      "cargo": "Job title",
+      "empresa": "Company name or project name",
+      "inicio": "Month Year",
+      "fin": "Month Year (or 'Present')",
+      "logros": "Descriptive block with context, action, stack and result. Ideally over 300 characters.",
+      "skills": "Skill1, Skill2, Skill3"
+    }
+  ]
+}
+`
+    : `
 Eres un experto en reclutamiento y extraccion de datos profesionales.
 Tu tarea es recibir el texto de un perfil de LinkedIn o de un CV y extraer la informacion estructurada necesaria para llenar un perfil maestro.
 

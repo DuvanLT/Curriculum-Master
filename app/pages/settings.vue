@@ -1,8 +1,8 @@
 <template>
   <NuxtLayout>
     <div>
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ajustes</div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Configura tu cuenta y gestiona tus preferencias.</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('settings.title') }}</div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('settings.subtitle') }}</div>
 
       <div class="flex gap-4 mb-6 border-b border-border/50">
         <button
@@ -10,7 +10,7 @@
           class="pb-2 text-[13px] font-mono transition-all relative"
           :class="activeTab === 'session' ? 'text-amber' : 'text-text-dim hover:text-text'"
         >
-          Sesion
+          {{ $t('settings.tab_session') }}
           <div v-if="activeTab === 'session'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber"></div>
         </button>
         <button
@@ -18,35 +18,54 @@
           class="pb-2 text-[13px] font-mono transition-all relative"
           :class="activeTab === 'privacy' ? 'text-amber' : 'text-text-dim hover:text-text'"
         >
-          Privacidad
+          {{ $t('settings.tab_privacy') }}
           <div v-if="activeTab === 'privacy'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber"></div>
         </button>
       </div>
 
       <div v-if="activeTab === 'session'">
-        <AppCard title="Gestion de Sesion">
+        <AppCard :title="$t('settings.session_management_title')">
           <p class="text-[13px] text-text-muted mb-4">
-            Has iniciado sesion como <strong class="text-text">{{ user?.email }}</strong>.
+            {{ $t('settings.session_logged_in_as') }}<strong class="text-text">{{ user?.email }}</strong>.
           </p>
           <AppButton variant="secondary" :loading="loggingOut" @click="handleLogout">
             <span class="material-symbols-outlined text-[18px] mr-2">logout</span>
-            Cerrar sesion en este dispositivo
+            {{ $t('settings.session_logout_btn') }}
           </AppButton>
+        </AppCard>
+
+        <AppCard :title="$t('settings.lang_pref_title')" class="mt-4">
+          <p class="text-[13px] text-text-muted mb-4">
+            {{ $t('settings.lang_pref_subtitle') }}
+          </p>
+          <div class="max-w-xs relative">
+            <select
+              :value="currentLocale"
+              @change="setPreferredLocale(($event.target as HTMLSelectElement).value)"
+              class="w-full bg-[var(--bg)]-bg border border-border focus:border-amber outline-none rounded-lg py-2.5 pl-3 pr-10 text-[13px] text-text transition-all appearance-none cursor-pointer"
+            >
+              <option value="es">Español (ES)</option>
+              <option value="en">English (EN)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-dim">
+              <span class="material-symbols-outlined text-[18px]">expand_more</span>
+            </div>
+          </div>
         </AppCard>
       </div>
 
       <div v-else-if="activeTab === 'privacy'">
-        <AppCard title="Privacidad y Datos">
+        <AppCard :title="$t('settings.privacy_data_title')">
           <div class="space-y-6">
             <div class="border border-border/60 bg-[var(--bg)]-bg3/50 rounded-xl p-6">
               <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div class="flex items-center gap-3 mb-3">
                     <span class="material-symbols-outlined text-amber">lock_reset</span>
-                    <h3 class="text-text font-head font-bold text-lg">Recuperar contraseña</h3>
+                    <h3 class="text-text font-head font-bold text-lg">{{ $t('settings.reset_pwd_title') }}</h3>
                   </div>
                   <p class="text-[13px] text-text-muted max-w-2xl">
-                    Enviaremos un codigo de 6 digitos a <strong class="text-text">{{ user?.email }}</strong> para validar el cambio antes de guardar una nueva contraseña.
+                    {{ $t('settings.reset_pwd_desc') }}<strong class="text-text">{{ user?.email }}</strong>{{ $t('settings.reset_pwd_desc_2') }}
                   </p>
                 </div>
 
@@ -55,7 +74,7 @@
                   :loading="requestingPasswordResetCode"
                   @click="handleRequestPasswordResetCode"
                 >
-                  {{ resetStep === 'idle' ? 'Recuperar contraseña' : 'Reenviar codigo' }}
+                  {{ resetStep === 'idle' ? $t('settings.reset_pwd_btn') : $t('settings.resend_code_btn') }}
                 </AppButton>
               </div>
 
@@ -70,7 +89,7 @@
               <div v-if="resetStep !== 'idle'" class="mt-6 space-y-5">
                 <div>
                   <label class="block text-[12px] text-text-dim font-mono uppercase tracking-wider mb-2">
-                    Codigo de recuperacion
+                    {{ $t('settings.reset_code_label') }}
                   </label>
 
                   <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -90,31 +109,31 @@
                       :loading="verifyingPasswordResetCode"
                       @click="handleVerifyPasswordResetCode"
                     >
-                      Validar codigo
+                      {{ $t('settings.verify_code_btn') }}
                     </AppButton>
                   </div>
 
                   <p class="text-[12px] text-text-dim mt-2">
-                    El codigo vence en 15 minutos. Si pediste uno nuevo, solo el mas reciente funciona.
+                    {{ $t('settings.reset_code_expires') }}
                   </p>
                 </div>
 
                 <div v-if="resetStep === 'verified'" class="border border-amber/20 bg-amber/5 rounded-xl p-5">
                   <div class="flex items-center gap-2 text-amber mb-4">
                     <span class="material-symbols-outlined text-[18px]">verified</span>
-                    <p class="text-[13px] font-medium">Codigo validado. Ya puedes definir una nueva contraseña.</p>
+                    <p class="text-[13px] font-medium">{{ $t('settings.code_verified') }}</p>
                   </div>
 
                   <div class="grid gap-2 lg:grid-cols-2">
                     <AppInput
                       v-model="passwordResetForm.password"
-                      label="Nueva contraseña"
+                      :label="$t('settings.new_pwd_label')"
                       type="password"
                       placeholder="********"
                     />
                     <AppInput
                       v-model="passwordResetForm.confirmPassword"
-                      label="Confirmar contraseña"
+                      :label="$t('settings.confirm_pwd_label')"
                       type="password"
                       placeholder="********"
                     />
@@ -125,7 +144,7 @@
                   </p>
 
                   <AppButton :loading="updatingPassword" @click="handleUpdatePassword">
-                    Guardar nueva contraseña
+                    {{ $t('settings.save_new_pwd_btn') }}
                   </AppButton>
                 </div>
               </div>
@@ -134,17 +153,17 @@
             <div class="border border-red-500/20 bg-red-500/5 rounded-xl p-6">
               <div class="flex items-center gap-3 mb-4">
                 <span class="material-symbols-outlined text-red-500">warning</span>
-                <h3 class="text-red-500 font-head font-bold text-lg">Zona de Peligro</h3>
+                <h3 class="text-red-500 font-head font-bold text-lg">{{ $t('settings.danger_zone_title') }}</h3>
               </div>
               <p class="text-[13px] text-text-muted mb-6">
-                Al eliminar tu cuenta, todos tus registros (experiencias, aplicaciones, retos y analisis) seran borrados permanentemente. Esta accion no se puede deshacer.
+                {{ $t('settings.danger_zone_desc') }}
               </p>
               <AppButton
                 variant="secondary"
                 class="!border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-text-dim transition-all"
                 @click="showDeleteModal = true"
               >
-                Borrar mi cuenta definitivamente
+                {{ $t('settings.delete_account_btn') }}
               </AppButton>
             </div>
           </div>
@@ -160,8 +179,8 @@
 
             <!-- Step 1: Reason -->
             <div v-if="deleteStep === 1">
-              <h2 class="text-xl font-bold mb-1 font-head tracking-tight text-text">¿Por qué te vas?</h2>
-              <p class="text-[13px] text-text-dim mb-6">Tu respuesta nos ayuda a mejorar BringJobs para todos.</p>
+              <h2 class="text-xl font-bold mb-1 font-head tracking-tight text-text">{{ $t('settings.churn_title') }}</h2>
+              <p class="text-[13px] text-text-dim mb-6">{{ $t('settings.churn_subtitle') }}</p>
 
               <div class="flex flex-col gap-2 mb-5">
                 <label
@@ -179,15 +198,15 @@
               <div v-if="churnReason" class="mb-6">
                 <textarea
                   v-model="churnComment"
-                  placeholder="Opcional: cuéntanos más..."
+                  :placeholder="$t('settings.churn_placeholder')"
                   rows="2"
                   class="churn-textarea w-full"
                 ></textarea>
               </div>
 
               <div class="flex gap-3">
-                <AppButton class="flex-1" variant="secondary" @click="closeDeleteModal">Cancelar</AppButton>
-                <AppButton class="flex-1" variant="primary" :disabled="!churnReason" @click="deleteStep = 2">Continuar</AppButton>
+                <AppButton class="flex-1" variant="secondary" @click="closeDeleteModal">{{ $t('settings.churn_cancel') }}</AppButton>
+                <AppButton class="flex-1" variant="primary" :disabled="!churnReason" @click="deleteStep = 2">{{ $t('settings.churn_continue') }}</AppButton>
               </div>
             </div>
 
@@ -195,20 +214,20 @@
             <div v-else-if="deleteStep === 2">
               <div class="flex items-center gap-3 mb-4">
                 <span class="material-symbols-outlined text-red-500 text-3xl">warning</span>
-                <h2 class="text-xl font-bold font-head tracking-tight text-red-500">Eliminar cuenta</h2>
+                <h2 class="text-xl font-bold font-head tracking-tight text-red-500">{{ $t('settings.churn_final_title') }}</h2>
               </div>
               <p class="text-[13px] text-text-muted mb-6 leading-relaxed">
-                ¿Estás absolutamente seguro? Todos tus datos serán eliminados de nuestros servidores para siempre. Esta acción no se puede deshacer.
+                {{ $t('settings.churn_final_desc') }}
               </p>
               <div class="flex gap-3">
-                <AppButton class="flex-1" variant="secondary" @click="deleteStep = 1">Atrás</AppButton>
+                <AppButton class="flex-1" variant="secondary" @click="deleteStep = 1">{{ $t('settings.churn_back') }}</AppButton>
                 <AppButton
                   class="flex-1 !border-red-500/30 !text-red-500 hover:!bg-red-500 hover:!text-white"
                   variant="secondary"
                   :loading="deletingAccount"
                   @click="handleDeleteAccount"
                 >
-                  Sí, eliminar
+                  {{ $t('settings.churn_confirm') }}
                 </AppButton>
               </div>
             </div>
@@ -231,6 +250,14 @@ type PasswordResetStep = 'idle' | 'code-sent' | 'verified'
 
 const { user, logout, loggingOut } = useAuth()
 const toast = useToast()
+const { locale, setLocale, t } = useI18n()
+
+const currentLocale = computed(() => locale.value)
+const setPreferredLocale = (newLocale: string) => {
+  setLocale(newLocale)
+  localStorage.setItem('preferred-locale', newLocale)
+  toast.success(t('settings.toast_lang_saved'))
+}
 
 const activeTab = ref('session')
 const showDeleteModal = ref(false)
@@ -239,14 +266,14 @@ const churnReason = ref('')
 const churnComment = ref('')
 const deletingAccount = ref(false)
 
-const churnReasons = [
-  { value: 'no_lo_necesito', label: 'Ya no busco trabajo activamente', icon: 'check_circle' },
-  { value: 'falta_funciones', label: 'Le faltan funciones que necesito', icon: 'build' },
-  { value: 'dificil_de_usar', label: 'Es difícil de usar', icon: 'sentiment_dissatisfied' },
-  { value: 'encontre_alternativa', label: 'Encontré una alternativa mejor', icon: 'swap_horiz' },
-  { value: 'privacidad', label: 'Preocupaciones de privacidad', icon: 'shield' },
-  { value: 'otro', label: 'Otro motivo', icon: 'more_horiz' },
-]
+const churnReasons = computed(() => [
+  { value: 'no_lo_necesito', label: t('settings.churn_reason_no_need'), icon: 'check_circle' },
+  { value: 'falta_funciones', label: t('settings.churn_reason_missing_features'), icon: 'build' },
+  { value: 'dificil_de_usar', label: t('settings.churn_reason_hard_to_use'), icon: 'sentiment_dissatisfied' },
+  { value: 'encontre_alternativa', label: t('settings.churn_reason_alternative'), icon: 'swap_horiz' },
+  { value: 'privacidad', label: t('settings.churn_reason_privacy'), icon: 'shield' },
+  { value: 'otro', label: t('settings.churn_reason_other'), icon: 'more_horiz' },
+])
 
 const closeDeleteModal = () => {
   showDeleteModal.value = false
@@ -292,18 +319,19 @@ const handleRequestPasswordResetCode = async () => {
     await $fetch('/api/auth/update-password', {
       method: 'POST',
       body: {
-        action: 'request-code'
+        action: 'request-code',
+        locale: locale.value
       }
     })
 
     resetStep.value = 'code-sent'
     clearResetForm()
-    setResetFeedback('Te enviamos un codigo de recuperacion a tu correo.', 'success')
-    toast.success('Revisa tu correo para continuar.')
+    setResetFeedback(t('settings.toast_code_sent'), 'success')
+    toast.success(t('settings.toast_check_email'))
   } catch (e: any) {
     console.error(e)
-    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos enviar el codigo de recuperacion.', 'error')
-    toast.error(e.data?.statusMessage || e.message || 'No pudimos enviar el codigo de recuperacion.')
+    setResetFeedback(e.data?.statusMessage || e.message || t('settings.toast_code_error'), 'error')
+    toast.error(e.data?.statusMessage || e.message || t('settings.toast_code_error'))
   } finally {
     requestingPasswordResetCode.value = false
   }
@@ -311,7 +339,7 @@ const handleRequestPasswordResetCode = async () => {
 
 const handleVerifyPasswordResetCode = async () => {
   if (resetCode.value.length !== 6) {
-    setResetFeedback('El codigo debe tener 6 digitos.', 'error')
+    setResetFeedback(t('settings.toast_code_length'), 'error')
     return
   }
 
@@ -323,17 +351,18 @@ const handleVerifyPasswordResetCode = async () => {
       method: 'POST',
       body: {
         action: 'verify-code',
-        code: resetCode.value
+        code: resetCode.value,
+        locale: locale.value
       }
     })
 
     resetStep.value = 'verified'
-    setResetFeedback('Codigo validado correctamente.', 'success')
-    toast.success('Ahora puedes definir tu nueva contraseña.')
+    setResetFeedback(t('settings.toast_code_verified'), 'success')
+    toast.success(t('settings.toast_can_set_pwd'))
   } catch (e: any) {
     console.error(e)
-    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos validar el codigo.', 'error')
-    toast.error(e.data?.statusMessage || e.message || 'No pudimos validar el codigo.')
+    setResetFeedback(e.data?.statusMessage || e.message || t('settings.toast_code_verify_error'), 'error')
+    toast.error(e.data?.statusMessage || e.message || t('settings.toast_code_verify_error'))
   } finally {
     verifyingPasswordResetCode.value = false
   }
@@ -341,7 +370,7 @@ const handleVerifyPasswordResetCode = async () => {
 
 const handleUpdatePassword = async () => {
   if (passwordResetForm.value.password !== passwordResetForm.value.confirmPassword) {
-    setResetFeedback('Las contraseñas no coinciden.', 'error')
+    setResetFeedback(t('settings.toast_pwd_mismatch'), 'error')
     return
   }
 
@@ -360,18 +389,19 @@ const handleUpdatePassword = async () => {
       body: {
         action: 'update-password',
         password: passwordResetForm.value.password,
-        confirmPassword: passwordResetForm.value.confirmPassword
+        confirmPassword: passwordResetForm.value.confirmPassword,
+        locale: locale.value
       }
     })
 
     resetStep.value = 'idle'
     clearResetForm()
-    setResetFeedback('Tu contraseña se actualizo correctamente.', 'success')
-    toast.success('contraseña actualizada correctamente.')
+    setResetFeedback(t('settings.toast_pwd_updated'), 'success')
+    toast.success(t('settings.toast_pwd_updated'))
   } catch (e: any) {
     console.error(e)
-    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos actualizar la contraseña.', 'error')
-    toast.error(e.data?.statusMessage || e.message || 'No pudimos actualizar la contraseña.')
+    setResetFeedback(e.data?.statusMessage || e.message || t('settings.toast_pwd_update_error'), 'error')
+    toast.error(e.data?.statusMessage || e.message || t('settings.toast_pwd_update_error'))
   } finally {
     updatingPassword.value = false
   }
@@ -382,7 +412,7 @@ const handleLogout = async () => {
     await logout()
     await navigateTo('/login', { replace: true })
   } catch (e) {
-    toast.error('Error al cerrar sesion')
+    toast.error(t('settings.toast_logout_error'))
   }
 }
 
@@ -399,7 +429,7 @@ const handleDeleteAccount = async () => {
     })
   } catch (e: any) {
     console.error(e)
-    toast.error('Error al intentar eliminar la cuenta: ' + (e.statusMessage || e.message))
+    toast.error(t('settings.toast_delete_error', { error: e.statusMessage || e.message }))
     deletingAccount.value = false
     showDeleteModal.value = false
     return
@@ -417,6 +447,7 @@ const handleDeleteAccount = async () => {
 </script>
 
 <style scoped>
+
 .churn-option {
   display: flex;
   align-items: center;

@@ -5,6 +5,8 @@ definePageMeta({
   middleware: 'guest'
 })
 
+const { locale } = useI18n()
+
 type PasswordResetStep = 'idle' | 'code-sent' | 'verified' | 'completed'
 const toast = useToast()
 const resetStep = ref<'idle' | 'code-sent' | 'verified' | 'completed'>('idle')
@@ -47,7 +49,8 @@ const handleRequestPasswordResetCode = async () => {
       method: 'POST',
       body: {
         action: 'request-code',
-        email: email.value
+        email: email.value,
+        locale: locale.value
       }
     })
 
@@ -78,7 +81,8 @@ const handleVerifyPasswordResetCode = async () => {
       method: 'POST',
       body: {
         action: 'verify-code',
-        code: resetCode.value
+        code: resetCode.value,
+        locale: locale.value
       }
     })
 
@@ -115,7 +119,8 @@ const handleUpdatePassword = async () => {
       body: {
         action: 'update-password',
         password: passwordResetForm.value.password,
-        confirmPassword: passwordResetForm.value.confirmPassword
+        confirmPassword: passwordResetForm.value.confirmPassword,
+        locale: locale.value
       }
     })
 

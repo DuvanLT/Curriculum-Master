@@ -1,15 +1,17 @@
 import { v4 as uuidv4 } from 'uuid'
+import { requireVerifiedUserSession } from '../utils/verified-session'
 
 const MAX_STEPS = 40
 
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
+  const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
   const { text } = await readBody(event)
   const db = useDb()
 
-  if (!text) {
-    throw createError({ statusCode: 400, statusMessage: 'Task text is required' })
+  const stepText = String(text || '').trim()
+  if (!stepText || stepText.length > 500) {
+    throw createError({ statusCode: 400, statusMessage: 'Task text is required and must be under 500 characters.' })
   }
 
   const countResult = await db.execute({

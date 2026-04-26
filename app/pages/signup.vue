@@ -6,7 +6,7 @@
       
       <div class="text-center mb-8 relative z-10">
         <h1 class="font-head text-[28px] font-bold text-text tracking-tighter mb-1">Bring<span class="text-amber">Jobs</span></h1>
-        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">Crea tu cuenta</p>
+        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">{{ t('auth.create_account') }}</p>
       </div>
 
       <form @submit.prevent="handleSignup" class="space-y-4 relative z-10">
@@ -18,30 +18,41 @@
         <div class="space-y-6 relative z-10 text-center py-6">
         <div class="bg-amber/10 border border-amber/20 text-text p-6 rounded-[8px] font-sans">
           <span class="material-symbols-outlined text-[48px] text-amber mb-4">lock</span>
-          <h2 class="text-[18px] font-bold mb-2">Beta Cerrada</h2>
-          <p class="text-[13px] text-text-dim leading-relaxed">
-            Actualmente nos encontramos en una fase de <strong>Beta Cerrada</strong>. 
-            El registro público no está disponible en este momento.
-          </p>
+          <h2 class="text-[18px] font-bold mb-2">{{ t('auth.closed_beta_title') }}</h2>
+          <p class="text-[13px] text-text-dim leading-relaxed" v-html="t('auth.closed_beta_desc')"></p>
         </div>
         </div>
        -->
-        <AppInput label="Nombre completo" v-model="form.name" placeholder="John Arias" required maxlength="50" minlength="5" />
-        <AppInput label="Email" type="email" v-model="form.email" placeholder="john@example.com" required maxlength="50" minlength="3" />
-        <AppInput label="Contraseña" type="password" v-model="form.password" placeholder="••••••••" required maxlength="20" minlength="8" />
-        <AppInput label="Confirmar contraseña" type="password" v-model="form.confirmPassword" placeholder="••••••••" required maxlength="20" minlength="8" />
+
+        <div class="mb-4">
+          <label class="block text-[11px] font-mono text-text-dim uppercase tracking-wider mb-2">
+            {{ t('settings.lang_pref_title') }}
+          </label>
+          <div class="flex gap-2">
+            <button type="button" @click="setPreferredLocale('es')" class="flex-1 py-2 text-[13px] border rounded-[5px] transition-colors" :class="locale === 'es' ? 'bg-amber/10 border-amber text-amber' : 'border-border text-text-dim hover:border-amber/50'">
+              Español
+            </button>
+            <button type="button" @click="setPreferredLocale('en')" class="flex-1 py-2 text-[13px] border rounded-[5px] transition-colors" :class="locale === 'en' ? 'bg-amber/10 border-amber text-amber' : 'border-border text-text-dim hover:border-amber/50'">
+              English
+            </button>
+          </div>
+        </div>
+        <AppInput :label="t('auth.name_label')" v-model="form.name" :placeholder="t('auth.name_placeholder')" autocomplete="name" required maxlength="50" minlength="5" />
+        <AppInput :label="t('auth.email_label')" type="email" v-model="form.email" :placeholder="t('auth.email_placeholder')" autocomplete="email" required maxlength="50" minlength="3" />
+        <AppInput :label="t('auth.password_label')" type="password" v-model="form.password" :placeholder="t('auth.password_placeholder')" autocomplete="new-password" required maxlength="20" minlength="8" />
+        <AppInput :label="t('auth.confirm_password_label')" type="password" v-model="form.confirmPassword" :placeholder="t('auth.password_placeholder')" autocomplete="new-password" required maxlength="20" minlength="8" />
   
         <div class="pt-2">
           <AppButton type="submit" :loading="loading" class="w-full h-[45px]">
-            Registrarse
+            {{ t('auth.btn_signup') }}
           </AppButton>
         </div>
       
       </form>
 
       <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
-        ¿Ya tienes cuenta? 
-        <NuxtLink to="/login" class="text-amber hover:underline font-medium ml-1">Inicia sesión</NuxtLink>
+        {{ t('auth.already_have_account') }} 
+        <NuxtLink to="/login" class="text-amber hover:underline font-medium ml-1">{{ t('auth.login_now') }}</NuxtLink>
       </div>
     </div>
   </div>
@@ -52,6 +63,12 @@ definePageMeta({
   middleware: 'guest'
 })
 const { signup } = useAuth()
+const { t, locale, setLocale } = useI18n()
+
+const setPreferredLocale = (newLocale) => {
+  setLocale(newLocale)
+  localStorage.setItem('preferred-locale', newLocale)
+}
 const loading = ref(false)
 const error = ref('')
 const form = ref({
@@ -63,7 +80,7 @@ const form = ref({
 
 const handleSignup = async () => {
   if (form.value.password !== form.value.confirmPassword) {
-    error.value = 'Las contraseñas no coinciden'
+    error.value = t('auth.passwords_mismatch')
     return
   }
 

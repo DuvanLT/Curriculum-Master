@@ -5,24 +5,24 @@
       <div class="dash-header">
         <div>
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">
-            <span>Dashboard</span>
+            <span>{{ $t('dashboard.title') }}</span>
             <HelpButton />
           </div>
-          <div class="page-sub text-[13px] text-text-dim font-mono">Tu centro de comando profesional — métricas, mercado y evolución.</div>
+          <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('dashboard.subtitle') }}</div>
         </div>
       </div>
 
       <!-- Loading -->
       <div v-if="loading" class="dash-loading">
         <div class="spinner"></div>
-        <div class="text-[12px] text-text-dim font-mono mt-3 uppercase tracking-widest">Cargando dashboard...</div>
+        <div class="text-[12px] text-text-dim font-mono mt-3 uppercase tracking-widest">{{ $t('dashboard.loading') }}</div>
       </div>
 
       <!-- Empty state -->
       <div v-else-if="!data" class="dash-empty">
         <span class="material-symbols-outlined text-6xl text-text-dim/20 mb-4">dashboard</span>
-        <div class="text-[14px] text-text-muted mb-2">No pudimos cargar tu dashboard</div>
-        <AppButton @click="fetchDashboard" variant="primary">Reintentar</AppButton>
+        <div class="text-[14px] text-text-muted mb-2">{{ $t('dashboard.empty_title') }}</div>
+        <AppButton @click="fetchDashboard" variant="primary">{{ $t('dashboard.retry') }}</AppButton>
       </div>
 
       <!-- Dashboard Content -->
@@ -35,7 +35,7 @@
 
           <!-- ATS Score Gauge -->
           <div class="dash-card dash-card-score">
-            <div class="dash-card-label">ATS Score Promedio</div>
+            <div class="dash-card-label">{{ $t('dashboard.ats_score_avg') }}</div>
             <div class="score-gauge-wrap">
               <svg class="score-gauge" viewBox="0 0 120 120">
                 <circle cx="60" cy="60" r="50" fill="none" stroke="var(--bg4)" stroke-width="10" />
@@ -51,17 +51,17 @@
               </svg>
               <div class="score-gauge-inner">
                 <div class="score-gauge-num" :style="{ color: scoreColor(data.atsScore.average) }">{{ animatedScore }}%</div>
-                <div class="score-gauge-label">MATCH</div>
+                <div class="score-gauge-label">{{ $t('dashboard.match') }}</div>
               </div>
             </div>
             <div class="score-meta">
               <div class="score-meta-item">
                 <span class="score-meta-num">{{ data.atsScore.totalAnalyses }}</span>
-                <span class="score-meta-label">Análisis</span>
+                <span class="score-meta-label">{{ $t('dashboard.analyses') }}</span>
               </div>
               <div class="score-meta-item">
                 <span class="score-meta-num">{{ data.atsScore.userSkillCount }}</span>
-                <span class="score-meta-label">Tus Skills</span>
+                <span class="score-meta-label">{{ $t('dashboard.your_skills') }}</span>
               </div>
             </div>
             <!-- Mini sparkline -->
@@ -76,19 +76,19 @@
                   stroke-linecap="round"
                 />
               </svg>
-              <div class="sparkline-label">Tendencia de score</div>
+              <div class="sparkline-label">{{ $t('dashboard.score_trend') }}</div>
             </div>
           </div>
 
           <!-- Skills Heatmap -->
           <div class="dash-card dash-card-skills">
-            <div class="dash-card-label">Habilidades: Mercado vs. Tuyas</div>
+            <div class="dash-card-label">{{ $t('dashboard.skills_title') }}</div>
             <div v-if="data.atsScore.demandedSkills.length === 0" class="skills-empty">
               <span class="material-symbols-outlined text-3xl text-text-dim/20 mb-2">bar_chart</span>
-              <div class="text-[11px] text-text-dim font-mono">Analiza vacantes para ver las skills más demandadas</div>
+              <div class="text-[11px] text-text-dim font-mono">{{ $t('dashboard.skills_empty') }}</div>
               <AppButton variant="ghost" size="sm" class="mt-3" @click="navigateTo('/analisis')">
                 <span class="material-symbols-outlined text-[14px] mr-1">search</span>
-                Ir a Análisis
+                {{ $t('dashboard.go_to_analysis') }}
               </AppButton>
             </div>
             <div v-else class="skills-bars">
@@ -114,11 +114,11 @@
           <div class="dash-card dash-card-wins">
             <div class="dash-card-label">
               <span class="material-symbols-outlined text-[16px] text-amber mr-1">bolt</span>
-              Mejoras rapidas
+              {{ $t('dashboard.quick_wins') }}
             </div>
             <div v-if="data.atsScore.quickWins.length === 0" class="wins-empty">
               <div class="text-[11px] text-text-dim font-mono text-center leading-relaxed">
-                Analiza vacantes para descubrir qué skills te faltan y cómo mejorar tu compatibilidad.
+                {{ $t('dashboard.quick_wins_empty') }}
               </div>
             </div>
             <div v-else class="wins-list">
@@ -126,7 +126,7 @@
                 <div class="win-impact">+{{ win.impact }}%</div>
                 <div class="win-body">
                   <div class="win-skill">{{ win.skill }}</div>
-                  <div class="win-desc">Mencionada {{ win.demandCount }}× en tus análisis. Añadirla podría mejorar tu compatibilidad.</div>
+                  <div class="win-desc">{{ $t('dashboard.win_desc', { count: win.demandCount }) }}</div>
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@
         <!-- ROW 2: Pipeline / Embudo de Conversión              -->
         <!-- ═══════════════════════════════════════════════════ -->
         <div class="dash-card dash-card-pipeline">
-          <div class="dash-card-label">Embudo de Conversión Laboral</div>
+          <div class="dash-card-label">{{ $t('dashboard.pipeline_title') }}</div>
           <div class="pipeline-funnel">
             <div class="funnel-stage" v-for="(stage, i) in pipelineStages" :key="stage.key">
               <div class="funnel-bar-wrap" :style="{ '--funnel-pct': stage.pct + '%' }">
@@ -156,7 +156,7 @@
           <!-- Insight -->
           <div class="pipeline-insight">
             <span class="material-symbols-outlined text-[18px]">lightbulb</span>
-            <span>{{ data.pipeline.insight }}</span>
+            <span>{{ $t(data.pipeline.insight) }}</span>
           </div>
         </div>
 
@@ -167,22 +167,22 @@
 
           <!-- Market Fit -->
           <div class="dash-card dash-card-market">
-            <div class="dash-card-label">Índice de Market Fit</div>
+            <div class="dash-card-label">{{ $t('dashboard.market_fit_title') }}</div>
 
             <!-- Top Companies -->
             <div class="market-section">
               <div class="market-sub-label">
                 <span class="material-symbols-outlined text-[14px]">business</span>
-                Empresas Más Activas
+                {{ $t('dashboard.top_companies') }}
               </div>
               <div v-if="data.marketFit.topCompanies.length === 0" class="market-empty">
-                <span class="text-[11px] text-text-dim font-mono">Sin datos aún</span>
+                <span class="text-[11px] text-text-dim font-mono">{{ $t('dashboard.no_data_yet') }}</span>
               </div>
               <div v-else class="company-list">
                 <div v-for="(c, i) in data.marketFit.topCompanies" :key="c.name" class="company-item">
                   <div class="company-rank">{{ i + 1 }}</div>
                   <div class="company-name">{{ c.name }}</div>
-                  <div class="company-count">{{ c.count }} análisis</div>
+                  <div class="company-count">{{ $t('dashboard.analyses_count', { count: c.count }) }}</div>
                 </div>
               </div>
             </div>
@@ -191,10 +191,10 @@
             <div class="market-section mt-5">
               <div class="market-sub-label">
                 <span class="material-symbols-outlined text-[14px]">trending_up</span>
-                Palabras Clave Frecuentes
+                {{ $t('dashboard.trending_keywords') }}
               </div>
               <div v-if="data.marketFit.trendingKeywords.length === 0" class="market-empty">
-                <span class="text-[11px] text-text-dim font-mono">Analiza vacantes para detectar tendencias</span>
+                <span class="text-[11px] text-text-dim font-mono">{{ $t('dashboard.keywords_empty') }}</span>
               </div>
               <div v-else class="keyword-cloud">
                 <span
@@ -214,14 +214,14 @@
           <div class="dash-card dash-card-history">
             <div class="dash-card-label">
               <span class="material-symbols-outlined text-[16px] mr-1">history</span>
-              Historial de CVs
+              {{ $t('dashboard.cv_history_title') }}
             </div>
             <div v-if="data.cvHistory.length === 0" class="history-empty">
               <span class="material-symbols-outlined text-3xl text-text-dim/20 mb-2">description</span>
-              <div class="text-[11px] text-text-dim font-mono text-center mb-3">No has generado ningún CV aún</div>
+              <div class="text-[11px] text-text-dim font-mono text-center mb-3">{{ $t('dashboard.no_cvs') }}</div>
               <AppButton variant="ghost" size="sm" @click="navigateTo('/generador')">
                 <span class="material-symbols-outlined text-[14px] mr-1">description</span>
-                Generar mi primer CV
+                {{ $t('dashboard.generate_first_cv') }}
               </AppButton>
             </div>
             <div v-else class="cv-timeline">
@@ -236,8 +236,8 @@
                   </div>
                   <div class="cv-timeline-meta">
                     <span class="cv-timeline-date">{{ formatDate(cv.created_at) }}</span>
-                    <span v-if="cv.hasJD" class="cv-timeline-badge">Con JD</span>
-                    <span v-else class="cv-timeline-badge cv-badge-general">General</span>
+                    <span v-if="cv.hasJD" class="cv-timeline-badge">{{ $t('dashboard.with_jd') }}</span>
+                    <span v-else class="cv-timeline-badge cv-badge-general">{{ $t('dashboard.general') }}</span>
                   </div>
                 </div>
               </div>
@@ -245,7 +245,7 @@
             <div v-if="data.cvHistory.length > 0" class="history-footer">
               <AppButton variant="ghost" size="sm" class="w-full" @click="navigateTo('/generador')">
                 <span class="material-symbols-outlined text-[14px] mr-1">add</span>
-                Generar nuevo CV
+                {{ $t('dashboard.generate_new_cv') }}
               </AppButton>
             </div>
           </div>
@@ -298,6 +298,7 @@ interface DashboardData {
   }[]
 }
 
+const { t } = useI18n()
 const loading = ref(true)
 const data = ref<DashboardData | null>(null)
 const animatedScore = ref(0)
@@ -356,11 +357,11 @@ const pipelineStages = computed(() => {
   const p = data.value.pipeline
   // First stage is always 100%, every stage scales proportionally but can never exceed the previous one
   const stages = [
-    { key: 'analyses', label: 'Análisis', value: p.analyses, color: 'var(--amber)' },
-    { key: 'cvs', label: 'CVs Generados', value: p.cvs, color: '#6366f1' },
-    { key: 'apps', label: 'Postulaciones', value: p.applications, color: '#0ea5e9' },
-    { key: 'interviews', label: 'Entrevistas', value: p.interviews, color: 'var(--green)' },
-    { key: 'offers', label: 'Ofertas', value: p.offers, color: '#f59e0b' }
+    { key: 'analyses', label: t('dashboard.stage_analyses'), value: p.analyses, color: 'var(--amber)' },
+    { key: 'cvs', label: t('dashboard.stage_cvs'), value: p.cvs, color: '#6366f1' },
+    { key: 'apps', label: t('dashboard.stage_applications'), value: p.applications, color: '#0ea5e9' },
+    { key: 'interviews', label: t('dashboard.stage_interviews'), value: p.interviews, color: 'var(--green)' },
+    { key: 'offers', label: t('dashboard.stage_offers'), value: p.offers, color: '#f59e0b' }
   ]
   const total = Math.max(p.analyses, p.cvs, p.applications, 1)
   let prevPct = 100

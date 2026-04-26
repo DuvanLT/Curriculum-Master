@@ -3,19 +3,19 @@
     <div class="h-full flex flex-col gap-6">
       <div class="flex justify-between items-end">
         <div>
-          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Simulación de Entrevista <HelpButton /></div>
-          <div class="page-sub text-[13px] text-text-dim font-mono">Preparación en tiempo real con simulacion de entrevista guiado por Inteligencia artificial - Beta este apartado aun esta en desarrollo</div>
+          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('entrevista.title') }} <HelpButton /></div>
+          <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('entrevista.subtitle') }}</div>
         </div>
         <div class="flex gap-2">
           <AppButton v-if="!active" @click="startInterview" variant="primary">
-            Iniciar Entrevista
+            {{ $t('entrevista.btn_start') }}
           </AppButton>
           <template v-else>
             <AppButton @click="finishAndAnalyze" :loading="analyzing" variant="primary">
-              Finalizar y Analizar
+              {{ $t('entrevista.btn_finish') }}
             </AppButton>
             <AppButton @click="stopInterview" variant="danger">
-              Cancelar
+              {{ $t('entrevista.btn_cancel') }}
             </AppButton>
           </template>
         </div>
@@ -25,19 +25,19 @@
       <div v-if="results" class="flex-1 bg-[var(--bg)]-bg3 border border-border rounded-lg p-6 overflow-y-auto">
         <div class="flex justify-between items-start mb-6">
           <div>
-            <h2 class="text-xl font-bold text-amber">Reporte de Entrevista</h2>
-            <p class="text-sm text-text-dim font-mono">Feedback personalizado y próximos pasos</p>
+            <h2 class="text-xl font-bold text-amber">{{ $t('entrevista.report_title') }}</h2>
+            <p class="text-sm text-text-dim font-mono">{{ $t('entrevista.report_subtitle') }}</p>
           </div>
-          <AppButton @click="results = null; stopInterview()" variant="secondary">Cerrar</AppButton>
+          <AppButton @click="results = null; stopInterview()" variant="secondary">{{ $t('entrevista.btn_close') }}</AppButton>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-[var(--bg)]-bg4 p-5 border border-border rounded-lg">
-            <h3 class="font-bold mb-3 text-sm uppercase tracking-wider text-text-dim">Resumen del Reclutador</h3>
+            <h3 class="font-bold mb-3 text-sm uppercase tracking-wider text-text-dim">{{ $t('entrevista.summary_title') }}</h3>
             <p class="text-[13px] leading-relaxed">{{ results.summary }}</p>
           </div>
           <div class="bg-[var(--bg)]-bg4 p-5 border border-border rounded-lg flex flex-col">
-            <h3 class="font-bold mb-3 text-sm uppercase tracking-wider text-text-dim">Sugerencias Personalizadas</h3>
+            <h3 class="font-bold mb-3 text-sm uppercase tracking-wider text-text-dim">{{ $t('entrevista.suggestions_title') }}</h3>
             <div class="flex-1 overflow-y-auto mb-4">
               <ul class="flex flex-col gap-3">
                 <li v-for="(step, i) in results.next_steps" :key="i" 
@@ -59,11 +59,11 @@
               :disabled="selectedSteps.length === 0 || savingSteps"
               :loading="savingSteps"
             >
-              Añadir ({{ selectedSteps.length }}) a mis pasos
+              {{ $t('entrevista.btn_add_steps', { count: selectedSteps.length }) }}
             </AppButton>
             <p v-if="stepsAdded" class="text-[10px] text-green text-center mt-2 font-mono flex items-center justify-center gap-1">
               <span class="material-symbols-outlined text-[12px]">check_circle</span>
-              Pasos añadidos correctamente
+              {{ $t('entrevista.steps_added') }}
             </p>
           </div>
         </div>
@@ -77,13 +77,13 @@
             <div v-if="!streamActive" class="absolute inset-0 flex items-center justify-center bg-[var(--bg)]-bg4/80 backdrop-blur-sm">
               <div class="text-center p-6 grayscale opacity-30">
                 <span class="material-symbols-outlined text-5xl mb-3">videocam_off</span>
-                <div class="text-[13px] text-text-dim font-mono">Cámara inactiva</div>
+                <div class="text-[13px] text-text-dim font-mono">{{ $t('entrevista.camera_inactive') }}</div>
               </div>
             </div>
             <!-- Status Badges -->
             <div class="absolute top-4 left-4 flex gap-2">
-              <div v-if="streamActive" class="bg-red/20 text-red text-[10px] px-2 py-0.5 rounded border border-red/30 font-bold uppercase tracking-widest animate-pulse">REC</div>
-              <div class="bg-[var(--bg)]-bg/60 backdrop-blur text-text-dim text-[10px] px-2 py-0.5 rounded border border-border/50 font-mono tracking-tighter">HD 1080p</div>
+              <div v-if="streamActive" class="bg-red/20 text-red text-[10px] px-2 py-0.5 rounded border border-red/30 font-bold uppercase tracking-widest animate-pulse">{{ $t('entrevista.rec') }}</div>
+              <div class="bg-[var(--bg)]-bg/60 backdrop-blur text-text-dim text-[10px] px-2 py-0.5 rounded border border-border/50 font-mono tracking-tighter">{{ $t('entrevista.hd') }}</div>
             </div>
           </div>
 
@@ -98,11 +98,11 @@
         <AppCard class="flex flex-col min-h-0 !mb-0">
           <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-[var(--bg)]-bg3 mb-4 flex flex-col gap-3" ref="chatContainer">
             <div v-if="msgs.length === 0" class="flex-1 flex items-center justify-center text-text-dim font-mono text-[12px] opacity-40">
-              Presiona "Iniciar Entrevista" para comenzar
+              {{ $t('entrevista.chat_placeholder') }}
             </div>
             <div v-for="(msg, i) in msgs" :key="i" class="max-w-[90%] p-3 rounded-[5px] text-[13px] leading-relaxed"
                  :class="msg.role === 'user' ? 'bg-amber-dim text-amber-light self-end rounded-br-none border border-amber/10' : 'bg-[var(--bg)]-bg4 text-text self-start rounded-bl-none border border-border'">
-              <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? 'Tú (Voz)' : 'Reclutador' }}</div>
+              <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? $t('entrevista.role_user') : $t('entrevista.role_ai') }}</div>
               {{ msg.text }}
             </div>
             <div v-if="loading" class="self-start bg-[var(--bg)]-bg4 p-3 rounded-[5px] flex gap-1 items-center border border-border">
@@ -122,13 +122,13 @@
               >
                 <span v-if="isListening" class="flex items-center gap-2">
                   <span class="w-2 h-2 bg-white rounded-full animate-ping"></span>
-                  Hablando... (Click para enviar)
+                  {{ $t('entrevista.btn_speaking') }}
                 </span>
-                <span v-else>Click para hablar</span>
+                <span v-else>{{ $t('entrevista.btn_click_to_speak') }}</span>
               </AppButton>
             </div>
             <div class="text-[11px] text-text-dim text-center font-mono italic">
-              {{ isListening ? 'La IA está escuchando... Haz clic de nuevo cuando termines de hablar.' : 'Práctica tu lenguaje corporal y tus respuestas en voz alta.' }}
+              {{ isListening ? $t('entrevista.note_listening') : $t('entrevista.note_practice') }}
             </div>
           </div>
         </AppCard>
@@ -137,12 +137,12 @@
     <!-- Confirm Finish Modal -->
     <AppModal
       :show="showConfirmFinish"
-      confirm-text="Finalizar de todos modos"
+      :confirm-text="$t('entrevista.modal_finish_anyway')"
       @close="showConfirmFinish = false"
       @confirm="finishAndAnalyze(true)"
     >
-      <template #title>Finalizar Entrevista</template>
-      Aún no has empezado la entrevista (no hay mensajes). ¿Estás seguro de que quieres finalizar y analizar de todos modos?
+      <template #title>{{ $t('entrevista.modal_title') }}</template>
+      {{ $t('entrevista.modal_desc') }}
     </AppModal>
   </NuxtLayout>
 </template>
@@ -154,6 +154,7 @@ definePageMeta({
 
 const { profile, experiences, fetchProfile } = useAppState()
 const toast = useToast()
+const { t, locale } = useI18n()
 const MAX_STEPS = 40
 const msgs = ref<{ role: string; text: string }[]>([])
 const loading = ref(false)
@@ -192,7 +193,7 @@ const setupSpeechRecognition = () => {
     recognition = new SpeechRecognition()
     recognition.continuous = true
     recognition.interimResults = true
-    recognition.lang = 'es-ES'
+    recognition.lang = locale.value === 'en' ? 'en-US' : 'es-ES'
 
     recognition.onresult = (event: any) => {
       let finalTranscript = ''
@@ -231,7 +232,7 @@ const startInterview = async () => {
     await sendResponse('') 
   } catch (err) {
     console.error('Error accessing camera:', err)
-    toast.error('No se pudo acceder a la cámara o micrófono. Por favor permite los permisos.')
+    toast.error(t('entrevista.toast_camera_error'))
   }
 }
 
@@ -277,7 +278,7 @@ const saveSelectedSteps = async () => {
   try {
     const existingSteps = await $fetch<{ id: string }[]>('/api/steps')
     if (existingSteps.length + selectedSteps.value.length > MAX_STEPS) {
-      toast.warning('Coach: ya tienes el maximo de 40 tareas o no hay suficiente espacio. Resuelve y elimina algunas para continuar.')
+      toast.warning(t('entrevista.toast_max_steps_1'))
       return
     }
 
@@ -292,11 +293,11 @@ const saveSelectedSteps = async () => {
   } catch (e: any) {
     console.error('Error saving steps:', e)
     const message = e?.data?.statusMessage || e?.statusMessage || e?.message || ''
-    if (message.includes('maximo de 40 tareas')) {
-      toast.warning('Coach: ya tienes el maximo de 40 tareas. Resuelve y elimina algunas para continuar.')
+    if (message.includes('maximo de 40 tareas') || message.includes('maximum of 40 tasks')) {
+      toast.warning(t('entrevista.toast_max_steps_2'))
       return
     }
-    toast.error('Hubo un error al guardar los pasos.')
+    toast.error(t('entrevista.toast_save_error'))
   } finally {
     savingSteps.value = false
   }
@@ -316,7 +317,8 @@ const finishAndAnalyze = async (force = false) => {
         messages: msgs.value,
         profile: profile.value,
         experiences: experiences.value,
-        isFinal: true
+        isFinal: true,
+        locale: locale.value
       }
     })
     
@@ -340,8 +342,8 @@ const finishAndAnalyze = async (force = false) => {
   } catch (e: any) {
     console.error('Analysis Error:', e)
     // Nuxt $fetch errors store the message in data.statusMessage or just message
-    const errorMsg = e.data?.statusMessage || e.message || 'Error desconocido'
-    toast.error('Error en el análisis: ' + errorMsg)
+    const errorMsg = e.data?.statusMessage || e.message || t('entrevista.unknown_error')
+    toast.error(t('entrevista.toast_analysis_error') + errorMsg)
   } finally {
     analyzing.value = false
   }
@@ -385,7 +387,7 @@ const speak = async (text: string, audioBase64?: string | null, audioMimeType?: 
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'es-ES'
+    utterance.lang = locale.value === 'en' ? 'en-US' : 'es-ES'
     utterance.rate = 1.0
     utterance.pitch = 1.0
     window.speechSynthesis.speak(utterance)
@@ -406,7 +408,8 @@ const sendResponse = async (text: string) => {
       body: {
         messages: msgs.value,
         profile: profile.value,
-        experiences: experiences.value
+        experiences: experiences.value,
+        locale: locale.value
       }
     })
     
@@ -414,7 +417,7 @@ const sendResponse = async (text: string) => {
     await speak(data.text, data.audio, data.audioMimeType)
   } catch (e) {
     console.error('Interview Error:', e)
-    msgs.value.push({ role: 'ai', text: 'Lo siento, hubo un problema con la simulación. Reintenta por favor.' })
+    msgs.value.push({ role: 'ai', text: t('entrevista.toast_simulation_error') })
   } finally {
     loading.value = false
     scrollToBottom()

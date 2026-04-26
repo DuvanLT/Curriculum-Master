@@ -1,28 +1,28 @@
 <template>
   <NuxtLayout>
     <div>
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Próximos Pasos <HelpButton /></div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Añade y completa tareas que te llevarán al éxito profesional.</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('pasos.title') }} <HelpButton /></div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('pasos.subtitle') }}</div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- LISTA DE TAREAS -->
         <div class="md:col-span-2">
-          <AppCard title="Mi Roadmap Profesional">
+          <AppCard :title="$t('pasos.roadmap_title')">
             <template #title-action>
               <div class="text-[11px] font-mono text-text-dim">
-                {{ completedCount }} / {{ steps.length }} completados · {{ steps.length }}/{{ MAX_STEPS }} tareas
+                {{ $t('pasos.progress_info', { completed: completedCount, total: steps.length, max: MAX_STEPS }) }}
               </div>
             </template>
 
             <div v-if="loading" class="text-center py-10">
               <div class="spinner inline-block"></div>
-              <div class="text-[12px] text-text-dim font-mono mt-2">Cargando roadmap...</div>
+              <div class="text-[12px] text-text-dim font-mono mt-2">{{ $t('pasos.loading_roadmap') }}</div>
             </div>
 
             <div v-else-if="steps.length === 0" class="text-center py-16 border border-dashed border-border rounded-[5px]">
               <span class="material-symbols-outlined text-4xl mb-2 text-text-dim/20">target</span>
-              <p class="text-[13px] text-text-dim font-mono">Tu lista aún está vacía.</p>
-              <p class="text-[11px] text-text-muted mt-1">Usa el Generador de CV para que la IA cree tareas automáticamente.</p>
+              <p class="text-[13px] text-text-dim font-mono">{{ $t('pasos.empty_list_title') }}</p>
+              <p class="text-[11px] text-text-muted mt-1">{{ $t('pasos.empty_list_subtitle') }}</p>
             </div>
 
             <div v-else class="space-y-2">
@@ -51,7 +51,7 @@
                   <button 
                     @click.stop="deleteStep(step.id)" 
                     class="p-1.5 hover:bg-red/10 rounded-full text-red/60 hover:text-red transition-all flex items-center justify-center"
-                    title="Eliminar tarea"
+                    :title="$t('pasos.delete_task_title')"
                   >
                     <span class="material-symbols-outlined text-[14px]">close</span>
                   </button>
@@ -63,26 +63,26 @@
 
         <!-- SIDEBAR DE AGREGAR -->
         <div>
-          <AppCard title="Nueva Tarea">
+          <AppCard :title="$t('pasos.new_task_title')">
             <AppInput 
-              placeholder="Ej: Aprender Docker base..." 
+              :placeholder="$t('pasos.new_task_placeholder')" 
               v-model="newStepText" 
               @keyup.enter="addStep"
             />
             <AppButton @click="addStep" class="w-full mt-2" :disabled="!newStepText.trim() || steps.length >= MAX_STEPS">
-              Añadir Paso
+              {{ $t('pasos.add_step_btn') }}
             </AppButton>
             
             <p class="mt-2 text-[11px] font-mono text-text-muted">
-              Máximo {{ MAX_STEPS }} tareas activas en tu roadmap.
+              {{ $t('pasos.max_tasks_info', { max: MAX_STEPS }) }}
             </p>
             <div class="mt-6 pt-6 border-t border-border-dim">
               <div class="text-[11px] text-amber font-mono mb-2 uppercase tracking-widest flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[14px]">lightbulb</span>
-                Tip del Coach
+                {{ $t('pasos.coach_tip_title') }}
               </div>
               <p class="text-[12px] text-text-dim leading-relaxed">
-                Prioriza las tareas que la IA generó específicamente para tus vacantes objetivo. Esas tienen el mayor impacto inmediato en tu empleabilidad.
+                {{ $t('pasos.coach_tip_text') }}
               </p>
             </div>
           </AppCard>
@@ -93,12 +93,12 @@
     <AppModal
       :show="stepToDelete !== null"
       confirm-variant="danger"
-      confirm-text="Eliminar"
+      :confirm-text="$t('pasos.modal_delete_confirm')"
       @close="stepToDelete = null"
       @confirm="confirmDelete"
     >
-      <template #title>Eliminar Paso</template>
-      ¿Estás seguro de que quieres eliminar esta tarea de tu roadmap?
+      <template #title>{{ $t('pasos.modal_delete_title') }}</template>
+      {{ $t('pasos.modal_delete_text') }}
     </AppModal>
   </NuxtLayout>
 </template>
@@ -110,6 +110,7 @@ definePageMeta({
 
 const { profile, experiences } = useAppState()
 const toast = useToast()
+const { t } = useI18n()
 const MAX_STEPS = 40
 
 interface Step {
@@ -138,7 +139,7 @@ const fetchSteps = async () => {
 const addStep = async () => {
   if (!newStepText.value.trim()) return
   if (steps.value.length >= MAX_STEPS) {
-    toast.warning('Coach: ya tienes el maximo de 40 tareas. Resuelve y elimina algunas para continuar.')
+    toast.warning(t('pasos.toast_max_tasks'))
     return
   }
 
@@ -149,15 +150,15 @@ const addStep = async () => {
     })
     steps.value.unshift(newItem)
     newStepText.value = ''
-    toast.success('Paso añadido correctamente')
+    toast.success(t('pasos.toast_add_success'))
   } catch (e: any) {
     console.error('Error adding step:', e)
     const message = e?.data?.statusMessage || e?.statusMessage || e?.message || ''
     if (message.includes('maximo de 40 tareas')) {
-      toast.warning('Coach: ya tienes el maximo de 40 tareas. Resuelve y elimina algunas para continuar.')
+      toast.warning(t('pasos.toast_max_tasks'))
       return
     }
-    toast.error('Error al añadir el paso')
+    toast.error(t('pasos.toast_add_error'))
   }
 }
 
@@ -194,10 +195,10 @@ const confirmDelete = async () => {
     if (index !== -1) {
       steps.value.splice(index, 1)
     }
-    toast.success('Paso eliminado')
+    toast.success(t('pasos.toast_delete_success'))
   } catch (e) {
     console.error('Error deleting step:', e)
-    toast.error('No se pudo eliminar el paso')
+    toast.error(t('pasos.toast_delete_error'))
   }
 }
 

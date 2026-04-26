@@ -26,6 +26,7 @@
         v-else-if="type === 'select'"
         :value="modelValue"
         @change="$emit('update:modelValue', $event.target.value)"
+        v-bind="$attrs"
         class="bg-[var(--bg)] border border-border text-text px-2.5 py-2 rounded-md text-[13px] font-body outline-none transition-colors duration-150 focus:border-amber w-full"
       >
         <slot />
@@ -60,6 +61,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+
+defineOptions({
+  inheritAttrs: false
+})
 
 const props = defineProps({
   label: String,

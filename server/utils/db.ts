@@ -1,21 +1,38 @@
 import { createClient } from '@libsql/client'
 
+// ─── Singleton DB client ───
+let cachedClient: ReturnType<typeof createClient> | null = null
+
 export const useDb = () => {
+  if (cachedClient) return cachedClient
+
   const config = useRuntimeConfig()
   
   if (!config.tursoUrl || !config.tursoToken) {
     throw new Error('Database configuration missing. Please check your .env file.')
   }
 
-  const client = createClient({
+  cachedClient = createClient({
     url: config.tursoUrl,
     authToken: config.tursoToken
   })
 
-  return client
+  return cachedClient
 }
 
+// ─── Column migration whitelist ───
+const ALLOWED_COLUMN_NAMES = new Set([
+  'email_profile', 'titulo', 'ubicacion', 'resumen', 'telefono',
+  'linkedin', 'github', 'web', 'educacion', 'years',
+  'sidebar_tour_completed_at', 'is_verified', 'verification_code'
+])
+
 async function ensureUserColumn(db: ReturnType<typeof useDb>, name: string, type: string) {
+  if (!ALLOWED_COLUMN_NAMES.has(name)) {
+    console.warn(`Skipping unknown column migration: ${name}`)
+    return
+  }
+
   const result = await db.execute('PRAGMA table_info(users)')
   const columns = result.rows
     .map((row: any) => String(row.name || row.column_name || '').trim())
@@ -180,4 +197,23 @@ export const initDb = async () => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `)
+
+  // ─── Indexes for performance ───
+  const indexes = [
+    'CREATE INDEX IF NOT EXISTS idx_experiences_user ON experiences(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_educations_user ON educations(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_job_analyses_user ON job_analyses(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_applications_user ON applications(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_generated_cvs_user ON generated_cvs(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_next_steps_user ON next_steps(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)'
+  ]
+
+  for (const indexSql of indexes) {
+    try {
+      await db.execute(indexSql)
+    } catch (e: any) {
+      console.warn('Index creation warning:', e.message)
+    }
+  }
 }

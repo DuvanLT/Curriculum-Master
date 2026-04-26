@@ -8,12 +8,20 @@ function getCacheKey(keywords: string, location: string, page: number): string {
   return `${(keywords || '').toLowerCase().trim()}|${(location || '').toLowerCase().trim()}|${page}`
 }
 
+const MAX_CACHE_SIZE = 500
+
 function cleanExpiredCache() {
   const now = Date.now()
   for (const [key, entry] of cache) {
     if (now - entry.timestamp > CACHE_TTL_MS) {
       cache.delete(key)
     }
+  }
+  
+  if (cache.size > MAX_CACHE_SIZE) {
+    const oldest = Array.from(cache.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp)[0]
+    if (oldest) cache.delete(oldest[0])
   }
 }
 

@@ -1,8 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
-  modules: ['nuxt-auth-utils'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/i18n'],
+  i18n: {
+    locales: [
+      { code: 'es', name: 'Español', file: 'es.json' },
+      { code: 'en', name: 'English', file: 'en.json' }
+    ],
+    defaultLocale: 'en',
+    langDir: 'locales',
+    strategy: 'no_prefix'
+  },
   runtimeConfig: {
     // Private keys (available only on server)
     openaiApiKey: '',
@@ -33,6 +43,17 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
+    routeRules: {
+      '/**': {
+        headers: {
+          'X-Frame-Options': 'DENY',
+          'X-Content-Type-Options': 'nosniff',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Permissions-Policy': 'camera=(self), microphone=(self), geolocation=()',
+          'X-XSS-Protection': '1; mode=block'
+        }
+      }
+    },
     rollupConfig: {
       external: ['@napi-rs/canvas']
     }

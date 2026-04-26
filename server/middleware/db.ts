@@ -17,14 +17,11 @@ const initDbOnce = () => {
 }
 
 export default defineEventHandler(async (event) => {
-  if (!process.dev) {
-    return
-  }
-
+  // Run in both dev and production — initDb is idempotent (CREATE IF NOT EXISTS)
   const initPromise = initDbOnce()
   const pathname = getRequestURL(event).pathname
 
-  // Let pages render without waiting on dev-time DB setup; APIs still wait for tables.
+  // Let pages render without waiting on DB setup; APIs still wait for tables.
   if (pathname.startsWith('/api/')) {
     await initPromise
   }

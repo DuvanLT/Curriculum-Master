@@ -19,145 +19,147 @@ interface HelpMatcher extends SectionHelp {
   match: (path: string) => boolean
 }
 
-const navigationHelpItems: NavigationHelpItem[] = [
-  {
-    id: 'dashboard',
-    to: '/dashboard',
-    label: 'Dashboard',
-    icon: 'dashboard',
-    description: 'Vista general de tu perfil profesional, métricas de búsqueda y análisis de mercado.',
-    tip: 'Tu centro de comando para entender cómo va tu proceso de búsqueda laboral.',
-    group: 'primary'
-  },
-  {
-    id: 'analisis',
-    to: '/analisis',
-    label: 'Analizar Vacante',
-    icon: 'search',
-    description: 'Descubre qué tan compatible eres con el puesto, qué detalles le faltan a tu CV y cómo mejorarlo para destacar.',
-    tip: 'Ideal para decidir rapido si vale la pena postularte o adaptar tu CV.',
-    group: 'primary'
-  },
-  {
-    id: 'generador',
-    to: '/generador',
-    label: 'Constructor CV',
-    icon: 'description',
-    description: 'Crea una version de tu Curriculum Vitae enfocada en una oferta usando tu Perfil Maestro como base.',
-    tip: 'Adapta tu perfil a cada oferta al instante y destaca lo que la empresa busca, sin reescribir todo desde cero.',
-    group: 'primary'
-  },
-  {
-    id: 'coach',
-    to: '/coach',
-    label: 'Ezra',
-    icon: 'smart_toy',
-    description: 'Tu coach con IA para practicar argumentos, resolver dudas y mejorar tu estrategia laboral.',
-    tip: 'Usalo cuando necesites ideas, feedback o apoyo antes de una postulacion.',
-    group: 'primary'
-  },
-  {
-    id: 'pasos',
-    to: '/pasos',
-    label: 'Mi Ruta',
-    icon: 'fact_check',
-    description: 'Organiza tus siguientes pasos y te muestra que tareas te faltan para avanzar.',
-    tip: 'Sirve como tablero personal para no perder el hilo del proceso.',
-    group: 'primary'
-  },
-  {
-    id: 'entrevista',
-    to: '/entrevista',
-    label: 'Practicar Entrevista',
-    icon: 'videocam',
-    description: 'Simula entrevistas y practica respuestas antes de hablar con reclutadores.',
-    tip: 'Muy util para entrenar seguridad, estructura y claridad en tus respuestas.',
-    group: 'primary',
-    badge: 'BETA'
-  },
-  {
-    id: 'aplicaciones',
-    to: '/aplicaciones',
-    label: 'Mis Aplicaciones',
-    icon: 'view_kanban',
-    description: 'Lleva el control de las vacantes guardadas, fechas y estado de cada postulacion.',
-    tip: 'Piensalo como tu linea de tiempo laboral personal de postulaciones.',
-    group: 'primary'
-  },
-  {
-    id: 'ofertas',
-    to: '/ofertas',
-    label: 'Bolsa de Empleo',
-    icon: 'work',
-    description: 'Explora vacantes y envialas directo al analisis o al constructor de CV.',
-    tip: 'Es el mejor punto de partida cuando aun estas buscando oportunidades.',
-    group: 'primary'
-  },
-  {
-    id: 'settings',
-    to: '/settings',
-    label: 'Ajustes',
-    icon: 'settings',
-    description: 'Administra tu cuenta, privacidad y configuraciones generales.',
-    tip: 'Aqui gestionas lo sensible: sesion, datos y acciones de cuenta.',
-    group: 'settings'
-  },
-  {
-    id: 'perfil',
-    to: '/perfil',
-    label: 'Perfil Maestro',
-    icon: 'person',
-    description: 'Es la base de tu experiencia, estudios y datos personales para toda la app.',
-    tip: 'Mientras mejor este tu perfil, mejores seran los analisis y CVs generados.',
-    group: 'profile'
-  }
-]
 
-const extraSectionHelp: HelpMatcher[] = [
-  {
-    title: 'Importar CV',
-    description: 'Carga tu hoja de vida para rellenar mas rapido el Perfil Maestro.',
-    tip: 'Despues puedes corregir o enriquecer cada dato manualmente.',
-    match: path => path === '/importar-cv' || path.startsWith('/importar-cv/')
-  },
-  {
-    title: 'Examen de Habilidades',
-    description: 'Descubre fortalezas y habilidades que luego puedes sumar a tu Perfil Maestro.',
-    tip: 'Conviene hacerlo si aun no tienes claro como describir tu propuesta profesional.',
-    match: path => path === '/examen' || path.startsWith('/examen/')
-  }
-]
-
-const fallbackSectionHelp: SectionHelp = {
-  title: 'BringJobs',
-  description: 'Esta vista forma parte de tu proceso para preparar, mejorar y seguir tus postulaciones.',
-  tip: 'Puedes moverte por el sidebar para cambiar de herramienta cuando lo necesites.'
-}
 
 const buildMatch = (path: string) => (currentPath: string) => currentPath === path || currentPath.startsWith(`${path}/`)
 
-const routeHelpMatchers: HelpMatcher[] = [
-  ...navigationHelpItems.map(item => ({
-    title: item.label,
-    description: item.description,
-    tip: item.tip,
-    match: buildMatch(item.to)
-  })),
-  ...extraSectionHelp
-]
-
-export const resolveSectionHelp = (path: string): SectionHelp => {
-  return routeHelpMatchers.find(entry => entry.match(path)) ?? fallbackSectionHelp
-}
-
 export const useNavigationHelp = () => {
   const route = useRoute()
+  const { t } = useI18n()
   const sidebarTourSignal = useState<number>('sidebar-tour-signal', () => 0)
 
-  const currentSectionHelp = computed(() => resolveSectionHelp(route.path))
-  const primaryNavigationItems = computed(() => navigationHelpItems.filter(item => item.group === 'primary'))
-  const settingsNavigationItems = computed(() => navigationHelpItems.filter(item => item.group === 'settings'))
-  const profileNavigationItem = computed(() => navigationHelpItems.find(item => item.group === 'profile') ?? null)
+  const navigationHelpItems = computed<NavigationHelpItem[]>(() => [
+    {
+      id: 'dashboard',
+      to: '/dashboard',
+      label: t('sidebar.items.dashboard.label'),
+      icon: 'dashboard',
+      description: t('sidebar.items.dashboard.description'),
+      tip: t('sidebar.items.dashboard.tip'),
+      group: 'primary'
+    },
+    {
+      id: 'analisis',
+      to: '/analisis',
+      label: t('sidebar.items.analisis.label'),
+      icon: 'search',
+      description: t('sidebar.items.analisis.description'),
+      tip: t('sidebar.items.analisis.tip'),
+      group: 'primary'
+    },
+    {
+      id: 'generador',
+      to: '/generador',
+      label: t('sidebar.items.generador.label'),
+      icon: 'description',
+      description: t('sidebar.items.generador.description'),
+      tip: t('sidebar.items.generador.tip'),
+      group: 'primary'
+    },
+    {
+      id: 'coach',
+      to: '/coach',
+      label: t('sidebar.items.coach.label'),
+      icon: 'smart_toy',
+      description: t('sidebar.items.coach.description'),
+      tip: t('sidebar.items.coach.tip'),
+      group: 'primary'
+    },
+    {
+      id: 'pasos',
+      to: '/pasos',
+      label: t('sidebar.items.pasos.label'),
+      icon: 'fact_check',
+      description: t('sidebar.items.pasos.description'),
+      tip: t('sidebar.items.pasos.tip'),
+      group: 'primary'
+    },
+    {
+      id: 'entrevista',
+      to: '/entrevista',
+      label: t('sidebar.items.entrevista.label'),
+      icon: 'videocam',
+      description: t('sidebar.items.entrevista.description'),
+      tip: t('sidebar.items.entrevista.tip'),
+      group: 'primary',
+      badge: 'BETA'
+    },
+    {
+      id: 'aplicaciones',
+      to: '/aplicaciones',
+      label: t('sidebar.items.aplicaciones.label'),
+      icon: 'view_kanban',
+      description: t('sidebar.items.aplicaciones.description'),
+      tip: t('sidebar.items.aplicaciones.tip'),
+      group: 'primary'
+    },
+    {
+      id: 'ofertas',
+      to: '/ofertas',
+      label: t('sidebar.items.ofertas.label'),
+      icon: 'work',
+      description: t('sidebar.items.ofertas.description'),
+      tip: t('sidebar.items.ofertas.tip'),
+      group: 'primary'
+    },
+    {
+      id: 'settings',
+      to: '/settings',
+      label: t('sidebar.items.settings_nav.label'),
+      icon: 'settings',
+      description: t('sidebar.items.settings_nav.description'),
+      tip: t('sidebar.items.settings_nav.tip'),
+      group: 'settings'
+    },
+    {
+      id: 'perfil',
+      to: '/perfil',
+      label: t('sidebar.items.perfil.label'),
+      icon: 'person',
+      description: t('sidebar.items.perfil.description'),
+      tip: t('sidebar.items.perfil.tip'),
+      group: 'profile'
+    }
+  ])
+
+  const extraSectionHelp = computed<HelpMatcher[]>(() => [
+    {
+      title: t('sidebar.extra_help.importar_cv.title'),
+      description: t('sidebar.extra_help.importar_cv.description'),
+      tip: t('sidebar.extra_help.importar_cv.tip'),
+      match: path => path === '/importar-cv' || path.startsWith('/importar-cv/')
+    },
+    {
+      title: t('sidebar.extra_help.examen.title'),
+      description: t('sidebar.extra_help.examen.description'),
+      tip: t('sidebar.extra_help.examen.tip'),
+      match: path => path === '/examen' || path.startsWith('/examen/')
+    }
+  ])
+
+  const fallbackSectionHelp = computed<SectionHelp>(() => ({
+    title: t('sidebar.fallback_help.title'),
+    description: t('sidebar.fallback_help.description'),
+    tip: t('sidebar.fallback_help.tip')
+  }))
+
+  const routeHelpMatchers = computed<HelpMatcher[]>(() => [
+    ...navigationHelpItems.value.map(item => ({
+      title: item.label,
+      description: item.description,
+      tip: item.tip,
+      match: buildMatch(item.to)
+    })),
+    ...extraSectionHelp.value
+  ])
+
+  const currentSectionHelp = computed(() => {
+    return routeHelpMatchers.value.find(entry => entry.match(route.path)) ?? fallbackSectionHelp.value
+  })
+
+  const primaryNavigationItems = computed(() => navigationHelpItems.value.filter(item => item.group === 'primary'))
+  const settingsNavigationItems = computed(() => navigationHelpItems.value.filter(item => item.group === 'settings'))
+  const profileNavigationItem = computed(() => navigationHelpItems.value.find(item => item.group === 'profile') ?? null)
 
   const requestSidebarTour = () => {
     sidebarTourSignal.value += 1

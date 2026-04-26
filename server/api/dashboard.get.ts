@@ -1,5 +1,7 @@
+import { requireVerifiedUserSession } from '../utils/verified-session'
+
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
+  const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
   const db = useDb()
 
@@ -100,19 +102,19 @@ export default defineEventHandler(async (event) => {
     // Generate pipeline insight
     let pipelineInsight = ''
     if (totalAnalyses === 0) {
-      pipelineInsight = '¡Comienza analizando tu primera vacante para activar tu dashboard!'
+      pipelineInsight = 'dashboard.insights.start_analyzing'
     } else if (totalCVs === 0) {
-      pipelineInsight = 'Ya has analizado vacantes. El siguiente paso es generar tu primer CV adaptado.'
+      pipelineInsight = 'dashboard.insights.generate_cv'
     } else if (totalApplications === 0) {
-      pipelineInsight = 'Tienes CVs generados sin postulaciones registradas. ¡Es hora de aplicar!'
+      pipelineInsight = 'dashboard.insights.time_to_apply'
     } else if (rateAppsToInterviews < 20 && totalApplications >= 3) {
-      pipelineInsight = 'Tu ratio de entrevistas es bajo. Revisa que tus CVs incluyan keywords relevantes y optimiza tu perfil.'
+      pipelineInsight = 'dashboard.insights.low_interview_rate'
     } else if (totalInterviews > 0 && totalOffers === 0) {
-      pipelineInsight = 'Tu CV está pasando los filtros (tienes entrevistas), pero falta cerrar la oferta. ¡Practica con el simulador de entrevistas!'
+      pipelineInsight = 'dashboard.insights.practice_interviews'
     } else if (totalOffers > 0) {
-      pipelineInsight = '¡Excelente progreso! Ya tienes ofertas en tu pipeline. Sigue optimizando para negociar mejor.'
+      pipelineInsight = 'dashboard.insights.great_progress'
     } else {
-      pipelineInsight = 'Sigue generando CVs adaptados y registrando tus aplicaciones para mejorar tus métricas.'
+      pipelineInsight = 'dashboard.insights.keep_generating'
     }
 
     // ─── 5. Market Fit ───

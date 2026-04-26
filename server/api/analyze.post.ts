@@ -1,24 +1,34 @@
 import OpenAI from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import { requireVerifiedUserSession } from '../utils/verified-session'
+import { checkUserAIRateLimit } from '../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
-  const { jd, profile, experiences } = await readBody(event)
+  checkUserAIRateLimit(userId)
+  const { jd, profile, experiences, locale = 'es' } = await readBody(event)
+  const isEn = locale === 'en'
 
-  if (!jd) {
+  const jdText = String(jd || '').trim()
+  if (!jdText) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Descripción de vacante (JD) requerida.'
+      statusMessage: 'Descripción de vacante requerida.'
+    })
+  }
+  if (jdText.length > 15000) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Job description is too long (max 15,000 characters).'
     })
   }
 
   if (!config.openaiApiKey) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'OpenAI API key missing'
+      statusMessage: 'Fatal error.'
     })
   }
 
@@ -26,7 +36,20 @@ export default defineEventHandler(async (event) => {
     apiKey: config.openaiApiKey
   })
 
-  const systemPrompt = `
+  const systemPrompt = isEn
+    ? `
+    You are an expert in recruitment and ATS systems. Your task is to analyze a job description (JD) and compare it with a candidate's profile.
+    
+    INSTRUCTIONS:
+    1. Identify the most important Hard Skills in the JD.
+    2. Compare those skills with the user's profile and experiences.
+    3. Calculate a match score from 0 to 100.
+    4. Provide a brief analysis and concrete recommendations.
+    5. Language: English.
+
+    IMPORTANT: This is NOT just for programmers. It can be for SALES, MARKETING, MEDICINE, CONSTRUCTION, etc. Extract technical/specific skills from ANY field.
+  `
+    : `
     Eres un experto en reclutamiento y sistemas ATS. Tu tarea es analizar una vacante (JD) y compararla con el perfil de un candidato.
     
     INSTRUCCIONES:
@@ -39,7 +62,32 @@ export default defineEventHandler(async (event) => {
     IMPORTANTE: Esto NO es solo para programadores. Puede ser para VENTAS, MARKETING, MEDICINA, CONSTRUCCIÓN, etc. Extrae las habilidades técnicas/específicas de CUALQUIER campo.
   `
 
-  const userPrompt = `
+  const userPrompt = isEn
+    ? `
+    JOB DESCRIPTION (JD):
+    ${jd}
+
+    USER PROFILE:
+    ${JSON.stringify({ profile, experiences })}
+
+    RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
+    {
+      "score": 85,
+      "company": "Apple",
+      "position": "Frontend Developer",
+      "keywords_presentes": ["Skill A", "Skill B"],
+      "keywords_faltantes": ["Skill C", "Skill D"],
+      "hard_skills_jd": [
+        { "skill": "Skill Name", "count": 3 } 
+      ],
+      "analisis": "Your profile has a match...",
+      "recomendaciones": ["Improve X", "Learn Y"]
+    }
+    * Note: 'hard_skills_jd' must be a list of the most mentioned or important skills in the JD with an estimated importance (count).
+    * Note: If 'company' or 'position' cannot be detected from the JD, set their value to null.
+    * IMPORTANT: The JSON keys MUST remain exactly as shown above (e.g. keywords_presentes, analisis, etc.).
+  `
+    : `
     VACANTE (JD):
     ${jd}
 
@@ -49,8 +97,8 @@ export default defineEventHandler(async (event) => {
     DEVUELVE ÚNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA:
     {
       "score": 85,
-      "company": "Nombre de la empresa detectada",
-      "position": "Nombre del cargo detectado",
+      "company": "Apple",
+      "position": "Frontend Developer",
       "keywords_presentes": ["Skill A", "Skill B"],
       "keywords_faltantes": ["Skill C", "Skill D"],
       "hard_skills_jd": [
@@ -60,6 +108,7 @@ export default defineEventHandler(async (event) => {
       "recomendaciones": ["Mejora X", "Aprende Y"]
     }
     * Nota: 'hard_skills_jd' debe ser una lista de las habilidades más mencionadas o importantes en la vacante con una estimación de su importancia (count).
+    * Nota: Si no se puede detectar 'company' o 'position' en la vacante, asigna su valor a null.
   `
 
   try {
@@ -86,8 +135,8 @@ export default defineEventHandler(async (event) => {
         uuidv4(),
         userId,
         jd,
-        result.company || 'N/A',
-        result.position || 'N/A',
+        (result.company && result.company !== 'N/A' && result.company !== 'null') ? result.company : null,
+        (result.position && result.position !== 'N/A' && result.position !== 'null') ? result.position : null,
         result.score || 0,
         content
       ]

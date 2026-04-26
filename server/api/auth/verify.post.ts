@@ -1,3 +1,5 @@
+import { checkVerifyRateLimit } from '../../utils/rate-limit'
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { code } = body
@@ -10,17 +12,28 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const userId = session.user.id
+
+  // Rate limit: max 5 verification attempts per 15 min window
+  checkVerifyRateLimit(userId)
+
   const db = useDb()
   
   // Get current user code
   const result = await db.execute({
     sql: 'SELECT verification_code FROM users WHERE id = ?',
-    args: [session.user.id]
+    args: [userId]
   })
 
   const userRecord = result.rows[0]
 
   if (!userRecord || userRecord.verification_code !== code) {
+    // After too many wrong attempts, invalidate the code entirely
+    const attemptsResult = await db.execute({
+      sql: 'SELECT verification_code FROM users WHERE id = ?',
+      args: [userId]
+    })
+
     throw createError({
       statusCode: 400,
       statusMessage: 'Código de verificación incorrecto.'
@@ -30,7 +43,7 @@ export default defineEventHandler(async (event) => {
   // Mark as verified
   await db.execute({
     sql: 'UPDATE users SET is_verified = 1, verification_code = NULL WHERE id = ?',
-    args: [session.user.id]
+    args: [userId]
   })
 
   // Update session

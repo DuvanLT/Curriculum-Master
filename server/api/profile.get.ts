@@ -18,8 +18,10 @@ async function getEducationSchema(db: ReturnType<typeof useDb>) {
   return new Set(columns)
 }
 
+import { requireVerifiedUserSession } from '../utils/verified-session'
+
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
+  const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
   const db = useDb()
 

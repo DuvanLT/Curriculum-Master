@@ -12,8 +12,8 @@
             <span class="material-symbols-outlined text-amber animate-pulse">auto_fix_high</span>
           </div>
         </div>
-        <h3 class="text-xl font-bold text-text mb-2 font-head tracking-tight">{{ auditRunning ? 'Analizando tu CV...' : 'Haciendo la magia...' }}</h3>
-        <p class="text-[13px] text-text-dim font-mono max-w-[320px]">{{ auditRunning ? 'Un momento, estamos generando tu diagnóstico inicial.' : 'Estamos analizando tu trayectoria para extraer experiencias, proyectos y estudios con mas contexto.' }}</p>
+        <h3 class="text-xl font-bold text-text mb-2 font-head tracking-tight">{{ auditRunning ? t('importar_cv.audit_loading_title') : t('importar_cv.magic_loading_title') }}</h3>
+        <p class="text-[13px] text-text-dim font-mono max-w-[320px]">{{ auditRunning ? t('importar_cv.audit_loading_desc') : t('importar_cv.magic_loading_desc') }}</p>
       </div>
 
       <!-- Audit Result Screen -->
@@ -24,8 +24,8 @@
           >
             <span class="font-head font-bold text-2xl" :style="{ color: scoreColor }">{{ auditResult.score }}</span>
           </div>
-          <h2 class="font-head text-2xl font-bold text-text tracking-tight mb-1">Diagnóstico Inicial de tu CV</h2>
-          <p class="text-[12px] font-mono text-text-dim">Puntuación general de calidad · <span :style="{ color: scoreColor }">{{ scoreLabel }}</span></p>
+          <h2 class="font-head text-2xl font-bold text-text tracking-tight mb-1">{{ t('importar_cv.audit_title') }}</h2>
+          <p class="text-[12px] font-mono text-text-dim">{{ t('importar_cv.audit_score_label') }}<span :style="{ color: scoreColor }">{{ scoreLabel }}</span></p>
         </div>
 
         <div class="grid grid-cols-1 gap-4 mb-6">
@@ -33,7 +33,7 @@
           <div class="rounded-xl p-4 border" style="background: color-mix(in srgb, var(--green) 5%, var(--bg3)); border-color: color-mix(in srgb, var(--green) 20%, var(--border))">
             <div class="flex items-center gap-2 mb-3">
               <span class="material-symbols-outlined text-[16px]" style="color: var(--green)">thumb_up</span>
-              <span class="text-[11px] font-mono uppercase tracking-widest" style="color: var(--green)">Lo que haces bien</span>
+              <span class="text-[11px] font-mono uppercase tracking-widest" style="color: var(--green)">{{ t('importar_cv.strengths_title') }}</span>
             </div>
             <ul class="space-y-2">
               <li v-for="(f, i) in auditResult.fortalezas" :key="i" class="flex gap-2 items-start">
@@ -47,7 +47,7 @@
           <div class="rounded-xl p-4 border" style="background: color-mix(in srgb, var(--amber) 5%, var(--bg3)); border-color: color-mix(in srgb, var(--amber) 20%, var(--border))">
             <div class="flex items-center gap-2 mb-3">
               <span class="material-symbols-outlined text-[16px] text-amber">rocket_launch</span>
-              <span class="text-[11px] font-mono uppercase tracking-widest text-amber">Lo que BringJobs mejorará contigo</span>
+              <span class="text-[11px] font-mono uppercase tracking-widest text-amber">{{ t('importar_cv.weaknesses_title') }}</span>
             </div>
             <ul class="space-y-2">
               <li v-for="(d, i) in auditResult.debilidades" :key="i" class="flex gap-2 items-start">
@@ -68,7 +68,7 @@
 
         <AppButton variant="primary" size="lg" class="w-full !h-14 font-bold" @click="goToDashboard">
           <span class="material-symbols-outlined text-[18px] mr-2">dashboard</span>
-          Ir a mi Dashboard
+          {{ t('importar_cv.btn_dashboard') }}
         </AppButton>
       </div>
 
@@ -78,17 +78,17 @@
             <span class="material-symbols-outlined text-amber text-3xl">auto_fix_high</span>
           </div>
           <div>
-            <h1 class="font-head text-2xl font-bold text-text tracking-tight">Potencia tu Perfil</h1>
-            <p class="font-mono text-[11px] text-text-dim tracking-widest">Haremos el trabajo manual por ti</p>
+            <h1 class="font-head text-2xl font-bold text-text tracking-tight">{{ t('importar_cv.import_title') }}</h1>
+            <p class="font-mono text-[11px] text-text-dim tracking-widest">{{ t('importar_cv.import_subtitle') }}</p>
           </div>
         </div>
 
         <div class="bg-amber/5 border border-amber/20 rounded-xl p-6 mb-8">
           <p class="text-[15px] text-text-muted leading-relaxed">
-            Importar un <span class="text-amber font-bold">Curriculum</span> nos ayudara a entender tu punto de partida, ademas llenaremos la informacion de tu perfil en base a ello automaticamente.
+            {{ t('importar_cv.import_desc_1') }}<span class="text-amber font-bold">{{ t('importar_cv.import_desc_cv') }}</span>{{ t('importar_cv.import_desc_2') }}
           </p>
           <p class="text-[12px] text-text-dim leading-relaxed mt-3">
-            El importador intentara extraer experiencias, proyectos y varios estudios si aparecen en tu CV.
+            {{ t('importar_cv.import_desc_3') }}
           </p>
         </div>
 
@@ -100,7 +100,7 @@
           <div class="w-16 h-16 bg-[var(--bg)]-bg3 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="material-symbols-outlined text-4xl text-text-dim group-hover:text-amber">upload_file</span>
           </div>
-          <div class="text-[14px] font-bold text-text mb-2">Haz clic para subir tu CV (PDF)</div>
+          <div class="text-[14px] font-bold text-text mb-2">{{ t('importar_cv.upload_text') }}</div>
 
           <input
             type="file"
@@ -132,7 +132,7 @@
             @click="runMagicImport"
             :loading="importing"
           >
-            Iniciar Magia
+            {{ t('importar_cv.btn_start_magic') }}
           </AppButton>
 
           <button
@@ -140,7 +140,7 @@
             @click="skipImport"
             class="skip-import-btn w-full h-14 border border-border rounded-xl text-text-dim transition-all text-[14px] font-medium flex items-center justify-center gap-2"
           >
-            Importar despues
+            {{ t('importar_cv.btn_skip') }}
             <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
         </div>
@@ -163,6 +163,7 @@ interface AuditResult {
 
 const { mergeImportedProfile, bulkEducation, bulkExperience, saveProfile, profile, experiences } = useAppState()
 const toast = useToast()
+const { t, locale } = useI18n()
 
 const importing = ref(false)
 const auditRunning = ref(false)
@@ -179,9 +180,9 @@ const scoreColor = computed(() => {
 
 const scoreLabel = computed(() => {
   const s = auditResult.value?.score ?? 0
-  if (s >= 70) return 'Perfil sólido'
-  if (s >= 45) return 'Perfil con potencial'
-  return 'Necesita mejoras'
+  if (s >= 70) return t('importar_cv.score_solid')
+  if (s >= 45) return t('importar_cv.score_potential')
+  return t('importar_cv.score_needs_improvement')
 })
 
 const handleFileChange = (e: Event) => {
@@ -198,6 +199,7 @@ const runMagicImport = async () => {
 
   const formData = new FormData()
   formData.append('file', selectedFile.value)
+  formData.append('locale', locale.value)
 
   try {
     const data: any = await $fetch<any>('/api/import', {
@@ -224,7 +226,8 @@ const runMagicImport = async () => {
         method: 'POST',
         body: {
           profile: profile.value,
-          experiences: experiences.value
+          experiences: experiences.value,
+          locale: locale.value
         }
       })
       auditResult.value = audit
@@ -235,7 +238,7 @@ const runMagicImport = async () => {
     }
   } catch (e: any) {
     console.error(e)
-    toast.error('Hubo un error al procesar tu archivo. Por favor intenta de nuevo.')
+    toast.error(t('importar_cv.toast_error'))
   } finally {
     importing.value = false
     auditRunning.value = false

@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { requireVerifiedUserSession } from '../utils/verified-session'
+import { checkUserAIRateLimit } from '../utils/rate-limit'
 
 const MAX_STEPS = 40
 
@@ -36,8 +37,19 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
+  checkUserAIRateLimit(userId)
   const body = await readBody(event)
-  const { profile, experiences, jd } = body
+  const { profile, experiences, jd, locale = 'es' } = body
+  const isEn = locale === 'en'
+
+  // Validate JD length
+  const jdText = typeof jd === 'string' ? jd.trim() : ''
+  if (jdText.length > 15000) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Job description is too long (max 15,000 characters).'
+    })
+  }
 
   if (!config.openaiApiKey) {
     throw createError({
@@ -64,7 +76,35 @@ export default defineEventHandler(async (event) => {
     }))
     : []
 
-  const systemPrompt = `
+  const systemPrompt = isEn 
+    ? `
+You are an expert in CV optimization for ATS systems and recruiters.
+Your goal is to adapt the user's CV to a specific job description without inventing experience, context, or metrics.
+
+CRITICAL RULES:
+1. First analyze the JD and detect responsibilities, tools, seniority, and expected results.
+2. Then evaluate each user experience and decide how relevant it is for the vacancy.
+3. Respect the type of each entry:
+   - "work" = formal work experience.
+   - "project" = personal, academic, or freelance project. Never present a project as a formal job.
+4. Do not just copy the profile text. Rewrite each achievement to connect it with the vacancy using the available context.
+5. Use the STAR methodology realistically:
+   - Situation/Task: clarify the context or problem.
+   - Action: explain the candidate's action or contribution.
+   - Result: express the impact.
+6. Only use percentages, figures, or volumes when there is explicit evidence in the profile, experiences, or portfolio.
+7. Never invent numbers or exaggerate. Avoid impossible improvements like "reduced times by 100%".
+8. If there is no reliable numerical data, use realistic qualitative results without figures.
+9. Include relevant keywords from the JD only when they honestly fit the candidate's real experience.
+10. Highlight the most relevant experiences more and lower the weight of the less related ones.
+11. When the type is "project", focus the writing on scope, stack, problem solved, deliverable, and learning applied to the role.
+12. When the type is "work", focus the writing on responsibility, collaboration, results, and business context.
+13. The tone must be professional, executive, and concrete. Avoid cliches and empty words.
+14. Return ONLY structured JSON.
+15. Language: English.
+16. If a portfolio/web URL is provided, use it only as a declarative reference of the profile and do not invent evidence from it.
+`
+    : `
 Eres un experto en optimizacion de CVs para sistemas ATS y reclutadores.
 Tu objetivo es adaptar el CV del usuario a una vacante especifica sin inventar experiencia, contexto ni metricas.
 
@@ -93,7 +133,54 @@ REGLAS CRITICAS:
 16. Si se proporciona una URL de portafolio/web, usala solo como referencia declarativa del perfil y no inventes evidencia a partir de ella.
 `
 
-  const userPrompt = `
+  const userPrompt = isEn 
+    ? `
+PROFILE DATA:
+${JSON.stringify(profile)}
+
+NORMALIZED EXPERIENCES:
+${JSON.stringify(normalizedExperiences)}
+
+PORTFOLIO/WEB:
+${profile?.web || 'N/A'}
+
+TARGET VACANCY (JD):
+${jd || 'N/A (Do a general high-quality optimization if there is no JD)'}
+
+ADDITIONAL OUTPUT INSTRUCTIONS:
+- Order "experiences" from highest to lowest relevance for the vacancy.
+- For each experience, analyze if it really contributes to the vacancy and adapt the focus.
+- Keep and return the "type" field in each experience.
+- Each "logros_optimizados" must sound specific to the vacancy, not be a simple copy of the original text.
+- If data is missing for a metric, do not invent percentages.
+- Use a maximum of 2 achievements when relevance is low or medium-low.
+- Use 3 or 4 achievements only when the experience is clearly relevant.
+
+RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
+{
+  "summary": "Optimized professional summary (3-4 lines)",
+  "optimized_title": "Professional title adjusted to the vacancy",
+  "experiences": [
+    {
+      "id": "same original id",
+      "type": "work or project",
+      "relevance_score": 0,
+      "relevance_reason": "brief explanation of why this experience is or isn't relevant to the vacancy",
+      "cargo": "optimized title",
+      "empresa": "company name",
+      "focus_for_role": "specific focus with which this experience should be presented for the vacancy",
+      "logros_optimizados": ["list of 2-4 adapted and realistic achievements"],
+      "skills_sugeridas": ["list of key skills for this position"],
+      "metricas_confiables": ["short list of metrics that can be supported by the given info, or empty if none"]
+    }
+  ],
+  "top_skills": ["list of the 10 most important skills for this role"],
+  "advice": ["3-4 key tips to stand out in this selection process"],
+  "next_steps": ["3-4 concrete to-do tasks to improve the profile or application"]
+}
+* IMPORTANT: The JSON keys MUST remain exactly as shown above (e.g. logros_optimizados, skills_sugeridas, cargo, empresa, etc.).
+`
+    : `
 DATOS DEL PERFIL:
 ${JSON.stringify(profile)}
 

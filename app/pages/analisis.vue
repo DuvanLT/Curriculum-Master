@@ -4,30 +4,30 @@
       <!-- Main Column -->
       <div>
         <div class="page-title analysis-title font-head text-[22px] font-bold mb-1 tracking-tighter">
-          <span>Análisis de Vacante</span>
+          <span>{{ $t('analisis.title') }}</span>
           <HelpButton />
         </div>
 
-        <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Pega la descripción completa de la vacante para analizar tu compatibilidad con el perfil.</div>
+        <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('analisis.subtitle') }}</div>
 
-        <AppCard title="Descripción de la Oferta">
+        <AppCard :title="$t('analisis.card_title')">
           <AppInput
             type="textarea"
             v-model="jd"
             :rows="6"
-            placeholder="Pega aqui el texto completo de la oferta de trabajo...&#10;&#10;Ejemplo: 'Buscamos analista de Marketing con experiencia en redes sociales, SEO y SEM...'"
+            :placeholder="$t('analisis.placeholder')"
           />
           <div class="flex gap-2 mt-3">
             <AppButton @click="runAIMatch" :disabled="loading || !jd.trim()">
               <span v-if="loading" class="spinner mr-2"></span>
               <span v-else class="material-symbols-outlined text-[18px] mr-2">smart_toy</span>
-              Análisis IA completo
+              {{ $t('analisis.btn_analyze') }}
             </AppButton>
           </div>
         </AppCard>
 
-        <AppCard v-if="skills.length > 0" title="Hard Skills detectadas en la oferta">
-          <div class="font-mono text-[11px] text-text-dim mb-3">habilidades ordenadas por frecuencia</div>
+        <AppCard v-if="skills.length > 0" :title="$t('analisis.hard_skills_title')">
+          <div class="font-mono text-[11px] text-text-dim mb-3">{{ $t('analisis.hard_skills_subtitle') }}</div>
           <div v-for="skill in skills.slice(0, 10)" :key="skill.skill" class="grid grid-cols-[120px_1fr_30px] items-center gap-2.5 mb-2">
             <div class="text-[12px] font-mono text-text-muted">{{ skill.skill }}</div>
             <div class="h-1.5 bg-[var(--bg)]-bg4 rounded-full overflow-hidden">
@@ -43,7 +43,7 @@
           </div>
         </AppCard>
 
-        <AppCard v-if="result" title="Resultado del Análisis">
+        <AppCard v-if="result" :title="$t('analisis.result_title')">
           <div class="grid grid-cols-[auto_1fr] gap-8 items-start">
             <div class="relative w-[90px] h-[90px] mt-2">
               <svg class="w-full h-full" viewBox="0 0 90 90">
@@ -63,26 +63,26 @@
               </svg>
               <div class="absolute inset-0 flex flex-col items-center justify-center">
                 <div class="font-head text-[20px] font-bold" :style="{ color: scoreColor }">{{ result.score }}%</div>
-                <div class="text-[9px] text-text-dim font-mono">MATCH</div>
+                <div class="text-[9px] text-text-dim font-mono">{{ $t('analisis.match') }}</div>
               </div>
             </div>
             <div>
               <div class="mb-5 pb-4 border-b border-border/50">
                 <div class="flex flex-col gap-1">
-                  <span class="text-[10px] text-amber uppercase font-mono tracking-widest opacity-70">Empresa Detectada</span>
-                  <span class="text-[18px] font-bold text-text">{{ result.company || 'N/A' }}</span>
+                  <span class="text-[10px] text-amber uppercase font-mono tracking-widest opacity-70">{{ $t('analisis.detected_company') }}</span>
+                  <span class="text-[18px] font-bold text-text">{{ (result.company && result.company !== 'N/A' && result.company !== 'null') ? result.company : $t('analisis.company_not_found') }}</span>
                 </div>
                 <div class="flex flex-col gap-1 mt-3">
-                  <span class="text-[10px] text-amber-light uppercase font-mono tracking-widest opacity-70">Posición</span>
-                  <span class="text-[14px] text-text-muted">{{ result.position || 'N/A' }}</span>
+                  <span class="text-[10px] text-amber-light uppercase font-mono tracking-widest opacity-70">{{ $t('analisis.position') }}</span>
+                  <span class="text-[14px] text-text-muted">{{ (result.position && result.position !== 'N/A' && result.position !== 'null') ? result.position : $t('analisis.position_not_found') }}</span>
                 </div>
               </div>
               <div class="mb-3">
-                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">Análisis Detallado</div>
+                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">{{ $t('analisis.detailed_analysis') }}</div>
                 <div class="text-[13px] text-text-muted leading-relaxed">{{ result.analisis }}</div>
               </div>
               <div v-if="result.recomendaciones?.length > 0">
-                <div class="text-[12px] text-text-dim font-mono mb-1.5">RECOMENDACIONES</div>
+                <div class="text-[12px] text-text-dim font-mono mb-1.5">{{ $t('analisis.recommendations') }}</div>
                 <div v-for="(r, i) in result.recomendaciones" :key="i" class="text-[12px] text-text-muted py-1 flex gap-1.5">
                   <span class="text-amber">→</span> {{ r }}
                 </div>
@@ -92,7 +92,7 @@
           <hr class="border-border my-4" />
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <div class="text-[11px] text-green font-mono mb-2 uppercase tracking-wider">✓ KEYWORDS PRESENTES</div>
+              <div class="text-[11px] text-green font-mono mb-2 uppercase tracking-wider">{{ $t('analisis.keywords_present') }}</div>
               <div class="flex flex-wrap gap-1.5">
                 <span v-for="k in result.keywords_presentes" :key="k" class="px-2 py-0.5 rounded-[3px] text-[11px] font-mono bg-emerald-500 text-white">
                   {{ k }}
@@ -100,7 +100,7 @@
               </div>
             </div>
             <div>
-              <div class="text-[11px] text-red font-mono mb-2 uppercase tracking-wider">✗ KEYWORDS FALTANTES</div>
+              <div class="text-[11px] text-red font-mono mb-2 uppercase tracking-wider">{{ $t('analisis.keywords_missing') }}</div>
               <div class="flex flex-wrap gap-1.5">
                 <span v-for="k in result.keywords_faltantes" :key="k" class="px-2 py-0.5 rounded-[3px] text-[11px] font-mono bg-red-400 text-white">
                   {{ k }}
@@ -113,20 +113,20 @@
         <div v-if="result" class="flex justify-center mt-6">
           <AppButton @click="saveAsApplication" variant="primary" class="!px-10">
             <span class="material-symbols-outlined text-[18px] mr-2">work</span>
-            Guardar esta vacante en mis aplicaciones
+            {{ $t('analisis.save_application') }}
           </AppButton>
         </div>
       </div>
 
       <!-- History Sidebar -->
       <div class="lg:sticky lg:top-6 self-start flex flex-col gap-4">
-        <div class="text-[11px] font-mono text-text-dim uppercase tracking-widest pl-2">Análisis Recientes</div>
+        <div class="text-[11px] font-mono text-text-dim uppercase tracking-widest pl-2">{{ $t('analisis.recent_analyses') }}</div>
         <div v-if="historyLoading" class="flex justify-center py-8">
           <div class="spinner"></div>
         </div>
         <div v-else-if="history.length === 0" class="bg-[var(--bg)]-bg/20 border border-dashed border-border rounded-xl p-6 text-center">
           <span class="material-symbols-outlined text-text-dim/30 text-3xl mb-2">history</span>
-          <div class="text-[11px] text-text-dim font-mono leading-tight">No tienes análisis previos</div>
+          <div class="text-[11px] text-text-dim font-mono leading-tight">{{ $t('analisis.no_analyses') }}</div>
         </div>
         <div v-else class="flex flex-col gap-2.5">
           <button
@@ -138,8 +138,8 @@
             <div class="absolute top-0 right-0 p-2 opacity-5">
               <span class="material-symbols-outlined text-2xl">description</span>
             </div>
-            <div class="text-[11px] font-bold text-text truncate mb-0.5">{{ item.company }}</div>
-            <div class="text-[10px] text-amber-light truncate opacity-80 mb-2">{{ item.position }}</div>
+            <div class="text-[11px] font-bold text-text truncate mb-0.5">{{ (item.company && item.company !== 'N/A' && item.company !== 'null') ? item.company : $t('analisis.company_not_found') }}</div>
+            <div class="text-[10px] text-amber-light truncate opacity-80 mb-2">{{ (item.position && item.position !== 'N/A' && item.position !== 'null') ? item.position : $t('analisis.position_not_found') }}</div>
             <div class="flex items-center justify-between">
               <div class="text-[9px] font-mono text-text-dim">{{ formatDate(item.created_at) }}</div>
               <div class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--bg)]-bg4" :style="{ color: getScoreColor(item.score) }">
@@ -186,6 +186,7 @@ interface HistoryItem {
 
 const { profile, experiences, ensureProfileLoaded, loading: profileLoading } = useAppState()
 const toast = useToast()
+const { t, locale } = useI18n()
 
 const jd = ref('')
 const result = ref<AnalysisResult | null>(null)
@@ -236,12 +237,12 @@ const runAIMatch = async () => {
   await ensureProfileLoaded()
 
   if (profileLoading.value) {
-    toast.error('Estamos cargando tu Perfil Maestro. Intenta de nuevo en un momento.')
+    toast.error(t('analisis.toast_loading_profile'))
     return
   }
 
   if (!jd.value.trim() || !profile.value.nombre) {
-    toast.error('Completa tu perfil y pega una descripción de vacante.')
+    toast.error(t('analisis.toast_complete_profile'))
     return
   }
 
@@ -253,7 +254,8 @@ const runAIMatch = async () => {
       body: {
         jd: jd.value,
         profile: profile.value,
-        experiences: experiences.value
+        experiences: experiences.value,
+        locale: locale.value
       }
     })
 
@@ -271,7 +273,7 @@ const runAIMatch = async () => {
     fetchHistory()
   } catch (e: any) {
     console.error('Error in AI Analysis:', e)
-    toast.error('Error al realizar el análisis. Inténtalo de nuevo.')
+    toast.error(t('analisis.toast_analysis_error'))
   } finally {
     loading.value = false
   }
@@ -291,18 +293,18 @@ const saveAsApplication = async () => {
     await $fetch<any>('/api/applications', {
       method: 'POST',
       body: {
-        company: result.value.company || 'Empresa Desconocida',
-        position: result.value.position || 'Puesto Desconocido',
-        status: 'Aplicado',
+        company: (result.value.company && result.value.company !== 'N/A' && result.value.company !== 'null') ? result.value.company : t('analisis.unknown_company'),
+        position: (result.value.position && result.value.position !== 'N/A' && result.value.position !== 'null') ? result.value.position : t('analisis.unknown_position'),
+        status: t('analisis.status_applied'),
         date: new Date().toISOString().split('T')[0],
         analysis: result.value
       }
     })
-    toast.success('¡Aplicación guardada correctamente!')
+    toast.success(t('analisis.toast_app_saved'))
     navigateTo('/aplicaciones')
   } catch (e) {
     console.error(e)
-    toast.error('Error al guardar la aplicación')
+    toast.error(t('analisis.toast_app_error'))
   }
 }
 

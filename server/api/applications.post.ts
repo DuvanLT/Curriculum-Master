@@ -1,5 +1,7 @@
+import { requireVerifiedUserSession } from '../utils/verified-session'
+
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
+  const session = await requireVerifiedUserSession(event)
   const body = await readBody(event)
   const { company, position, status, date, analysis, interview_date } = body
   
@@ -8,6 +10,10 @@ export default defineEventHandler(async (event) => {
       statusCode: 400,
       statusMessage: 'Faltan campos obligatorios'
     })
+  }
+
+  if (String(company).length > 200 || String(position).length > 200 || String(status).length > 50 || String(date).length > 50) {
+    throw createError({ statusCode: 400, statusMessage: 'Data size limit exceeded for one or more fields.' })
   }
 
   const db = useDb()

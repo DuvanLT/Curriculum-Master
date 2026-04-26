@@ -1,12 +1,21 @@
 import OpenAI from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import { requireVerifiedUserSession } from '../utils/verified-session'
+import { checkUserAIRateLimit } from '../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
-  const { profile, experiences } = await readBody(event)
+  checkUserAIRateLimit(userId)
+  const { profile, experiences, locale = 'es' } = await readBody(event)
+  const isEn = locale === 'en'
+
+  // Validate input size
+  const inputSize = JSON.stringify({ profile, experiences }).length
+  if (inputSize > 30000) {
+    throw createError({ statusCode: 400, statusMessage: 'Input data is too large (max 30,000 characters).' })
+  }
 
   if (!config.openaiApiKey) {
     throw createError({ statusCode: 500, statusMessage: 'OpenAI API key missing' })
@@ -14,7 +23,23 @@ export default defineEventHandler(async (event) => {
 
   const openai = new OpenAI({ apiKey: config.openaiApiKey })
 
-  const systemPrompt = `
+  const systemPrompt = isEn
+    ? `
+You are an expert in recruitment and professional CV review. 
+Your task is to audit a candidate's profile and provide an honest diagnosis of their current CV quality, without comparing it to any specific job listing.
+
+INSTRUCTIONS:
+1. Evaluate the overall strength of the profile (experiences, skills, title, summary, years of experience).
+2. Calculate a score from 0 to 100 reflecting how complete, clear, and compelling the CV is.
+3. Identify the 3 strengths of the profile (what the candidate already does well).
+4. Identify 3 concrete areas for improvement that the BringJobs platform can help solve.
+   - Phrase these opportunities positively and action-oriented.
+   - Examples: "Automatically adapt your CV to each job listing using AI", "Detect missing keywords for specific industries", "Quantify your achievements to pass stricter ATS filters".
+   - DO NOT use negative or critical tone.
+5. Provide a 2-line executive recommendation that connects the profile with the platform's potential.
+6. You must reply in English.
+`
+    : `
 Eres un experto en reclutamiento y revisión de CVs profesionales. 
 Tu tarea es auditar el perfil de un candidato y darle un diagnóstico honesto de la calidad de su CV actual, sin compararlo con ninguna vacante específica.
 
@@ -30,7 +55,28 @@ INSTRUCCIONES:
 6. Responde siempre en Español.
 `
 
-  const userPrompt = `
+  const userPrompt = isEn
+    ? `
+CANDIDATE PROFILE:
+${JSON.stringify({ profile, experiences })}
+
+RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE EXACT SPANISH KEYS):
+{
+  "score": 72,
+  "fortalezas": [
+    "More than 5 years of clearly documented technical leadership experience.",
+    "Well-defined and updated technology stack.",
+    "Quantifiable achievements in 2 of the 3 listed experiences."
+  ],
+  "debilidades": [
+    "The professional summary is very generic and does not differentiate the candidate.",
+    "Missing metrics or quantifiable impact in the most recent experiences.",
+    "No personal projects or portfolio to reinforce the technical profile."
+  ],
+  "recomendacion": "Your profile has a solid foundation but needs more specificity. Prioritize quantifying your achievements and customizing your summary for each type of job."
+}
+`
+    : `
 PERFIL DEL CANDIDATO:
 ${JSON.stringify({ profile, experiences })}
 

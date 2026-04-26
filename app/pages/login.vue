@@ -6,7 +6,7 @@
       
       <div class="text-center mb-8 relative z-10">
         <h1 class="font-head text-[28px] font-bold text-text tracking-tighter mb-1">Bring<span class="text-amber">Jobs</span></h1>
-        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">Bienvenido de nuevo</p>
+        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">{{ t('auth.welcome_back') }}</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-4 relative z-10">
@@ -14,23 +14,23 @@
           {{ error }}
         </div>
 
-        <AppInput label="Email" type="email" v-model="form.email" placeholder="john@example.com" required />
-        <AppInput label="Contraseña" type="password" v-model="form.password" placeholder="••••••••" required />
+        <AppInput :label="t('auth.email_label')" type="email" v-model="form.email" :placeholder="t('auth.email_placeholder')" autocomplete="email" required />
+        <AppInput :label="t('auth.password_label')" type="password" v-model="form.password" :placeholder="t('auth.password_placeholder')" autocomplete="current-password" required />
 
         <div class="pt-2">
           <AppButton type="submit" :loading="loading" class="w-full h-[45px]">
-            Iniciar Sesión
+            {{ t('auth.btn_login') }}
           </AppButton>
         </div>
       </form>
 
       <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
-        ¿No tienes cuenta? 
-        <NuxtLink to="/signup" class="text-amber hover:underline font-medium ml-1">Regístrate gratis</NuxtLink>
+        {{ t('auth.no_account') }} 
+        <NuxtLink to="/signup" class="text-amber hover:underline font-medium ml-1">{{ t('auth.register_free') }}</NuxtLink>
       </div>
       <div class="mt-2 text-center text-[13px] text-text-dim relative z-10">
-        ¿Olvidaste tu contraseña? 
-        <NuxtLink to="/recuperar" class="text-amber hover:underline font-medium ml-1">Recuperala</NuxtLink>
+        {{ t('auth.forgot_password') }} 
+        <NuxtLink to="/recuperar" class="text-amber hover:underline font-medium ml-1">{{ t('auth.recover_it') }}</NuxtLink>
       </div>
     </div>
   </div>
@@ -41,6 +41,7 @@ definePageMeta({
   middleware: 'guest'
 })
 const { login } = useAuth()
+const { t } = useI18n()
 const loading = ref(false)
 const error = ref('')
 const form = ref({

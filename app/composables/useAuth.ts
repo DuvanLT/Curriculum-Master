@@ -9,7 +9,7 @@ export const useAuth = () => {
     try {
       const data = await $fetch<{ user: any }>('/api/auth/signup', {
         method: 'POST',
-        body: { email, password, name }
+        body: { email, password, name, locale: useNuxtApp().$i18n.locale.value }
       })
       await fetchSession()
       await fetchProfile(true)

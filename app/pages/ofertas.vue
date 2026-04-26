@@ -1,29 +1,29 @@
 <template>
   <NuxtLayout>
     <div class="overflow-hidden max-w-full">
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">Ofertas de Empleo <HelpButton /></div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">Powered by Jooble · Encuentra tu próximo reto profesional</div>
+      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('ofertas.title') }} <HelpButton /></div>
+      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('ofertas.subtitle') }}</div>
 
       <!-- Search Bar -->
       <div class="flex gap-3 mb-6">
         <AppInput 
-          label="Cargo o palabras clave" 
+          :label="$t('ofertas.search_keyword_label')" 
           v-model="keywords" 
-          placeholder="Desarrollador Backend, Comercial, Marketing Digital" 
+          :placeholder="$t('ofertas.search_keyword_placeholder')" 
           class="flex-1"
           @keyup.enter="searchJobs"
         />
         <AppInput 
-          label="Ubicación" 
+          :label="$t('ofertas.search_location_label')" 
           v-model="location" 
-          placeholder="Madrid, Remoto, Colombia..." 
+          :placeholder="$t('ofertas.search_location_placeholder')" 
           class="flex-1"
           @keyup.enter="searchJobs"
         />
         <div class="flex items-end">
           <AppButton @click="searchJobs" :loading="loading" class="h-[38px] mb-3 px-6">
             <span class="material-symbols-outlined text-[18px] mr-1">search</span>
-            Buscar
+            {{ $t('ofertas.search_button') }}
           </AppButton>
         </div>
       </div>
@@ -31,32 +31,32 @@
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-16">
         <div class="spinner inline-block"></div>
-        <div class="text-[12px] text-text-dim font-mono mt-3">Buscando ofertas...</div>
+        <div class="text-[12px] text-text-dim font-mono mt-3">{{ $t('ofertas.loading_jobs') }}</div>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="!hasSearched" class="text-center py-16">
         <span class="material-symbols-outlined text-6xl text-text-dim/30 mb-4 block">work</span>
-        <div class="text-[14px] text-text-muted mb-2">Busca ofertas de empleo en tiempo real</div>
-        <div class="text-[12px] text-text-dim font-mono">Escribe un cargo o habilidad y una ubicación para empezar</div>
+        <div class="text-[14px] text-text-muted mb-2">{{ $t('ofertas.empty_search_title') }}</div>
+        <div class="text-[12px] text-text-dim font-mono">{{ $t('ofertas.empty_search_subtitle') }}</div>
       </div>
 
       <!-- No Results -->
       <div v-else-if="jobs.length === 0" class="text-center py-16">
         <span class="material-symbols-outlined text-5xl text-text-dim/30 mb-4 block">search_off</span>
-        <div class="text-[14px] text-text-muted">No se encontraron ofertas con esos criterios</div>
-        <div class="text-[12px] text-text-dim font-mono mt-1">Intenta con palabras clave o ubicación diferente</div>
+        <div class="text-[14px] text-text-muted">{{ $t('ofertas.no_results_title') }}</div>
+        <div class="text-[12px] text-text-dim font-mono mt-1">{{ $t('ofertas.no_results_subtitle') }}</div>
       </div>
 
       <!-- Results -->
       <div v-else>
         <div class="text-[12px] text-text-dim font-mono mb-4">
-          {{ totalCount }} ofertas encontradas
+          {{ $t('ofertas.jobs_found', { count: totalCount }) }}
         </div>
        
             <div class="mt-3 flex mb-4 items-center gap-1.5 text-[10px] text-amber/60 font-mono italic">
               <span class="material-symbols-outlined text-[12px]">info</span>
-              Recomendamos ir al enlace de la vacante para encontrar la información completa
+              {{ $t('ofertas.info_recommendation') }}
             </div>
         <div class="grid gap-3">
           <div 
@@ -104,14 +104,14 @@
                 class="action-btn cursor-pointer flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded-md bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-all whitespace-nowrap"
               >
                 <span class="material-symbols-outlined text-[10px]">search</span>
-                Analizar vacante
+                {{ $t('ofertas.btn_analyze') }}
               </button>
               <button 
                 @click="goToGenerador(job)" 
                 class="action-btn cursor-pointer flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded-md bg-green/10 border border-green/30 text-green hover:bg-green/20 transition-all whitespace-nowrap"
               >
                 <span class="material-symbols-outlined text-[10px]">description</span>
-                Crear CV
+                {{ $t('ofertas.btn_create_cv') }}
               </button>
               <a 
                 :href="job.link" 
@@ -120,7 +120,7 @@
                 class="action-btn flex items-center gap-1 text-[11px] font-mono px-2.5 py-1 rounded-md bg-text-dim/10 border border-border text-text-muted hover:text-text hover:border-text-muted/50 transition-all no-underline whitespace-nowrap"
               >
                 <span class="material-symbols-outlined text-[14px]">open_in_new</span>
-                Ver oferta
+                {{ $t('ofertas.btn_view_offer') }}
               </a>
             </div>
           </div>
@@ -129,7 +129,7 @@
         <!-- Load More -->
         <div v-if="jobs.length < totalCount" class="text-center mt-6 mb-4">
           <AppButton variant="secondary" @click="loadMore" :loading="loadingMore">
-            Cargar más ofertas
+            {{ $t('ofertas.btn_load_more') }}
           </AppButton>
         </div>
       </div>
@@ -143,6 +143,7 @@ definePageMeta({
 })
 
 const toast = useToast()
+const { t } = useI18n()
 
 const STORAGE_KEY = 'ofertas_cache'
 
@@ -205,7 +206,7 @@ onMounted(() => {
 
 const searchJobs = async () => {
   if (!keywords.value.trim() && !location.value.trim()) {
-    toast.error('Escribe al menos una palabra clave o ubicación')
+    toast.error(t('ofertas.toast_empty_search'))
     return
   }
 
@@ -229,7 +230,7 @@ const searchJobs = async () => {
     saveToSession()
   } catch (e: any) {
     console.error(e)
-    toast.error('Error al buscar ofertas: ' + (e.statusMessage || e.message))
+    toast.error(t('ofertas.toast_search_error', { error: e.statusMessage || e.message }))
   } finally {
     loading.value = false
   }
@@ -255,7 +256,7 @@ const loadMore = async () => {
     saveToSession()
   } catch (e: any) {
     console.error(e)
-    toast.error('Error al cargar más ofertas')
+    toast.error(t('ofertas.toast_load_more_error'))
     currentPage.value--
   } finally {
     loadingMore.value = false
@@ -282,15 +283,15 @@ const renderMarkdown = (text: string) => {
 }
 
 const buildJobJD = (job: JoobleJob) => {
-  const parts = [`Título: ${job.title}`]
-  if (job.company) parts.push(`Empresa: ${job.company}`)
-  if (job.location) parts.push(`Ubicación: ${job.location}`)
-  if (job.type) parts.push(`Tipo: ${job.type}`)
-  if (job.salary) parts.push(`Salario: ${job.salary}`)
+  const parts = [`${t('ofertas.jd_label_title')}${job.title}`]
+  if (job.company) parts.push(`${t('ofertas.jd_label_company')}${job.company}`)
+  if (job.location) parts.push(`${t('ofertas.jd_label_location')}${job.location}`)
+  if (job.type) parts.push(`${t('ofertas.jd_label_type')}${job.type}`)
+  if (job.salary) parts.push(`${t('ofertas.jd_label_salary')}${job.salary}`)
   if (job.snippet) {
     // Strip HTML tags from snippet
     const cleanSnippet = job.snippet.replace(/<[^>]+>/g, '')
-    parts.push(`\nDescripción:\n${cleanSnippet}`)
+    parts.push(`${t('ofertas.jd_label_description')}${cleanSnippet}`)
   }
   return parts.join('\n')
 }
