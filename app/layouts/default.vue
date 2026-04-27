@@ -25,4 +25,10 @@
   padding: 24px;
   background: var(--bg);
 }
+
+@media (max-width: 767px) {
+  .main {
+    padding: 20px 16px 24px;
+  }
+}
 </style>

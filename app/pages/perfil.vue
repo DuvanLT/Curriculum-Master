@@ -1,21 +1,23 @@
 <template>
   <NuxtLayout>
-    <div>
-      <div class="flex justify-between">
-        <div>
+    <div class="profile-page">
+      <div class="profile-hero">
+        <div class="profile-hero-copy">
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('profile.title') }} <HelpButton /></div>
           <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('profile.subtitle') }}</div>
         </div>
-        <div class="flex items-center gap-4">
-        <div class="text-[11px] font-mono uppercase tracking-widest" :class="hasUnsavedChanges ? 'text-amber' : 'text-text-dim'">
-          {{ hasUnsavedChanges ? $t('profile.unsaved_changes') : $t('profile.no_changes') }}
-        </div>
-        <NuxtLink to="/examen" class="nav-item" active-class="active">
-          <AppButton variant="ghost">{{ $t('profile.btn_discover_skills') }}</AppButton>
-        </NuxtLink>
-        <NuxtLink to="/importar-cv" class="nav-item" active-class="active">
-          <AppButton variant="ghost">{{ $t('profile.btn_import_cv') }}</AppButton>
-        </NuxtLink>
+        <div class="profile-hero-actions">
+          <div class="profile-status text-[11px] font-mono uppercase tracking-widest" :class="hasUnsavedChanges ? 'text-amber' : 'text-text-dim'">
+            {{ hasUnsavedChanges ? $t('profile.unsaved_changes') : $t('profile.no_changes') }}
+          </div>
+          <div class="profile-action-links">
+            <NuxtLink to="/examen" class="nav-item" active-class="active">
+              <AppButton variant="ghost">{{ $t('profile.btn_discover_skills') }}</AppButton>
+            </NuxtLink>
+            <NuxtLink to="/importar-cv" class="nav-item" active-class="active">
+              <AppButton variant="ghost">{{ $t('profile.btn_import_cv') }}</AppButton>
+            </NuxtLink>
+          </div>
         </div>
       </div>
 
@@ -40,33 +42,33 @@
         </div>
       </div>
 
-      <AppCard :title="$t('profile.section_personal')">
-        <div class="grid grid-cols-2 gap-3 mb-3">
+      <AppCard :title="$t('profile.section_personal')" class="profile-card">
+        <div class="profile-grid profile-grid-two gap-3 mb-3">
           <AppInput :label="$t('profile.label_name')" v-model="profile.nombre" maxlength="50" :placeholder="$t('profile.placeholder_name')" />
           <AppInput :label="$t('profile.label_title')" v-model="profile.titulo" maxlength="30" :placeholder="$t('profile.placeholder_title')" />
         </div>
-        <div class="grid grid-cols-3 gap-3 mb-3">
+        <div class="profile-grid profile-grid-three gap-3 mb-3">
           <AppInput :label="$t('profile.label_email')" type="email" v-model="profile.email_profile" placeholder="juan@email.com" />
           <AppInput :label="$t('profile.label_phone')" v-model="profile.telefono" placeholder="+57 321..." />
           <AppInput :label="$t('profile.label_years')" type="number" v-model="profile.years" placeholder="7" />
         </div>
-        <div class="grid grid-cols-3 gap-3 mb-3">
+        <div class="profile-grid profile-grid-three gap-3 mb-3">
           <AppInput :label="$t('profile.label_linkedin')" v-model="profile.linkedin" placeholder="linkedin.com/in/..." />
           <AppInput :label="$t('profile.label_web')" v-model="profile.web" placeholder="miweb.com" />
           <AppInput :label="$t('profile.label_other')" v-model="profile.otros" :placeholder="$t('profile.placeholder_other')" />
         </div>
-        <div class="grid grid-cols-1 gap-3 mb-3">
+        <div class="profile-grid gap-3 mb-3">
           <AppInput :label="$t('profile.label_location')" maxlength="50" v-model="profile.ubicacion" :placeholder="$t('profile.placeholder_location')" />
         </div>
         <AppInput :label="$t('profile.label_summary')" :maxlength="500" type="textarea" v-model="profile.resumen" :placeholder="$t('profile.placeholder_summary')" />
-        <AppButton :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
+        <AppButton class="profile-save-button" :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
           {{ $t('profile.btn_save_changes') }}
         </AppButton>
       </AppCard>
 
-      <AppCard :title="$t('profile.section_education')">
+      <AppCard :title="$t('profile.section_education')" class="profile-card">
         <template #title-action>
-          <div class="ml-auto">
+          <div class="ml-auto profile-card-action">
             <AppButton size="sm" @click="toggleEducationForm">
               <span class="material-symbols-outlined text-[16px] mr-1">{{ addingEducation ? 'close' : 'school' }}</span>
               {{ addingEducation ? $t('profile.btn_cancel') : $t('profile.btn_add_study') }}
@@ -77,17 +79,17 @@
         <div v-if="addingEducation" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
           <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">{{ editingEducationId ? $t('profile.lbl_edit_study') : $t('profile.lbl_new_study') }}</div>
 
-          <div class="grid grid-cols-2 gap-3 mb-3">
+          <div class="profile-grid profile-grid-two gap-3 mb-3">
             <AppInput :label="$t('profile.label_edu_title')" v-model="newEducation.titulo" placeholder="Ingenieria de Sistemas" />
             <AppInput :label="$t('profile.label_edu_institution')" v-model="newEducation.institucion" placeholder="UNIACC / Universidad X" />
           </div>
-          <div class="grid grid-cols-2 gap-3 mb-3">
+          <div class="profile-grid profile-grid-two gap-3 mb-3">
             <AppInput :label="$t('profile.label_edu_start')" v-model="newEducation.inicio" placeholder="Ene 2022" />
             <AppInput :label="$t('profile.label_edu_end')" v-model="newEducation.fin" :placeholder="$t('profile.placeholder_edu_end')" />
           </div>
           <AppInput :label="$t('profile.label_edu_desc')" minlength="50" maxlength="1000" type="textarea" v-model="newEducation.descripcion" :placeholder="$t('profile.placeholder_edu_desc')" />
 
-          <div class="flex gap-3">
+          <div class="profile-form-actions">
             <AppButton @click="saveEducation" class="flex-1">{{ editingEducationId ? $t('profile.btn_update_study') : $t('profile.btn_save_study') }}</AppButton>
             <AppButton v-if="editingEducationId" variant="secondary" @click="resetEducationForm">{{ $t('profile.btn_cancel_edit') }}</AppButton>
           </div>
@@ -99,15 +101,15 @@
 
         <div v-else class="space-y-3">
           <div v-for="edu in educations" :key="edu.id" class="border border-border rounded-[5px] p-[14px] bg-[var(--bg)]-bg3">
-            <div class="flex justify-between gap-4">
+            <div class="profile-entry">
               <div>
                 <div class="text-[14px] text-text font-medium">{{ edu.titulo }}</div>
                 <div class="text-[12px] text-amber font-mono">{{ edu.institucion }}</div>
                 <div v-if="edu.descripcion" class="text-[12px] text-text-dim mt-2 leading-relaxed">{{ edu.descripcion }}</div>
               </div>
-              <div class="text-right shrink-0">
+              <div class="profile-entry-side text-right shrink-0">
                 <div class="text-[11px] text-text-dim font-mono">{{ edu.inicio || $t('profile.lbl_na') }} - {{ edu.fin || $t('profile.lbl_actual') }}</div>
-                <div class="flex gap-2 mt-2 justify-end">
+                <div class="profile-entry-actions">
                   <AppButton variant="secondary" size="sm" @click="startEditingEducation(edu)">{{ $t('profile.btn_edit') }}</AppButton>
                   <AppButton variant="danger" size="sm" @click="removeEducationEntry(edu.id)">{{ $t('profile.btn_delete') }}</AppButton>
                 </div>
@@ -117,9 +119,9 @@
         </div>
       </AppCard>
 
-      <AppCard :title="$t('profile.section_experience')">
+      <AppCard :title="$t('profile.section_experience')" class="profile-card">
         <template #title-action>
-          <div class="ml-auto">
+          <div class="ml-auto profile-card-action">
             <AppButton size="sm" @click="toggleExperienceForm">
               <span class="material-symbols-outlined text-[16px] mr-1">{{ adding ? 'close' : 'add' }}</span>
               {{ adding ? $t('profile.btn_cancel') : $t('profile.btn_add') }}
@@ -130,7 +132,7 @@
         <div v-if="adding" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
           <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">{{ editingExpId ? $t('profile.lbl_edit_exp') : $t('profile.lbl_new_exp') }}</div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+          <div class="profile-grid profile-grid-exp gap-3 mb-3">
             <AppInput :label="$t('profile.label_exp_type')" type="select" v-model="newExp.type">
               <option value="work">{{ $t('profile.type_work') }}</option>
               <option value="project">{{ $t('profile.type_project') }}</option>
@@ -139,7 +141,7 @@
             <AppInput :label="newExp.type === 'project' ? $t('profile.label_exp_company_project') : $t('profile.label_exp_company_work')" v-model="newExp.empresa" :placeholder="$t('profile.placeholder_exp_company')" />
           </div>
 
-          <div class="grid grid-cols-2 gap-3 mb-3">
+          <div class="profile-grid profile-grid-two gap-3 mb-3">
             <AppInput :label="$t('profile.label_exp_start')" v-model="newExp.inicio" placeholder="Ene 2020" />
             <AppInput :label="newExp.type === 'project' ? $t('profile.label_exp_end_project') : $t('profile.label_exp_end_work')" v-model="newExp.fin" placeholder="Dic 2023" />
           </div>
@@ -163,7 +165,7 @@
             {{ $t('profile.help_exp_type') }}
           </div>
 
-          <div class="flex gap-3">
+          <div class="profile-form-actions">
             <AppButton @click="saveExp" class="flex-1">{{ editingExpId ? $t('profile.btn_update_exp') : $t('profile.btn_save_exp') }}</AppButton>
             <AppButton v-if="editingExpId" variant="secondary" @click="resetExpForm">{{ $t('profile.btn_cancel_edit') }}</AppButton>
           </div>
@@ -180,7 +182,7 @@
 
         <div v-else class="space-y-5">
           <section v-if="workExperiences.length">
-            <div class="flex items-center justify-between mb-3">
+            <div class="profile-section-header">
               <div class="text-[12px] font-mono text-amber tracking-widest uppercase">{{ $t('profile.lbl_work_exp') }}</div>
               <div class="text-[11px] text-text-dim font-mono">{{ $t('profile.lbl_entries_count', { count: workExperiences.length }) }}</div>
             </div>
@@ -195,7 +197,7 @@
           </section>
 
           <section v-if="projectExperiences.length">
-            <div class="flex items-center justify-between mb-3">
+            <div class="profile-section-header">
               <div class="text-[12px] font-mono text-sky-500 tracking-widest uppercase">{{ $t('profile.lbl_projects') }}</div>
               <div class="text-[11px] text-text-dim font-mono">{{ $t('profile.lbl_entries_count', { count: projectExperiences.length }) }}</div>
             </div>
@@ -461,3 +463,228 @@ const handleRemoveExperience = () => {
   expToDelete.value = null
 }
 </script>
+
+<style scoped>
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.profile-hero-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.profile-action-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.profile-status {
+  flex-shrink: 0;
+}
+
+.profile-grid {
+  display: grid;
+}
+
+.profile-grid-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.profile-grid-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.profile-grid-exp {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.profile-save-button {
+  margin-top: 16px;
+}
+
+.profile-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.profile-entry {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-entry-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.profile-entry-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.profile-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 767px) {
+  .profile-page {
+    gap: 16px;
+  }
+
+  .profile-hero {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .profile-hero-copy .page-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+
+  .profile-hero-copy .page-sub {
+    margin-bottom: 0;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .profile-hero-actions {
+    width: 100%;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .profile-status {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+  }
+
+  .profile-action-links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .profile-action-links .nav-item {
+    min-width: 0;
+  }
+
+  .profile-action-links :deep(button) {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 12px;
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 0;
+  }
+
+  .stat-card {
+    padding: 12px;
+    min-width: 0;
+  }
+
+  .stat-val {
+    font-size: 20px;
+  }
+
+  .stat-lbl {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .profile-grid-two,
+  .profile-grid-three,
+  .profile-grid-exp {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .profile-save-button {
+    width: 100%;
+  }
+
+  .profile-form-actions {
+    flex-direction: column;
+  }
+
+  .profile-form-actions > * {
+    width: 100%;
+  }
+
+  .profile-entry {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .profile-entry-side {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .profile-entry-actions {
+    width: 100%;
+    justify-content: stretch;
+    flex-direction: column;
+  }
+
+  .profile-entry-actions > * {
+    width: 100%;
+  }
+
+  .profile-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-card-action {
+    width: 100%;
+  }
+
+  .profile-card-action :deep(button) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>

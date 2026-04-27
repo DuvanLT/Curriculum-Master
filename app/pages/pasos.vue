@@ -1,15 +1,15 @@
 <template>
   <NuxtLayout>
-    <div>
+    <div class="steps-page">
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('pasos.title') }} <HelpButton /></div>
       <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('pasos.subtitle') }}</div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="steps-layout grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- LISTA DE TAREAS -->
-        <div class="md:col-span-2">
-          <AppCard :title="$t('pasos.roadmap_title')">
+        <div class="steps-main md:col-span-2">
+          <AppCard :title="$t('pasos.roadmap_title')" class="steps-card">
             <template #title-action>
-              <div class="text-[11px] font-mono text-text-dim">
+              <div class="steps-progress text-[11px] font-mono text-text-dim">
                 {{ $t('pasos.progress_info', { completed: completedCount, total: steps.length, max: MAX_STEPS }) }}
               </div>
             </template>
@@ -25,7 +25,7 @@
               <p class="text-[11px] text-text-muted mt-1">{{ $t('pasos.empty_list_subtitle') }}</p>
             </div>
 
-            <div v-else class="space-y-2">
+            <div v-else class="space-y-2 steps-list">
               <div 
                 v-for="step in steps" 
                 :key="step.id" 
@@ -62,8 +62,8 @@
         </div>
 
         <!-- SIDEBAR DE AGREGAR -->
-        <div>
-          <AppCard :title="$t('pasos.new_task_title')">
+        <div class="steps-sidebar">
+          <AppCard :title="$t('pasos.new_task_title')" class="steps-card">
             <AppInput 
               :placeholder="$t('pasos.new_task_placeholder')" 
               v-model="newStepText" 
@@ -212,3 +212,115 @@ const formatDate = (dateStr?: string) => {
 
 onMounted(fetchSteps)
 </script>
+
+<style scoped>
+.steps-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.steps-progress {
+  margin-left: auto;
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .steps-page .page-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  .steps-page .page-sub {
+    font-size: 12px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+
+  .steps-layout {
+    gap: 16px;
+  }
+
+  .steps-card :deep(.card) {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 0;
+  }
+
+  .steps-card :deep(.card-title) {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .steps-progress {
+    width: 100%;
+    margin-left: 0;
+    text-align: left;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .steps-list {
+    gap: 10px;
+  }
+
+  .steps-list > .group {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .steps-list > .group > div:first-child {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .steps-list > .group > span {
+    min-width: 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .steps-list > .group > div:last-child {
+    opacity: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .steps-list > .group > div:last-child > div {
+    font-size: 9px;
+  }
+
+  .steps-list > .group > div:last-child button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .steps-sidebar :deep(.form-group) {
+    margin-bottom: 0;
+  }
+
+  .steps-sidebar :deep(input) {
+    min-height: 52px;
+    padding: 14px 12px;
+    font-size: 14px;
+  }
+
+  .steps-sidebar :deep(button) {
+    min-height: 48px;
+  }
+}
+</style>

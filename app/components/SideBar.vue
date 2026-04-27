@@ -1,8 +1,27 @@
 <template>
+  <button
+    v-if="isMobile"
+    type="button"
+    class="mobile-menu-button"
+    :class="{ 'tour-sidebar-active': showTour }"
+    @click="openMobileDrawer"
+  >
+    <span class="material-symbols-outlined text-[20px]">menu</span>
+    <span class="sr-only">Abrir menu</span>
+  </button>
+
+  <Transition name="sidebar-overlay">
+    <div
+      v-if="showMobileDrawer"
+      class="mobile-drawer-backdrop"
+      @click="closeMobileDrawer"
+    ></div>
+  </Transition>
+
   <nav
     ref="sidebarRef"
-    class="sidebar w-[200px] bg-[var(--bg)]-bg2 border-r border-border p-4 flex-shrink-0 flex flex-col relative"
-    :class="{ 'tour-sidebar-active': showTour }"
+    class="sidebar flex-shrink-0 flex flex-col relative"
+    :class="sidebarClasses"
   >
     <div class="nav-section mb-6">
       <div class="nav-label text-[10px] text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">{{ $t('sidebar.main') }}</div>
@@ -19,11 +38,11 @@
           class="nav-item"
           active-class="active"
           :class="{ 'tour-item-active': isFocusedTourItem(item.id) }"
-          @click="preventNavigationDuringTour"
+          @click="handleNavigationClick"
         >
           <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
-          <span class="nav-text">{{ item.label }}</span>
-          <span v-if="item.badge" class="badge-beta">{{ item.badge }}</span>
+          <span v-if="showItemText" class="nav-text">{{ item.label }}</span>
+          <span v-if="showItemText && item.badge" class="badge-beta">{{ item.badge }}</span>
         </NuxtLink>
       </div>
 
@@ -41,10 +60,10 @@
           class="nav-item"
           active-class="active"
           :class="{ 'tour-item-active': isFocusedTourItem(item.id) }"
-          @click="preventNavigationDuringTour"
+          @click="handleNavigationClick"
         >
           <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
-          <span class="nav-text">{{ item.label }}</span>
+          <span v-if="showItemText" class="nav-text">{{ item.label }}</span>
         </NuxtLink>
       </div>
     </div>
@@ -57,15 +76,15 @@
         :class="getTourShellClass(profileNavigationItem.id)"
       >
         <NuxtLink
-          to="/perfil"
+          :to="profileNavigationItem.to"
           class="user-profile-link flex items-center gap-3 px-4 mb-4 group cursor-pointer no-underline"
           :class="{ 'tour-item-active': isFocusedTourItem(profileNavigationItem.id) }"
-          @click="preventNavigationDuringTour"
+          @click="handleNavigationClick"
         >
           <div class="w-8 h-8 rounded-full bg-amber/10 border border-amber/30 flex items-center justify-center text-amber font-bold text-[12px] shrink-0 group-hover:bg-amber/20 transition-all">
             {{ user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase() }}
           </div>
-          <div class="flex flex-col min-w-0">
+          <div v-if="showProfileText" class="flex flex-col min-w-0">
             <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || $t('sidebar.unnamed') }}</div>
             <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">{{ $t('sidebar.plan_beta') }}</div>
           </div>
@@ -135,6 +154,7 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute()
 const { user } = useAuth()
 const {
   primaryNavigationItems,
@@ -150,6 +170,32 @@ const tourCardStyle = ref<Record<string, string>>({})
 const tourItemRefs = ref<Record<string, HTMLElement | null>>({})
 const tourCardRef = ref<HTMLElement | null>(null)
 const hasCompletedTour = ref(true)
+const viewportWidth = ref(import.meta.client ? window.innerWidth : 1280)
+const showMobileDrawer = ref(false)
+
+const MOBILE_BREAKPOINT = 768
+const TABLET_BREAKPOINT = 1024
+const SMALL_DESKTOP_BREAKPOINT = 1280
+const STANDARD_DESKTOP_BREAKPOINT = 1536
+
+const isMobile = computed(() => viewportWidth.value < MOBILE_BREAKPOINT)
+const isTablet = computed(() => viewportWidth.value >= MOBILE_BREAKPOINT && viewportWidth.value < TABLET_BREAKPOINT)
+const isSmallDesktop = computed(() => viewportWidth.value >= TABLET_BREAKPOINT && viewportWidth.value < SMALL_DESKTOP_BREAKPOINT)
+const isStandardDesktop = computed(() => viewportWidth.value >= SMALL_DESKTOP_BREAKPOINT && viewportWidth.value < STANDARD_DESKTOP_BREAKPOINT)
+const isLargeDesktop = computed(() => viewportWidth.value >= STANDARD_DESKTOP_BREAKPOINT)
+const isCollapsed = computed(() => isTablet.value)
+const showItemText = computed(() => !isCollapsed.value)
+const showProfileText = computed(() => !isCollapsed.value)
+
+const sidebarClasses = computed(() => ({
+  'tour-sidebar-active': showTour.value,
+  'sidebar-mobile': isMobile.value,
+  'sidebar-mobile-open': isMobile.value && showMobileDrawer.value,
+  'sidebar-collapsed': isCollapsed.value,
+  'sidebar-small-desktop': isSmallDesktop.value,
+  'sidebar-standard-desktop': isStandardDesktop.value,
+  'sidebar-large-desktop': isLargeDesktop.value
+}))
 
 const tourItems = computed(() => {
   const items = [
@@ -180,6 +226,22 @@ const setTourItemRef = (id: string) => (element: any) => {
   if (showTour.value && currentTourItem.value?.id === id) {
     nextTick(() => updateTourCardPosition())
   }
+}
+
+const openMobileDrawer = () => {
+  showMobileDrawer.value = true
+}
+
+const closeMobileDrawer = () => {
+  showMobileDrawer.value = false
+}
+
+const updateViewportWidth = () => {
+  if (!import.meta.client) {
+    return
+  }
+
+  viewportWidth.value = window.innerWidth
 }
 
 const updateTourCardPosition = () => {
@@ -283,8 +345,9 @@ const previousTourStep = () => {
   tourStep.value -= 1
 }
 
-const preventNavigationDuringTour = (event: MouseEvent) => {
+const handleNavigationClick = (event: MouseEvent) => {
   if (!showTour.value) {
+    closeMobileDrawer()
     return
   }
 
@@ -347,6 +410,8 @@ watch(() => user.value?.id, async (value, oldValue) => {
 })
 
 onMounted(async () => {
+  updateViewportWidth()
+  window.addEventListener('resize', updateViewportWidth)
   window.addEventListener('resize', updateTourCardPosition)
   window.addEventListener('keydown', handleKeyboardShortcuts)
 
@@ -356,18 +421,79 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateViewportWidth)
   window.removeEventListener('resize', updateTourCardPosition)
   window.removeEventListener('keydown', handleKeyboardShortcuts)
+})
+
+watch(() => route.fullPath, () => {
+  closeMobileDrawer()
+})
+
+watch(isMobile, mobile => {
+  if (!mobile) {
+    closeMobileDrawer()
+  }
 })
 </script>
 
 <style scoped>
 .sidebar {
-  width: 200px;
   background: var(--bg2);
   border-right: 1px solid var(--border);
   padding: 16px 0;
   flex-shrink: 0;
+  width: 220px;
+  transition: width 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sidebar-small-desktop {
+  width: 220px;
+}
+
+.sidebar-standard-desktop {
+  width: 250px;
+}
+
+.sidebar-large-desktop {
+  width: 272px;
+}
+
+.sidebar-collapsed {
+  width: 88px;
+}
+
+.sidebar-collapsed .nav-label {
+  text-align: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.sidebar-collapsed .nav-item {
+  justify-content: center;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.sidebar-collapsed .user-profile-link {
+  justify-content: center;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.sidebar-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  width: min(86vw, 320px);
+  height: 100vh;
+  transform: translateX(-100%);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+.sidebar-mobile-open {
+  transform: translateX(0);
 }
 
 .tour-sidebar-active {
@@ -421,6 +547,7 @@ onBeforeUnmount(() => {
   font-size: 18px;
   width: 20px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .tour-shell-dimmed {
@@ -447,6 +574,31 @@ onBeforeUnmount(() => {
   border: 1px solid transparent;
   border-radius: 10px;
   transition: all 0.18s ease;
+}
+
+.mobile-menu-button {
+  position: fixed;
+  top: 10px;
+  left: 12px;
+  z-index: 92;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg2) 92%, white);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.mobile-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 89;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(4px);
 }
 
 .tour-backdrop {
@@ -604,9 +756,43 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
+.sidebar-overlay-enter-active,
+.sidebar-overlay-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-overlay-enter-from,
+.sidebar-overlay-leave-to {
+  opacity: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 1100px) {
   .tour-card {
     max-width: calc(100vw - 32px);
+  }
+}
+
+@media (max-width: 767px) {
+  .nav-label {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .nav-item {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 </style>

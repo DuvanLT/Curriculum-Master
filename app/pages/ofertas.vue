@@ -1,27 +1,27 @@
 <template>
   <NuxtLayout>
-    <div class="overflow-hidden max-w-full">
+    <div class="offers-page overflow-hidden max-w-full">
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('ofertas.title') }} <HelpButton /></div>
       <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('ofertas.subtitle') }}</div>
 
       <!-- Search Bar -->
-      <div class="flex gap-3 mb-6">
+      <div class="search-bar mb-6">
         <AppInput 
           :label="$t('ofertas.search_keyword_label')" 
           v-model="keywords" 
           :placeholder="$t('ofertas.search_keyword_placeholder')" 
-          class="flex-1"
+          class="search-field"
           @keyup.enter="searchJobs"
         />
         <AppInput 
           :label="$t('ofertas.search_location_label')" 
           v-model="location" 
           :placeholder="$t('ofertas.search_location_placeholder')" 
-          class="flex-1"
+          class="search-field"
           @keyup.enter="searchJobs"
         />
-        <div class="flex items-end">
-          <AppButton @click="searchJobs" :loading="loading" class="h-[38px] mb-3 px-6">
+        <div class="search-action">
+          <AppButton @click="searchJobs" :loading="loading" class="search-button h-[38px] mb-3 px-6">
             <span class="material-symbols-outlined text-[18px] mr-1">search</span>
             {{ $t('ofertas.search_button') }}
           </AppButton>
@@ -50,41 +50,41 @@
 
       <!-- Results -->
       <div v-else>
-        <div class="text-[12px] text-text-dim font-mono mb-4">
+        <div class="results-count text-[12px] text-text-dim font-mono mb-4">
           {{ $t('ofertas.jobs_found', { count: totalCount }) }}
         </div>
        
-            <div class="mt-3 flex mb-4 items-center gap-1.5 text-[10px] text-amber/60 font-mono italic">
-              <span class="material-symbols-outlined text-[12px]">info</span>
-              {{ $t('ofertas.info_recommendation') }}
-            </div>
+        <div class="results-note mt-3 flex mb-4 items-center gap-1.5 text-[10px] text-amber/60 font-mono italic">
+          <span class="material-symbols-outlined text-[12px]">info</span>
+          {{ $t('ofertas.info_recommendation') }}
+        </div>
         <div class="grid gap-3">
           <div 
             v-for="(job, i) in jobs" 
             :key="i"
             class="job-card relative bg-[var(--bg)]-bg2 border border-border rounded-lg p-5 hover:border-amber/40 transition-all group"
           >
-            <div class="flex justify-between items-start mb-2">
+            <div class="job-card-header flex justify-between items-start mb-2">
               <div class="flex-1 min-w-0">
-                <div class="text-[15px] font-medium text-text group-hover:text-amber transition-colors truncate">{{ job.title }}</div>
-                <div class="text-[13px] text-amber font-mono mt-0.5">{{ job.company }}</div>
+                <div class="job-title text-[15px] font-medium text-text group-hover:text-amber transition-colors truncate">{{ job.title }}</div>
+                <div class="job-company text-[13px] text-amber font-mono mt-0.5">{{ job.company }}</div>
               </div>
             </div>
 
-            <div class="flex items-center gap-4 text-[11px] text-text-dim font-mono mb-3">
-              <span v-if="job.location" class="flex items-center gap-1">
+            <div class="job-meta flex items-center gap-4 text-[11px] text-text-dim font-mono mb-3">
+              <span v-if="job.location" class="job-meta-item flex items-center gap-1">
                 <span class="material-symbols-outlined text-[14px]">location_on</span>
                 {{ job.location }}
               </span>
-              <span v-if="job.type" class="flex items-center gap-1">
+              <span v-if="job.type" class="job-meta-item flex items-center gap-1">
                 <span class="material-symbols-outlined text-[14px]">schedule</span>
                 {{ job.type }}
               </span>
-              <span v-if="job.salary" class="flex items-center gap-1 text-green">
+              <span v-if="job.salary" class="job-meta-item flex items-center gap-1 text-green">
                 <span class="material-symbols-outlined text-[14px]">payments</span>
                 {{ job.salary }}
               </span>
-              <span v-if="job.updated" class="flex items-center gap-1">
+              <span v-if="job.updated" class="job-meta-item flex items-center gap-1">
                 <span class="material-symbols-outlined text-[14px]">calendar_today</span>
                 {{ formatDate(job.updated) }}
               </span>
@@ -92,7 +92,7 @@
 
             <div 
               v-if="job.snippet" 
-              class="text-[12px] text-text-muted leading-relaxed line-clamp-3 markdown-content"
+              class="job-snippet text-[12px] text-text-muted leading-relaxed line-clamp-3 markdown-content"
               v-html="renderMarkdown(job.snippet)"
             ></div>
 
@@ -306,6 +306,26 @@ const goToGenerador = (job: JoobleJob) => {
 </script>
 
 <style scoped>
+.offers-page {
+  padding-bottom: 8px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-action {
+  display: flex;
+  align-items: flex-end;
+}
+
 .job-card {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
@@ -338,5 +358,136 @@ const goToGenerador = (job: JoobleJob) => {
 :deep(.markdown-content) strong {
   color: var(--amber);
   font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .offers-page .page-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  .offers-page .page-sub {
+    font-size: 12px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 20px;
+    align-items: stretch;
+  }
+
+  .search-field {
+    width: 100%;
+    display: block;
+    align-self: stretch;
+  }
+
+  .search-field :deep(label) {
+    font-size: 13px;
+    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+  }
+
+  .search-field :deep(.form-group) {
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .search-field :deep(input) {
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 16px 14px !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    border-radius: 8px !important;
+  }
+
+  .search-action {
+    width: 100%;
+    align-self: stretch;
+  }
+
+  .search-button {
+    width: 100%;
+    min-height: 56px;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+
+  .results-count {
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .results-note {
+    align-items: flex-start;
+    margin-top: 0;
+    line-height: 1.45;
+  }
+
+  .job-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .job-card-header {
+    margin-bottom: 10px;
+    padding-right: 0;
+  }
+
+  .job-title {
+    font-size: 14px;
+    line-height: 1.35;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .job-company {
+    font-size: 12px;
+  }
+
+  .job-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .job-meta-item {
+    width: 100%;
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .job-snippet {
+    font-size: 12px;
+    line-height: 1.6;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+
+  .job-actions {
+    position: static;
+    opacity: 1;
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 12px;
+    white-space: normal;
+    text-align: center;
+  }
 }
 </style>

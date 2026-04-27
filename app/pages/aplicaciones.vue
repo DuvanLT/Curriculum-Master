@@ -1,12 +1,12 @@
 <template>
   <NuxtLayout>
-    <div class="h-full flex flex-col gap-6 overflow-hidden max-w-full">
-      <div class="flex justify-between items-end flex-shrink-0">
+    <div class="applications-page h-full flex flex-col gap-6 overflow-hidden max-w-full">
+      <div class="applications-header flex justify-between items-end flex-shrink-0">
         <div>
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('aplicaciones.title') }} <HelpButton /></div>
           <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('aplicaciones.subtitle') }}</div>
         </div>
-        <AppButton @click="showAddModal = true" variant="primary">
+        <AppButton @click="showAddModal = true" variant="primary" class="applications-add-button">
           {{ $t('aplicaciones.new_app_btn') }}
         </AppButton>
       </div>
@@ -19,16 +19,16 @@
       </div>
 
       <!-- Kanban Board Wrapper with edge indicators -->
-      <div v-else class="flex-1 relative overflow-hidden min-w-0 pb-2">
+      <div v-else class="board-shell flex-1 relative overflow-hidden min-w-0 pb-2">
         <!-- Right side indicator gradient -->
-        <div class="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-dark-bg to-transparent pointer-events-none z-10 opacity-60"></div>
+        <div class="board-edge-indicator absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-dark-bg to-transparent pointer-events-none z-10 opacity-60"></div>
         
-        <div class="h-full flex gap-4 overflow-x-auto pb-4 scrollbar-custom min-w-0">
+        <div class="board-scroll h-full flex gap-4 overflow-x-auto pb-4 scrollbar-custom min-w-0">
           <div v-for="status in statusOptions" :key="status" 
-               class="flex-shrink-0 w-[280px] flex flex-col gap-3">
+               class="board-column flex-shrink-0 w-[280px] flex flex-col gap-3">
             
             <!-- Column Header -->
-            <div class="flex items-center justify-between px-2 mb-1">
+            <div class="board-column-header flex items-center justify-between px-2 mb-1">
               <div class="flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full" :class="statusBg(status)"></div>
                 <h3 class="text-[11px] font-mono uppercase tracking-widest text-text-dim">{{ $t(`aplicaciones.status_${status}`) }}</h3>
@@ -39,14 +39,14 @@
             </div>
   
             <!-- Column Content -->
-            <div class="flex-1 bg-[var(--bg)]-bg/20 border border-border/40 rounded-xl p-2 flex flex-col gap-3 min-h-[200px] overflow-y-auto scrollbar-none">
+            <div class="board-column-body flex-1 bg-[var(--bg)]-bg/20 border border-border/40 rounded-xl p-2 flex flex-col gap-3 min-h-[200px] overflow-y-auto scrollbar-none">
               <div v-for="app in groupedApps[status]" :key="app.id" 
-                   class="bg-[var(--bg)]-bg3 border border-border rounded-lg p-4 group hover:border-amber/40 transition-all flex flex-col gap-3 relative shadow-sm">
+                   class="application-card bg-[var(--bg)]-bg3 border border-border rounded-lg p-4 group hover:border-amber/40 transition-all flex flex-col gap-3 relative shadow-sm">
                 
-                <div class="flex justify-between items-start gap-2">
+                <div class="application-card-header flex justify-between items-start gap-2">
                   <div class="flex-1 min-w-0">
-                    <h4 class="font-bold text-[13px] tracking-tight leading-tight truncate text-text">{{ app.company }}</h4>
-                    <p class="text-[11px] text-amber-light font-medium truncate opacity-80">{{ app.position }}</p>
+                    <h4 class="application-company font-bold text-[13px] tracking-tight leading-tight truncate text-text">{{ app.company }}</h4>
+                    <p class="application-position text-[11px] text-amber-light font-medium truncate opacity-80">{{ app.position }}</p>
                   </div>
                   <!-- FIXED DELETE BUTTON -->
                   <button 
@@ -73,11 +73,11 @@
                   </button>
                 </div>
   
-                <div class="flex items-center justify-between mt-1 pt-3 border-t border-border/40">
-                  <div class="text-[10px] text-text-dim font-mono">
+                <div class="application-footer flex items-center justify-between mt-1 pt-3 border-t border-border/40">
+                  <div class="application-date text-[10px] text-text-dim font-mono">
                     {{ formatDate(app.date) }}
                   </div>
-                  <div class="flex gap-1">
+                  <div class="application-move-actions flex gap-1">
                     <!-- Quick status move -->
                     <button 
                       v-if="canMoveBackward(app.status)" 
@@ -121,7 +121,7 @@
             <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">{{ $t('aplicaciones.position_label') }}</label>
             <AppInput v-model="newApp.position" :placeholder="$t('aplicaciones.position_placeholder')" />
           </div>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="modal-grid grid grid-cols-2 gap-4">
             <div>
               <label class="text-[11px] text-text-dim uppercase font-mono mb-1.5 block">{{ $t('aplicaciones.status_label') }}</label>
               <select v-model="newApp.status" class="panel-input">
@@ -142,7 +142,7 @@
             <input type="date" v-model="newApp.interview_date" class="panel-input panel-input-accent" />
           </div>
         </div>
-        <div class="flex gap-3 mt-8">
+        <div class="modal-actions flex gap-3 mt-8">
           <AppButton class="flex-1" variant="secondary" @click="showAddModal = false">{{ $t('aplicaciones.cancel') }}</AppButton>
           <AppButton class="flex-1" variant="primary" @click="addNewApp" :disabled="!newApp.company || !newApp.position">{{ $t('aplicaciones.save') }}</AppButton>
         </div>
@@ -371,6 +371,10 @@ onMounted(fetchApps)
 </script>
 
 <style scoped>
+.applications-page {
+  padding-bottom: 8px;
+}
+
 .scrollbar-custom::-webkit-scrollbar {
   height: 8px;
 }
@@ -421,5 +425,143 @@ onMounted(fetchApps)
 .panel-input-accent {
   background: color-mix(in srgb, var(--amber-dim) 55%, white);
   border-color: color-mix(in srgb, var(--amber) 20%, var(--border));
+}
+
+@media (max-width: 767px) {
+  .applications-page {
+    gap: 18px;
+  }
+
+  .applications-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .applications-page .page-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  .applications-page .page-sub {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .applications-add-button {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  .board-shell {
+    padding-bottom: 0;
+  }
+
+  .board-edge-indicator {
+    width: 28px;
+    bottom: 0;
+  }
+
+  .board-scroll {
+    gap: 12px;
+    padding-bottom: 10px;
+    scroll-snap-type: x proximity;
+  }
+
+  .board-column {
+    width: min(82vw, 300px);
+    scroll-snap-align: start;
+    gap: 10px;
+  }
+
+  .board-column-header {
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-bottom: 0;
+  }
+
+  .board-column-body {
+    padding: 10px;
+    gap: 10px;
+    min-height: 180px;
+    border-radius: 14px;
+  }
+
+  .application-card {
+    padding: 14px;
+    border-radius: 12px;
+    gap: 12px;
+  }
+
+  .application-company,
+  .application-position {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .application-company {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .application-position {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .application-footer {
+    align-items: center;
+    gap: 10px;
+  }
+
+  .application-date {
+    font-size: 9px;
+    line-height: 1.3;
+  }
+
+  .application-move-actions button {
+    width: 26px;
+    height: 26px;
+  }
+
+  .add-modal-panel {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .modal-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    margin-top: 20px;
+  }
+
+  .modal-actions > * {
+    width: 100%;
+  }
+
+  .add-modal-panel :deep(.form-group) {
+    margin-bottom: 0;
+  }
+
+  .add-modal-panel :deep(input) {
+    min-height: 50px;
+    padding: 14px 12px;
+    font-size: 14px;
+  }
+
+  .panel-input {
+    min-height: 50px;
+    padding: 14px 12px;
+    font-size: 14px;
+  }
 }
 </style>

@@ -55,4 +55,18 @@
   gap: 10px;
 }
 
+@media (max-width: 767px) {
+  .topbar {
+    padding: 0 16px 0 60px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .logo-tag {
+    display: none;
+  }
+}
+
 </style>
