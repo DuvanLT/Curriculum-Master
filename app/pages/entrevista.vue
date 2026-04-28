@@ -1,20 +1,20 @@
 <template>
   <NuxtLayout>
     <div class="h-full flex flex-col gap-6">
-      <div class="flex justify-between items-end">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('entrevista.title') }} <HelpButton /></div>
           <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('entrevista.subtitle') }}</div>
         </div>
-        <div class="flex gap-2">
-          <AppButton v-if="!active" @click="startInterview" variant="primary">
+        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <AppButton v-if="!active" @click="startInterview" variant="primary" class="w-full sm:w-auto">
             {{ $t('entrevista.btn_start') }}
           </AppButton>
           <template v-else>
-            <AppButton @click="finishAndAnalyze" :loading="analyzing" variant="primary">
+            <AppButton @click="finishAndAnalyze" :loading="analyzing" variant="primary" class="w-full sm:w-auto">
               {{ $t('entrevista.btn_finish') }}
             </AppButton>
-            <AppButton @click="stopInterview" variant="danger">
+            <AppButton @click="stopInterview" variant="danger" class="w-full sm:w-auto">
               {{ $t('entrevista.btn_cancel') }}
             </AppButton>
           </template>
@@ -69,69 +69,68 @@
         </div>
       </div>
 
-      <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
-        <!-- Video Section (Unchanged) -->
-        <div class="flex flex-col gap-4">
-          <div class="flex-1 bg-[var(--bg)]-bg3 border border-border rounded-lg overflow-hidden relative group">
-            <video ref="videoRef" autoplay muted playsinline class="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all"></video>
-            <div v-if="!streamActive" class="absolute inset-0 flex items-center justify-center bg-[var(--bg)]-bg4/80 backdrop-blur-sm">
-              <div class="text-center p-6 grayscale opacity-30">
-                <span class="material-symbols-outlined text-5xl mb-3">videocam_off</span>
-                <div class="text-[13px] text-text-dim font-mono">{{ $t('entrevista.camera_inactive') }}</div>
+      <div v-else class="flex-1 min-h-0">
+        <div class="interview-stage">
+          <section class="single-wave-panel" :class="singleWavePanelClass">
+            <div class="single-wave-panel__head">
+              <div>
+                <h2 class="single-wave-panel__title">{{ currentSpeakerTitle }}</h2>
+              </div>
+              <span class="single-wave-panel__status">{{ currentSpeakerStatus }}</span>
+            </div>
+
+            <div class="single-wave-shell">
+              <div class="single-wave" :class="[singleWaveClass, { 'is-active': waveIsActive }]" aria-hidden="true">
+                <span
+                  v-for="(bar, index) in waveBars"
+                  :key="`wave-${bar}`"
+                  class="single-wave__bar"
+                  :style="{
+                    height: `${waveHeights[index]}px`,
+                    opacity: waveOpacities[index]
+                  }"
+                ></span>
               </div>
             </div>
-            <!-- Status Badges -->
-            <div class="absolute top-4 left-4 flex gap-2">
-              <div v-if="streamActive" class="bg-red/20 text-red text-[10px] px-2 py-0.5 rounded border border-red/30 font-bold uppercase tracking-widest animate-pulse">{{ $t('entrevista.rec') }}</div>
-              <div class="bg-[var(--bg)]-bg/60 backdrop-blur text-text-dim text-[10px] px-2 py-0.5 rounded border border-border/50 font-mono tracking-tighter">{{ $t('entrevista.hd') }}</div>
-            </div>
-          </div>
 
-          <!-- Voice visualizer placeholder -->
-          <div class="h-12 bg-[var(--bg)]-bg3 border border-border rounded-lg flex items-center justify-center px-4 gap-2">
-            <div v-for="i in 20" :key="i" class="w-1 bg-amber/40 rounded-full transition-all duration-150" 
-                 :style="{ height: isListening ? (Math.random() * 80 + 20) + '%' : '10%' }"></div>
-          </div>
+            <AppButton
+              class="single-wave-panel__cta single-wave-panel__cta-icon"
+              :variant="isListening ? 'warning' : 'primary'"
+              :disabled="!active || loading"
+              @click="toggleListening"
+            >
+              <span class="material-symbols-outlined text-[20px] leading-none">mic</span>
+            </AppButton>
+          </section>
+
+          <AppCard class="history-card compact-chat flex flex-col min-h-0 !mb-0">
+            <div class="history-card__head">
+              <div>
+                <p class="history-card__label">Historial</p>
+                <h3 class="history-card__title">Conversacion</h3>
+              </div>
+              <span class="history-card__count">{{ msgs.length }}</span>
+            </div>
+
+            <div class="chat-area flex-1 overflow-y-auto mt-4 pr-1 flex flex-col gap-2" ref="chatContainer">
+              <div v-if="msgs.length === 0" class="flex-1 flex items-center justify-center text-text-dim font-mono text-[11px] opacity-40 text-center px-4">
+                {{ $t('entrevista.chat_placeholder') }}
+              </div>
+              <div v-for="(msg, i) in msgs" :key="i" class="history-bubble"
+                   :class="msg.role === 'user' ? 'history-bubble-user self-end' : 'history-bubble-ai self-start'">
+                <div class="text-[9px] font-mono text-text-dim mb-1 uppercase tracking-[0.24em]">
+                  {{ msg.role === 'user' ? $t('entrevista.role_user') : $t('entrevista.role_ai') }}
+                </div>
+                <p class="leading-relaxed">{{ msg.text }}</p>
+              </div>
+              <div v-if="loading" class="history-bubble history-bubble-ai self-start flex gap-1 items-center">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+            </div>
+          </AppCard>
         </div>
-
-        <!-- Chat / Feedback Section -->
-        <AppCard class="flex flex-col min-h-0 !mb-0">
-          <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-[var(--bg)]-bg3 mb-4 flex flex-col gap-3" ref="chatContainer">
-            <div v-if="msgs.length === 0" class="flex-1 flex items-center justify-center text-text-dim font-mono text-[12px] opacity-40">
-              {{ $t('entrevista.chat_placeholder') }}
-            </div>
-            <div v-for="(msg, i) in msgs" :key="i" class="max-w-[90%] p-3 rounded-[5px] text-[13px] leading-relaxed"
-                 :class="msg.role === 'user' ? 'bg-amber-dim text-amber-light self-end rounded-br-none border border-amber/10' : 'bg-[var(--bg)]-bg4 text-text self-start rounded-bl-none border border-border'">
-              <div class="text-[10px] font-mono text-text-dim mb-1 uppercase tracking-tighter">{{ msg.role === 'user' ? $t('entrevista.role_user') : $t('entrevista.role_ai') }}</div>
-              {{ msg.text }}
-            </div>
-            <div v-if="loading" class="self-start bg-[var(--bg)]-bg4 p-3 rounded-[5px] flex gap-1 items-center border border-border">
-              <div class="typing-dot"></div>
-              <div class="typing-dot"></div>
-              <div class="typing-dot"></div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-3">
-            <div class="flex gap-2">
-              <AppButton 
-                class="flex-1 !h-14 font-bold text-base" 
-                :variant="isListening ? 'warning' : 'primary'"
-                :disabled="!active || loading"
-                @click="toggleListening"
-              >
-                <span v-if="isListening" class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-white rounded-full animate-ping"></span>
-                  {{ $t('entrevista.btn_speaking') }}
-                </span>
-                <span v-else>{{ $t('entrevista.btn_click_to_speak') }}</span>
-              </AppButton>
-            </div>
-            <div class="text-[11px] text-text-dim text-center font-mono italic">
-              {{ isListening ? $t('entrevista.note_listening') : $t('entrevista.note_practice') }}
-            </div>
-          </div>
-        </AppCard>
       </div>
     </div>
     <!-- Confirm Finish Modal -->
@@ -159,22 +158,68 @@ const MAX_STEPS = 40
 const msgs = ref<{ role: string; text: string }[]>([])
 const loading = ref(false)
 const active = ref(false)
-const streamActive = ref(false)
 const isListening = ref(false)
 const analyzing = ref(false)
 const results = ref<any>(null)
 const selectedSteps = ref<string[]>([])
 const savingSteps = ref(false)
 const stepsAdded = ref(false)
+const aiSpeaking = ref(false)
 const transcribedText = ref('')
 const showConfirmFinish = ref(false)
-const videoRef = ref<HTMLVideoElement | null>(null)
 const chatContainer = ref<HTMLElement | null>(null)
+const waveBars = Array.from({ length: 20 }, (_, index) => index)
+const waveHeights = ref<number[]>(Array.from({ length: 20 }, () => 18))
+const waveOpacities = computed(() => waveHeights.value.map((height) => {
+  const normalized = Math.max(0.34, Math.min(1, height / 96))
+  return Number(normalized.toFixed(2))
+}))
+const waveIsActive = computed(() => isListening.value || aiSpeaking.value || loading.value)
+const currentSpeaker = computed<'user' | 'ai' | 'idle'>(() => {
+  if (isListening.value) return 'user'
+  if (aiSpeaking.value || loading.value) return 'ai'
+  return 'idle'
+})
+const currentSpeakerLabel = computed(() => {
+  if (currentSpeaker.value === 'user') return t('entrevista.role_user')
+  if (currentSpeaker.value === 'ai') return t('entrevista.role_ai')
+  return t('entrevista.title')
+})
+const currentSpeakerTitle = computed(() => {
+  if (currentSpeaker.value === 'user') return t('entrevista.btn_speaking')
+  if (currentSpeaker.value === 'ai') {
+    return aiSpeaking.value ? t('entrevista.status_ai_speaking') : t('entrevista.status_thinking')
+  }
+  return t('entrevista.status_ready')
+})
+const currentSpeakerStatus = computed(() => {
+  if (currentSpeaker.value === 'user') return t('entrevista.status_your_voice')
+  if (currentSpeaker.value === 'ai') return aiSpeaking.value ? t('entrevista.status_ia') : t('entrevista.status_processing')
+  return active.value ? t('entrevista.status_waiting') : t('entrevista.status_paused')
+})
+const singleWaveClass = computed(() => {
+  if (currentSpeaker.value === 'user') return 'single-wave-user'
+  if (currentSpeaker.value === 'ai') return 'single-wave-ai'
+  return 'single-wave-idle'
+})
+const singleWavePanelClass = computed(() => {
+  if (currentSpeaker.value === 'user') return 'single-wave-panel-user'
+  if (currentSpeaker.value === 'ai') return 'single-wave-panel-ai'
+  return 'single-wave-panel-idle'
+})
 
 let recognition: any = null
 let mediaStream: MediaStream | null = null
 let currentAudio: HTMLAudioElement | null = null
 let currentAudioUrl: string | null = null
+let audioContext: AudioContext | null = null
+let micAnalyser: AnalyserNode | null = null
+let aiAnalyser: AnalyserNode | null = null
+let micSource: MediaStreamAudioSourceNode | null = null
+let aiSource: MediaElementAudioSourceNode | null = null
+let speechWaveTimer: number | null = null
+let waveAnimationFrame: number | null = null
+let aiAnalyserElement: HTMLAudioElement | null = null
 
 onMounted(async () => {
   await fetchProfile()
@@ -182,6 +227,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  stopWaveAnimation()
   cleanupAudio()
   stopInterview()
 })
@@ -221,11 +267,8 @@ const setupSpeechRecognition = () => {
 const startInterview = async () => {
   results.value = null
   try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    if (videoRef.value) {
-      videoRef.value.srcObject = mediaStream
-    }
-    streamActive.value = true
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    await setupMicAnalyser(mediaStream)
     active.value = true
     
     // Initial recruiter greeting
@@ -239,10 +282,12 @@ const startInterview = async () => {
 const stopInterview = () => {
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop())
+    mediaStream = null
   }
+  disconnectMicAnalyser()
   cleanupAudio()
-  streamActive.value = false
   active.value = false
+  aiSpeaking.value = false
   if (recognition) recognition.stop()
   isListening.value = false
   msgs.value = []
@@ -337,8 +382,9 @@ const finishAndAnalyze = async (force = false) => {
     
     if (mediaStream) {
       mediaStream.getTracks().forEach(track => track.stop())
-      streamActive.value = false
+      mediaStream = null
     }
+    disconnectMicAnalyser()
   } catch (e: any) {
     console.error('Analysis Error:', e)
     // Nuxt $fetch errors store the message in data.statusMessage or just message
@@ -349,15 +395,182 @@ const finishAndAnalyze = async (force = false) => {
   }
 }
 
+const ensureAudioContext = async () => {
+  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+  if (!AudioCtx) return null
+
+  if (!audioContext) {
+    audioContext = new AudioCtx()
+  }
+
+  if (audioContext.state === 'suspended') {
+    await audioContext.resume()
+  }
+
+  return audioContext
+}
+
+const disconnectMicAnalyser = () => {
+  if (micSource) {
+    micSource.disconnect()
+    micSource = null
+  }
+  micAnalyser = null
+}
+
+const disconnectAiAnalyser = () => {
+  if (aiSource) {
+    aiSource.disconnect()
+    aiSource = null
+  }
+  aiAnalyser = null
+  aiAnalyserElement = null
+}
+
+const setupMicAnalyser = async (stream: MediaStream) => {
+  const ctx = await ensureAudioContext()
+  if (!ctx) return
+
+  disconnectMicAnalyser()
+
+  micSource = ctx.createMediaStreamSource(stream)
+  micAnalyser = ctx.createAnalyser()
+  micAnalyser.fftSize = 256
+  micAnalyser.smoothingTimeConstant = 0.82
+  micSource.connect(micAnalyser)
+  startWaveAnimation()
+}
+
+const attachAiAnalyser = async (audio: HTMLAudioElement) => {
+  const ctx = await ensureAudioContext()
+  if (!ctx) return
+
+  if (aiAnalyserElement === audio && aiAnalyser) {
+    startWaveAnimation()
+    return
+  }
+
+  disconnectAiAnalyser()
+  aiSource = ctx.createMediaElementSource(audio)
+  aiAnalyser = ctx.createAnalyser()
+  aiAnalyser.fftSize = 256
+  aiAnalyser.smoothingTimeConstant = 0.78
+  aiSource.connect(aiAnalyser)
+  aiAnalyser.connect(ctx.destination)
+  aiAnalyserElement = audio
+  startWaveAnimation()
+}
+
+const resetWaveHeights = () => {
+  waveHeights.value = waveHeights.value.map(() => 18)
+}
+
+const sampleAnalyser = (analyser: AnalyserNode | null) => {
+  if (!analyser) return null
+
+  const data = new Uint8Array(analyser.frequencyBinCount)
+  analyser.getByteFrequencyData(data)
+  const bucketSize = Math.max(1, Math.floor(data.length / waveBars.length))
+
+  return waveBars.map((_, index) => {
+    const start = index * bucketSize
+    const end = Math.min(data.length, start + bucketSize)
+    let sum = 0
+
+    for (let i = start; i < end; i++) {
+      sum += data[i] ?? 0
+    }
+
+    const average = sum / Math.max(1, end - start)
+    const normalized = average / 255
+    return 14 + normalized * 120
+  })
+}
+
+const updateWaveFrame = () => {
+  let nextHeights: number[] | null = null
+
+  if (isListening.value && micAnalyser) {
+    nextHeights = sampleAnalyser(micAnalyser)
+  } else if ((aiSpeaking.value || loading.value) && aiAnalyser) {
+    nextHeights = sampleAnalyser(aiAnalyser)
+  }
+
+  if (!nextHeights) {
+    nextHeights = waveHeights.value.map((height, index) => {
+      const target = waveIsActive.value ? 26 + Math.sin((Date.now() / 160) + index) * 8 : 18
+      return height + (target - height) * 0.18
+    })
+  } else {
+    nextHeights = nextHeights.map((target, index) => {
+      const current = waveHeights.value[index] ?? 18
+      return current + (target - current) * 0.35
+    })
+  }
+
+  waveHeights.value = nextHeights.map((height) => Math.max(10, Math.min(132, Number(height.toFixed(2)))))
+  waveAnimationFrame = window.requestAnimationFrame(updateWaveFrame)
+}
+
+const startWaveAnimation = () => {
+  if (waveAnimationFrame !== null) return
+  waveAnimationFrame = window.requestAnimationFrame(updateWaveFrame)
+}
+
+const stopWaveAnimation = () => {
+  if (waveAnimationFrame !== null) {
+    window.cancelAnimationFrame(waveAnimationFrame)
+    waveAnimationFrame = null
+  }
+}
+
+const startSpeechWaveFallback = () => {
+  if (speechWaveTimer !== null) {
+    window.clearInterval(speechWaveTimer)
+  }
+
+  startWaveAnimation()
+  speechWaveTimer = window.setInterval(() => {
+    if (!aiSpeaking.value || aiAnalyser) return
+
+    waveHeights.value = waveBars.map((_, index) => {
+      const swing = Math.abs(Math.sin((Date.now() / 140) + index * 0.65))
+      return 16 + swing * 86
+    })
+  }, 90)
+}
+
+const stopSpeechWaveFallback = () => {
+  if (speechWaveTimer !== null) {
+    window.clearInterval(speechWaveTimer)
+    speechWaveTimer = null
+  }
+}
+
 const cleanupAudio = () => {
+  stopSpeechWaveFallback()
+
   if (currentAudio) {
     currentAudio.pause()
+    currentAudio.onended = null
+    currentAudio.onerror = null
     currentAudio = null
   }
+
+  disconnectAiAnalyser()
 
   if (currentAudioUrl) {
     URL.revokeObjectURL(currentAudioUrl)
     currentAudioUrl = null
+  }
+
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+  }
+
+  aiSpeaking.value = false
+  if (!isListening.value) {
+    resetWaveHeights()
   }
 }
 
@@ -376,7 +589,31 @@ const speak = async (text: string, audioBase64?: string | null, audioMimeType?: 
       const blob = new Blob([bytes], { type: audioMimeType })
       currentAudioUrl = URL.createObjectURL(blob)
       currentAudio = new Audio(currentAudioUrl)
-      await currentAudio.play()
+      await attachAiAnalyser(currentAudio)
+      aiSpeaking.value = true
+      await new Promise<void>(async (resolve, reject) => {
+        if (!currentAudio) {
+          aiSpeaking.value = false
+          resolve()
+          return
+        }
+
+        currentAudio.onended = () => {
+          aiSpeaking.value = false
+          resolve()
+        }
+        currentAudio.onerror = () => {
+          aiSpeaking.value = false
+          reject(new Error('Audio playback failed'))
+        }
+
+        try {
+          await currentAudio.play()
+        } catch (playError) {
+          aiSpeaking.value = false
+          reject(playError)
+        }
+      })
       return
     } catch (error) {
       console.error('OpenAI audio playback failed, using browser speech fallback:', error)
@@ -390,7 +627,24 @@ const speak = async (text: string, audioBase64?: string | null, audioMimeType?: 
     utterance.lang = locale.value === 'en' ? 'en-US' : 'es-ES'
     utterance.rate = 1.0
     utterance.pitch = 1.0
-    window.speechSynthesis.speak(utterance)
+    aiSpeaking.value = true
+    startSpeechWaveFallback()
+
+    await new Promise<void>((resolve) => {
+      utterance.onend = () => {
+        aiSpeaking.value = false
+        stopSpeechWaveFallback()
+        resetWaveHeights()
+        resolve()
+      }
+      utterance.onerror = () => {
+        aiSpeaking.value = false
+        stopSpeechWaveFallback()
+        resetWaveHeights()
+        resolve()
+      }
+      window.speechSynthesis.speak(utterance)
+    })
   }
 }
 
@@ -434,6 +688,195 @@ const scrollToBottom = () => {
 </script>
 
 <style scoped>
+.interview-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 360px);
+  gap: 20px;
+  min-height: 100%;
+}
+
+.single-wave-panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 520px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 30%),
+    linear-gradient(145deg, rgba(18, 24, 41, 0.97), rgba(9, 12, 22, 0.99));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.single-wave-panel::after {
+  content: '';
+  position: absolute;
+  right: -80px;
+  bottom: -80px;
+  width: 240px;
+  height: 240px;
+  border-radius: 999px;
+  filter: blur(16px);
+  opacity: 0.22;
+}
+
+.single-wave-panel-idle::after {
+  background: rgba(149, 163, 184, 0.28);
+}
+
+.single-wave-panel-user::after {
+  background: rgba(255, 181, 72, 0.58);
+}
+
+.single-wave-panel-ai::after {
+  background: rgba(90, 154, 255, 0.58);
+}
+
+.single-wave-panel__head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.single-wave-panel__label {
+  margin: 0 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(232, 238, 255, 0.6);
+  font-family: var(--font-mono, monospace);
+}
+
+.single-wave-panel__title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: #f6f8ff;
+}
+
+.single-wave-panel__status {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(246, 248, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: var(--font-mono, monospace);
+}
+
+.single-wave-shell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.single-wave {
+  width: min(100%, 620px);
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.single-wave__bar {
+  width: 10px;
+  height: 18px;
+  border-radius: 999px;
+  transition: height 90ms linear, opacity 120ms ease;
+  opacity: 0.42;
+  transform-origin: center;
+}
+
+.single-wave-idle .single-wave__bar {
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.9), rgba(100, 116, 139, 0.18));
+}
+
+.single-wave-user .single-wave__bar {
+  background: linear-gradient(180deg, rgba(255, 222, 150, 0.98), rgba(255, 170, 0, 0.26));
+}
+
+.single-wave-ai .single-wave__bar {
+  background: linear-gradient(180deg, rgba(182, 218, 255, 0.98), rgba(72, 120, 255, 0.28));
+}
+
+.single-wave-panel__cta {
+  position: relative;
+  z-index: 1;
+}
+
+.single-wave-panel__cta-icon {
+  width: 52px;
+  min-width: 52px;
+  height: 52px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+}
+
+.history-card {
+  padding: 16px !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.compact-chat {
+  min-height: 520px;
+}
+
+.history-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history-card__label {
+  margin: 0 0 4px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-family: var(--font-mono, monospace);
+}
+
+.history-card__title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.history-card__count {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+}
+
 .chat-area::-webkit-scrollbar {
   width: 4px;
 }
@@ -441,6 +884,26 @@ const scrollToBottom = () => {
   background: var(--border);
   border-radius: 10px;
 }
+
+.history-bubble {
+  max-width: 92%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  line-height: 1.55;
+  border: 1px solid var(--border);
+}
+
+.history-bubble-user {
+  background: rgba(255, 191, 73, 0.08);
+  color: var(--amber-light);
+  border-color: rgba(255, 191, 73, 0.18);
+}
+
+.history-bubble-ai {
+  background: var(--bg3);
+}
+
 .typing-dot {
   width: 6px;
   height: 6px;
@@ -458,5 +921,34 @@ const scrollToBottom = () => {
 @keyframes bounce {
   0%, 80%, 100% { transform: scale(0); }
   40% { transform: scale(1.0); }
+}
+
+@media (max-width: 768px) {
+  .interview-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .single-wave-panel {
+    min-height: 380px;
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .single-wave-panel__title {
+    font-size: 26px;
+  }
+
+  .single-wave {
+    height: 132px;
+    gap: 7px;
+  }
+
+  .single-wave__bar {
+    width: 8px;
+  }
+
+  .compact-chat {
+    min-height: 280px;
+  }
 }
 </style>

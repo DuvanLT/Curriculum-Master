@@ -229,7 +229,6 @@ body {
 .help-tooltip {
   position: absolute;
   top: calc(100% + 12px);
-  top: calc(100% + 12px);
   left: -20px;
   width: 300px;
   max-width: calc(100vw - 40px);
@@ -243,7 +242,23 @@ body {
     0 25px 60px -15px rgba(15, 23, 42, 0.3);
   z-index: 200;
   animation: tooltip-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  pointer-events: none;
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  .help-tooltip {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+  }
+  
+  .help-tooltip::before {
+    display: none;
+  }
 }
 
 .help-tooltip::before {
@@ -268,6 +283,20 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* Update animation for mobile centering */
+@media (max-width: 640px) {
+  @keyframes tooltip-in {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(12px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
   }
 }
 

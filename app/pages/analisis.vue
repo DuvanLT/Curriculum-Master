@@ -44,7 +44,7 @@
         </AppCard>
 
         <AppCard v-if="result" :title="$t('analisis.result_title')">
-          <div class="grid grid-cols-[auto_1fr] gap-8 items-start">
+          <div class="flex flex-col sm:grid sm:grid-cols-[auto_1fr] gap-6 sm:gap-8 items-center sm:items-start text-center sm:text-left">
             <div class="relative w-[90px] h-[90px] mt-2">
               <svg class="w-full h-full" viewBox="0 0 90 90">
                 <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border)" stroke-width="7" />
@@ -90,7 +90,7 @@
             </div>
           </div>
           <hr class="border-border my-4" />
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <div class="text-[11px] text-green font-mono mb-2 uppercase tracking-wider">{{ $t('analisis.keywords_present') }}</div>
               <div class="flex flex-wrap gap-1.5">

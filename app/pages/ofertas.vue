@@ -98,8 +98,8 @@
 
 
             <!-- Hover Actions -->
-            <div class="job-actions absolute top-3 right-3 flex flex-row gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button 
+           <div class="job-actions absolute top-3 right-3 flex flex-row gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+           <!--    <button 
                 @click="goToAnalisis(job)" 
                 class="action-btn cursor-pointer flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded-md bg-amber/10 border border-amber/30 text-amber hover:bg-amber/20 transition-all whitespace-nowrap"
               >
@@ -113,6 +113,7 @@
                 <span class="material-symbols-outlined text-[10px]">description</span>
                 {{ $t('ofertas.btn_create_cv') }}
               </button>
+              -->
               <a 
                 :href="job.link" 
                 target="_blank" 

@@ -31,7 +31,15 @@
     "toast_save_error": "There was an error saving the steps.",
     "toast_analysis_error": "Analysis error: ",
     "unknown_error": "Unknown error",
-    "toast_simulation_error": "Sorry, there was a problem with the simulation. Please try again."
+    "toast_simulation_error": "Sorry, there was a problem with the simulation. Please try again.",
+    "status_ready": "Ready to start",
+    "status_paused": "PAUSED",
+    "status_waiting": "WAITING",
+    "status_ai_speaking": "AI is speaking",
+    "status_thinking": "Thinking...",
+    "status_your_voice": "YOUR VOICE",
+    "status_ia": "AI",
+    "status_processing": "PROCESSING"
   },
   "analisis": {
     "title": "Job Listing Analysis",
@@ -302,6 +310,10 @@
     "tour_prev": "Previous",
     "tour_finish": "Finish",
     "tour_next": "Next",
+    "helper": {
+      "current_section": "Current Section",
+      "view_tour": "View sidebar tour"
+    },
     "items": {
       "dashboard": {
         "label": "Dashboard",

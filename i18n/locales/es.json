@@ -31,7 +31,15 @@
     "toast_save_error": "Hubo un error al guardar los pasos.",
     "toast_analysis_error": "Error en el análisis: ",
     "unknown_error": "Error desconocido",
-    "toast_simulation_error": "Lo siento, hubo un problema con la simulación. Reintenta por favor."
+    "toast_simulation_error": "Lo siento, hubo un problema con la simulación. Reintenta por favor.",
+    "status_ready": "Listo para comenzar",
+    "status_paused": "PAUSADO",
+    "status_waiting": "EN ESPERA",
+    "status_ai_speaking": "La IA está hablando",
+    "status_thinking": "Pensando respuesta...",
+    "status_your_voice": "TU VOZ",
+    "status_ia": "IA",
+    "status_processing": "PROCESANDO"
   },
   "analisis": {
     "title": "Análisis de Vacante",
@@ -302,6 +310,10 @@
     "tour_prev": "Anterior",
     "tour_finish": "Finalizar",
     "tour_next": "Siguiente",
+    "helper": {
+      "current_section": "Sección actual",
+      "view_tour": "Ver recorrido del sidebar"
+    },
     "items": {
       "dashboard": {
         "label": "Dashboard",
