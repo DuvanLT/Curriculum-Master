@@ -57,7 +57,7 @@
 
 @media (max-width: 767px) {
   .topbar {
-    padding: 0 16px 0 60px;
+    padding: 0 16px 0 20px;
   }
 
   .logo {

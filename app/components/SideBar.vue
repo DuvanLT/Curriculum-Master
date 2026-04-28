@@ -578,8 +578,8 @@ watch(isMobile, mobile => {
 
 .mobile-menu-button {
   position: fixed;
-  top: 10px;
-  left: 12px;
+  top: 2px;
+  right: 12px;
   z-index: 92;
   width: 40px;
   height: 40px;

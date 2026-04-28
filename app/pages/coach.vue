@@ -1,10 +1,10 @@
 <template>
   <NuxtLayout>
-    <div class="h-full flex flex-col">
+    <div class="flex flex-col pb-10">
       <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('coach.title') }} <HelpButton /></div>
       <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('coach.subtitle') }}</div>
 
-      <AppCard class="flex-1 flex flex-col min-h-0 !mb-0">
+      <AppCard class="flex flex-col !mb-0">
         <div class="chat-area flex-1 overflow-y-auto border border-border rounded-[5px] p-3 bg-[var(--bg)]-bg3 mb-2.5 flex flex-col gap-2.5 min-h-[300px]" ref="chatContainer">
           <div v-for="(msg, i) in msgs" :key="i" class="max-w-[85%] p-2.5 px-3.5 rounded-[5px] text-[13px] leading-relaxed"
             :class="msg.role === 'user' ? 'msg-user bg-amber-dim text-amber-light self-end rounded-br-none' : 'msg-ai bg-[var(--bg)]-bg4 text-text self-start rounded-bl-none border border-border'">
@@ -31,12 +31,12 @@
           </AppButton>
         </div>
 
-        <div class="flex flex-wrap gap-2 mt-4">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-2 mt-4">
           <button 
             v-for="s in suggestions" 
             :key="s" 
             @click="send(s)"
-            class="text-[11px] font-mono text-text-dim border border-border rounded-full px-3 py-1 hover:border-amber hover:text-amber transition-colors"
+            class="text-[11px] font-mono text-text-dim border border-border rounded-lg sm:rounded-full px-4 py-1.5 hover:border-amber hover:text-amber transition-all text-left w-full sm:w-auto whitespace-normal leading-tight"
           >
             {{ s }}
           </button>

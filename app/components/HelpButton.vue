@@ -1,18 +1,12 @@
 <template>
-  <div
-    class="help-group"
-    @mouseenter="showHelp = true"
-    @mouseleave="showHelp = false"
-  >
+  <div class="help-group">
     <button
       type="button"
-      class="help-link"
+      class="help-link flex items-center justify-center"
       :aria-label="`Ayuda sobre ${currentSectionHelp.title}`"
-      @focus="showHelp = true"
-      @blur="showHelp = false"
       @click.stop="showHelp = !showHelp"
     >
-      <span class="material-symbols-outlined hover:text-amber text-[10px] translate-y-[-3px] p-1">help</span>
+      <span class="material-symbols-outlined hover:text-amber text-[18px] opacity-40 hover:opacity-100 transition-all p-1">help</span>
     </button>
 
     <div v-if="showHelp" class="help-tooltip" @click.stop>
@@ -41,10 +35,16 @@ const showHelp = ref(false)
 
 // Close on click outside
 if (process.client) {
+  const close = () => {
+    showHelp.value = false
+  }
+  
   onMounted(() => {
-    window.addEventListener('click', () => {
-      showHelp.value = false
-    })
+    window.addEventListener('click', close)
+  })
+  
+  onUnmounted(() => {
+    window.removeEventListener('click', close)
   })
 }
 </script>
