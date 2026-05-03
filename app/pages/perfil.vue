@@ -273,6 +273,74 @@ const newExp = ref(emptyExperienceForm())
 const workExperiences = computed(() => experiences.value.filter(exp => exp.type !== 'project'))
 const projectExperiences = computed(() => experiences.value.filter(exp => exp.type === 'project'))
 
+const mockExperiences = [
+  {
+    id: 'mock-1',
+    type: 'work',
+    cargo: 'Senior Full Stack Developer',
+    empresa: 'TechCorp Solutions',
+    inicio: 'Mar 2021',
+    fin: 'Presente',
+    logros: '',
+    logros_optimizados: [
+      'Lideré la migración de una plataforma monolítica a microservicios, reduciendo el tiempo de deploy en un 60%.',
+      'Diseñé e implementé una API REST que procesa +50K solicitudes diarias con un uptime del 99.9%.',
+      'Mentoré a un equipo de 4 desarrolladores junior, estableciendo estándares de code review y CI/CD.'
+    ],
+    skills_sugeridas: ['Vue.js', 'Node.js', 'PostgreSQL', 'Docker', 'AWS']
+  },
+  {
+    id: 'mock-2',
+    type: 'work',
+    cargo: 'Frontend Developer',
+    empresa: 'Digital Agency Pro',
+    inicio: 'Ene 2019',
+    fin: 'Feb 2021',
+    logros: '',
+    logros_optimizados: [
+      'Desarrollé dashboards interactivos con Vue.js y D3.js que mejoraron la toma de decisiones del cliente en un 40%.',
+      'Optimicé el rendimiento del sitio principal logrando un score de Lighthouse de 95+ en todas las métricas.'
+    ],
+    skills_sugeridas: ['Vue.js', 'TypeScript', 'Tailwind CSS', 'D3.js']
+  }
+]
+
+const mockEducations = [
+  { id: 'mock-edu-1', titulo: 'Ingeniería de Sistemas', institucion: 'Universidad Nacional', inicio: '2014', fin: '2019', descripcion: '' },
+  { id: 'mock-edu-2', titulo: 'Diplomado en Cloud Computing', institucion: 'Platzi Academy', inicio: '2020', fin: '2020', descripcion: '' }
+]
+
+const previewProfile = computed(() => ({
+  nombre: profile.value.nombre || 'Alejandra Martínez',
+  titulo: profile.value.titulo || 'Senior Full Stack Developer',
+  ubicacion: profile.value.ubicacion || 'Bogotá, Colombia',
+  email_profile: profile.value.email_profile || 'alejandra.mtz@email.com',
+  telefono: profile.value.telefono || '+57 310 456 7890',
+  linkedin: profile.value.linkedin || 'linkedin.com/in/alejandra-mtz',
+  otros: profile.value.otros || '',
+  web: profile.value.web || 'alejandramtz.dev',
+  educacion: profile.value.educacion || '',
+  resumen: profile.value.resumen || 'Desarrolladora Full Stack con 5+ años de experiencia construyendo aplicaciones web escalables. Especializada en Vue.js, Node.js y arquitecturas cloud. Apasionada por crear interfaces intuitivas y optimizar procesos de desarrollo mediante CI/CD y buenas prácticas de ingeniería.',
+  years: profile.value.years || '5'
+}))
+
+const previewEducations = computed(() => {
+  if (educations.value.length) return educations.value.slice(0, 2)
+  return mockEducations
+})
+
+const previewExperiences = computed(() => {
+  if (experiences.value.length) return experiences.value.slice(0, 2)
+  return mockExperiences
+})
+
+const previewAiData = computed(() => ({
+  optimized_title: previewProfile.value.titulo,
+  summary: previewProfile.value.resumen,
+  top_skills: ['JavaScript', 'TypeScript', 'Vue.js', 'Node.js', 'PostgreSQL', 'Docker'],
+  experiences: previewExperiences.value
+}))
+
 onMounted(async () => {
   await fetchProfile()
   nextTick(() => {
@@ -375,7 +443,8 @@ const startEditingEducation = (edu: any) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const removeEducationEntry = (id: string | number) => {
+const removeEducationEntry = (id?: string | number) => {
+  if (!id) return
   educations.value = educations.value.filter(edu => edu.id !== id)
   toast.success(t('profile.toast_edu_deleted'))
 }
@@ -449,7 +518,8 @@ const startEditingExperience = (exp: any) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const confirmRemoveExperience = (id: string | number) => {
+const confirmRemoveExperience = (id?: string | number) => {
+  if (!id) return
   expToDelete.value = id
   showConfirmDeleteExp.value = true
 }
@@ -554,6 +624,105 @@ const handleRemoveExperience = () => {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+/* CV Template Selector */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.template-option {
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: var(--bg);
+}
+
+.template-option:hover {
+  border-color: rgba(var(--amber-rgb), 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(var(--amber-rgb), 0.1);
+}
+
+.template-active {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px var(--amber), 0 8px 24px rgba(var(--amber-rgb), 0.15);
+}
+
+.template-preview-wrapper {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+
+.template-preview-scaler {
+  transform: scale(0.28);
+  transform-origin: top left;
+  width: 357%;
+  pointer-events: none;
+}
+
+.template-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.template-preview-wrapper:hover .template-overlay {
+  opacity: 1;
+}
+
+.template-info {
+  padding: 12px 14px;
+}
+
+.template-name {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.template-desc {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.4;
+  margin: 0 0 8px 0;
+}
+
+.template-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--amber);
+  background: rgba(var(--amber-rgb), 0.1);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.template-badge-ghost {
+  color: var(--text3);
+  background: transparent;
+  border: 1px solid var(--border);
 }
 
 @media (max-width: 767px) {
@@ -685,6 +854,14 @@ const handleRemoveExperience = () => {
   .profile-card-action :deep(button) {
     width: 100%;
     justify-content: center;
+  }
+
+  .template-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .template-preview-wrapper {
+    height: 220px;
   }
 }
 </style>

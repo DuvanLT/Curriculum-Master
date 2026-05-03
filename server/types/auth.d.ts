@@ -4,6 +4,7 @@ declare module '#auth-utils' {
     email: string;
     name?: string;
     is_verified: number;
+    preferred_locale?: string;
   }
 }
 

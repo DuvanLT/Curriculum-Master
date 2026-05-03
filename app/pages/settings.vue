@@ -41,7 +41,7 @@
           <div class="max-w-xs relative">
             <select
               :value="currentLocale"
-              @change="setPreferredLocale(($event.target as HTMLSelectElement).value)"
+              @change="setPreferredLocale(($event.target as HTMLSelectElement).value as 'es' | 'en')"
               class="w-full bg-[var(--bg)]-bg border border-border focus:border-amber outline-none rounded-lg py-2.5 pl-3 pr-10 text-[13px] text-text transition-all appearance-none cursor-pointer"
             >
               <option value="es">Español (ES)</option>
@@ -253,10 +253,19 @@ const toast = useToast()
 const { locale, setLocale, t } = useI18n()
 
 const currentLocale = computed(() => locale.value)
-const setPreferredLocale = (newLocale: string) => {
+const setPreferredLocale = async (newLocale: 'es' | 'en') => {
   setLocale(newLocale)
   localStorage.setItem('preferred-locale', newLocale)
   toast.success(t('settings.toast_lang_saved'))
+  // Persist to DB so it's available on login from any device
+  try {
+    await $fetch('/api/profile/locale', {
+      method: 'POST',
+      body: { locale: newLocale }
+    })
+  } catch (e) {
+    console.error('Could not save locale to server:', e)
+  }
 }
 
 const activeTab = ref('session')

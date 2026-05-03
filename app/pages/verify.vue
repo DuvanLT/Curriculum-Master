@@ -5,19 +5,19 @@
       
       <div class="text-center mb-8 relative z-10">
         <h1 class="font-head text-[28px] font-bold text-black tracking-tighter mb-1">Bring<span class="text-amber">Jobs</span></h1>
-        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">Verifica tu correo</p>
+        <p class="font-mono text-[11px] text-text-dim uppercase tracking-widest">{{ t('auth.verify_title') }}</p>
       </div>
 
       <div v-if="success" class="bg-amber/10 border border-amber/20 text-text p-4 rounded-[4px] text-center mb-6">
         <span class="material-symbols-outlined text-[32px] mb-2 block">task_alt</span>
-        <p class="text-[14px] font-bold">¡Cuenta verificada!</p>
-        <p class="text-[12px] opacity-80 mt-1">Redirigiendo...</p>
+        <p class="text-[14px] font-bold">{{ t('auth.verify_success_title') }}</p>
+        <p class="text-[12px] opacity-80 mt-1">{{ t('auth.verify_redirecting') }}</p>
       </div>
 
       <form v-else @submit.prevent="handleVerify" class="space-y-6 relative z-10">
         <div class="text-center">
           <p class="text-[13px] text-text-dim mb-4">
-            Hemos enviado un código de 6 dígitos a <br>
+            {{ t('auth.verify_code_sent') }} <br>
             <strong class="text-text">{{ user?.email }}</strong>
           </p>
         </div>
@@ -39,12 +39,12 @@
         </div>
 
         <AppButton type="submit" :loading="loading" class="w-full h-[45px]">
-          Verificar Código
+          {{ t('auth.verify_btn') }}
         </AppButton>
         
         <div class="text-center">
           <button @click.prevent="handleLogout" class="text-[12px] text-text-dim hover:text-text transition-colors underline">
-            Cerrar sesión e intentar otro correo
+            {{ t('auth.verify_logout') }}
           </button>
         </div>
       </form>
@@ -54,6 +54,7 @@
 
 <script setup>
 const { user, logout } = useAuth()
+const { t } = useI18n()
 const code = ref('')
 const loading = ref(false)
 const error = ref('')
@@ -66,7 +67,7 @@ const handleLogout = async () => {
 
 const handleVerify = async () => {
   if (code.value.length !== 6) {
-    error.value = 'El código debe tener 6 dígitos'
+    error.value = t('auth.verify_code_length')
     return
   }
 
@@ -89,7 +90,7 @@ const handleVerify = async () => {
       navigateTo('/importar-cv')
     }, 1500)
   } catch (e) {
-    error.value = e.data?.statusMessage || 'Error al verificar el código'
+    error.value = e.data?.statusMessage || t('auth.verify_error')
   } finally {
     loading.value = false
   }

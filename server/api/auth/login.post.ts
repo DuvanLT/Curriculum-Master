@@ -38,7 +38,8 @@ export default defineEventHandler(async (event) => {
     id: userRecord.id,
     email: userRecord.email,
     name: userRecord.name,
-    is_verified: userRecord.is_verified
+    is_verified: userRecord.is_verified,
+    preferred_locale: userRecord.preferred_locale || 'es'
   }
 
   await setUserSession(event, { user })

@@ -1,8 +1,18 @@
 <template>
   <NuxtLayout>
     <div>
-      <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('generador.title') }} <HelpButton /></div>
-      <div class="page-sub text-[13px] text-text-dim mb-6 font-mono">{{ $t('generador.subtitle') }}</div>
+      <div class="generator-hero mb-6">
+        <div class="generator-hero-copy">
+          <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('generador.title') }} <HelpButton /></div>
+          <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('generador.subtitle') }}</div>
+        </div>
+        <NuxtLink to="/plantillas" class="generator-hero-link">
+          <AppButton variant="ghost">
+            <span class="material-symbols-outlined text-[16px] mr-1">dashboard_customize</span>
+            {{ $t('generador.view_templates') }}
+          </AppButton>
+        </NuxtLink>
+      </div>
 
       <AppCard :title="$t('generador.card_title')">
         <div class="text-[12px] text-text-muted mb-3">
@@ -27,8 +37,8 @@
             </label>
             <div v-if="cvImage" class="relative group">
               <img :src="cvImage" class="w-10 h-10 rounded-full object-cover border border-amber" alt="Preview">
-              <button @click="cvImage = null" class="absolute -top-1 -right-1 bg-red-500 text-text-dim rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
-                ×
+              <button @click="cvImage = undefined" class="absolute -top-1 -right-1 bg-red-500 text-text-dim rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+                x
               </button>
             </div>
           </div>
@@ -110,7 +120,8 @@
       </div>
 
       <div style="position: absolute; left: -9999px; top: -9999px;">
-        <CVTemplate
+        <component
+          :is="selectedTemplateComponent"
           v-if="aiResult"
           id="pdf-area"
           :profile="profile"
@@ -124,7 +135,11 @@
   </NuxtLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import CVTemplate from '../components/templates/CVTemplate.vue'
+import CVminimalist from '../components/templates/CVminimalist.vue'
+import CVdoublecolumn from '../components/templates/CVdoublecolumn.vue'
+
 definePageMeta({
   middleware: 'auth'
 })
@@ -134,11 +149,51 @@ const toast = useToast()
 const { t, locale } = useI18n()
 const jd = ref('')
 const loading = ref(false)
-const aiResult = ref(null)
-const cvImage = ref(null)
+interface AIExperience {
+  id: string | number;
+  type: 'work' | 'project';
+  cargo: string;
+  empresa: string;
+  inicio: string;
+  fin: string;
+  logros_optimizados: string[];
+  skills_sugeridas: string[];
+  relevance_score?: number;
+  relevance_reason?: string;
+  focus_for_role?: string;
+  metricas_confiables?: string[];
+}
 
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
+interface AIResult {
+  summary: string;
+  optimized_title: string;
+  experiences: AIExperience[];
+  top_skills: string[];
+  advice: string[];
+  next_steps: string[];
+}
+
+const aiResult = ref<AIResult | null>(null)
+const cvImage = ref<string | undefined>(undefined)
+
+// CV Template selection
+const selectedTemplate = ref('classic')
+const selectedTemplateComponent = computed(() => {
+  if (selectedTemplate.value === 'minimalist') return CVminimalist
+  if (selectedTemplate.value === 'doublecolumn') return CVdoublecolumn
+  return CVTemplate
+})
+
+onMounted(() => {
+  const saved = localStorage.getItem('preferred-cv-template')
+  if (saved && ['classic', 'minimalist', 'doublecolumn'].includes(saved)) {
+    selectedTemplate.value = saved
+  }
+})
+
+const handleImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
   if (file) {
     if (cvImage.value) {
       URL.revokeObjectURL(cvImage.value)
@@ -208,6 +263,11 @@ const exportToPDF = async () => {
 
   const safeName = (profile.value.nombre || 'CV').replace(/\s+/g, '_')
 
+  // Get all styles from the current document to preserve CSS classes (crucial for CVminimalist)
+  const styles = Array.from(document.head.querySelectorAll('style, link[rel="stylesheet"]'))
+    .map(style => style.outerHTML)
+    .join('\n')
+
   printWindow.document.open()
   printWindow.document.write(`
     <!DOCTYPE html>
@@ -216,6 +276,7 @@ const exportToPDF = async () => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${safeName}_Optimizado</title>
+        ${styles}
         <style>
           @page {
             size: A4;
@@ -247,7 +308,7 @@ const exportToPDF = async () => {
           #print-root .pdf-container {
             width: 100% !important;
             max-width: 210mm !important;
-            min-height: auto !important;
+            min-height: 297mm !important;
             padding: 12mm 10mm !important;
             margin: 0 auto !important;
           }
@@ -298,3 +359,34 @@ const exportToPDF = async () => {
   }, 300)
 }
 </script>
+
+<style scoped>
+.generator-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.generator-hero-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.generator-hero-link {
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .generator-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .generator-hero-link,
+  .generator-hero-link :deep(button) {
+    width: 100%;
+  }
+}
+</style>

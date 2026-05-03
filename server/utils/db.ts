@@ -24,7 +24,8 @@ export const useDb = () => {
 const ALLOWED_COLUMN_NAMES = new Set([
   'email_profile', 'titulo', 'ubicacion', 'resumen', 'telefono',
   'linkedin', 'github', 'web', 'educacion', 'years',
-  'sidebar_tour_completed_at', 'is_verified', 'verification_code'
+  'sidebar_tour_completed_at', 'is_verified', 'verification_code',
+  'preferred_locale'
 ])
 
 async function ensureUserColumn(db: ReturnType<typeof useDb>, name: string, type: string) {
@@ -91,7 +92,8 @@ export const initDb = async () => {
     { name: 'years', type: 'TEXT' },
     { name: 'sidebar_tour_completed_at', type: 'DATETIME' },
     { name: 'is_verified', type: 'INTEGER DEFAULT 0' },
-    { name: 'verification_code', type: 'TEXT' }
+    { name: 'verification_code', type: 'TEXT' },
+    { name: 'preferred_locale', type: "TEXT DEFAULT 'es'" }
   ]
   for (const col of columns) {
     try {

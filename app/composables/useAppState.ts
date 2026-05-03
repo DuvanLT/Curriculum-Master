@@ -197,7 +197,8 @@ export const useAppState = () => {
     saveProfile();
   };
 
-  const updateEducation = async (id: string | number, updatedData: any) => {
+  const updateEducation = async (id: string | number | undefined, updatedData: any) => {
+    if (!id) return;
     const index = educations.value.findIndex(e => e.id === id);
     const existing = educations.value[index];
     if (index !== -1 && existing) {
@@ -210,7 +211,8 @@ export const useAppState = () => {
     }
   };
 
-  const removeEducation = (id: string | number) => {
+  const removeEducation = (id: string | number | undefined) => {
+    if (!id) return;
     educations.value = educations.value.filter(e => e.id !== id);
     syncEducationSummary()
     saveProfile();
@@ -252,12 +254,14 @@ export const useAppState = () => {
     saveProfile();
   };
 
-  const removeExperience = (id: string | number) => {
+  const removeExperience = (id: string | number | undefined) => {
+    if (!id) return;
     experiences.value = experiences.value.filter(e => e.id !== id);
     saveProfile();
   };
 
-  const updateExperience = async (id: string | number, updatedData: any) => {
+  const updateExperience = async (id: string | number | undefined, updatedData: any) => {
+    if (!id) return;
     const index = experiences.value.findIndex(e => e.id === id);
     const existing = experiences.value[index];
     if (index !== -1 && existing) {

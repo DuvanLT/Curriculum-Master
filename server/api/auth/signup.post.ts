@@ -61,8 +61,8 @@ export default defineEventHandler(async (event) => {
   const verificationCode = Math.floor(100000 + Math.random() * 900000).toString()
 
   await db.execute({
-    sql: 'INSERT INTO users (id, email, email_profile, password, name, is_verified, verification_code) VALUES (?, ?, ?, ?, ?, 0, ?)',
-    args: [id, email, null, hashedPassword, name || null, verificationCode]
+    sql: 'INSERT INTO users (id, email, email_profile, password, name, is_verified, verification_code, preferred_locale) VALUES (?, ?, ?, ?, ?, 0, ?, ?)',
+    args: [id, email, null, hashedPassword, name || null, verificationCode, locale]
   })
 
   // Send verification email
@@ -103,7 +103,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const user = { id, email, name, is_verified: 0 }
+  const user = { id, email, name, is_verified: 0, preferred_locale: locale }
 
   // Set session
   await setUserSession(event, { user })

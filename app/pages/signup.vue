@@ -24,19 +24,6 @@
         </div>
        -->
 
-        <div class="mb-4">
-          <label class="block text-[11px] font-mono text-text-dim uppercase tracking-wider mb-2">
-            {{ t('settings.lang_pref_title') }}
-          </label>
-          <div class="flex gap-2">
-            <button type="button" @click="setPreferredLocale('es')" class="flex-1 py-2 text-[13px] border rounded-[5px] transition-colors" :class="locale === 'es' ? 'bg-amber/10 border-amber text-amber' : 'border-border text-text-dim hover:border-amber/50'">
-              Español
-            </button>
-            <button type="button" @click="setPreferredLocale('en')" class="flex-1 py-2 text-[13px] border rounded-[5px] transition-colors" :class="locale === 'en' ? 'bg-amber/10 border-amber text-amber' : 'border-border text-text-dim hover:border-amber/50'">
-              English
-            </button>
-          </div>
-        </div>
         <AppInput :label="t('auth.name_label')" v-model="form.name" :placeholder="t('auth.name_placeholder')" autocomplete="name" required maxlength="50" minlength="5" />
         <AppInput :label="t('auth.email_label')" type="email" v-model="form.email" :placeholder="t('auth.email_placeholder')" autocomplete="email" required maxlength="50" minlength="3" />
         <AppInput :label="t('auth.password_label')" type="password" v-model="form.password" :placeholder="t('auth.password_placeholder')" autocomplete="new-password" required maxlength="20" minlength="8" />
@@ -58,17 +45,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({
   middleware: 'guest'
 })
 const { signup } = useAuth()
-const { t, locale, setLocale } = useI18n()
+const { t } = useI18n()
 
-const setPreferredLocale = (newLocale) => {
-  setLocale(newLocale)
-  localStorage.setItem('preferred-locale', newLocale)
-}
 const loading = ref(false)
 const error = ref('')
 const form = ref({

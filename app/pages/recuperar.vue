@@ -5,7 +5,7 @@ definePageMeta({
   middleware: 'guest'
 })
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 type PasswordResetStep = 'idle' | 'code-sent' | 'verified' | 'completed'
 const toast = useToast()
@@ -56,12 +56,12 @@ const handleRequestPasswordResetCode = async () => {
 
     resetStep.value = 'code-sent'
     clearResetForm()
-    setResetFeedback('Te enviamos un codigo de recuperacion a tu correo.', 'success')
-    toast.success('Revisa tu correo para continuar.')
+    setResetFeedback(t('auth.recover_toast_code_sent'), 'success')
+    toast.success(t('auth.recover_toast_check_email'))
   } catch (e: any) {
     console.error(e)
-    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos enviar el codigo de recuperacion.', 'error')
-    toast.error(e.data?.statusMessage || e.message || 'No pudimos enviar el codigo de recuperacion.')
+    setResetFeedback(e.data?.statusMessage || e.message || t('auth.recover_toast_code_error'), 'error')
+    toast.error(e.data?.statusMessage || e.message || t('auth.recover_toast_code_error'))
   } finally {
     requestingPasswordResetCode.value = false
   }
@@ -69,7 +69,7 @@ const handleRequestPasswordResetCode = async () => {
 
 const handleVerifyPasswordResetCode = async () => {
   if (resetCode.value.length !== 6) {
-    setResetFeedback('El codigo debe tener 6 digitos.', 'error')
+    setResetFeedback(t('auth.recover_toast_code_length'), 'error')
     return
   }
 
@@ -87,12 +87,12 @@ const handleVerifyPasswordResetCode = async () => {
     })
 
     resetStep.value = 'verified'
-    setResetFeedback('Codigo validado correctamente.', 'success')
-    toast.success('Ahora puedes definir tu nueva contraseña.')
+    setResetFeedback(t('auth.recover_toast_code_verified'), 'success')
+    toast.success(t('auth.recover_toast_set_pwd'))
   } catch (e: any) {
     console.error(e)
-    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos validar el codigo.', 'error')
-    toast.error(e.data?.statusMessage || e.message || 'No pudimos validar el codigo.')
+    setResetFeedback(e.data?.statusMessage || e.message || t('auth.recover_toast_verify_error'), 'error')
+    toast.error(e.data?.statusMessage || e.message || t('auth.recover_toast_verify_error'))
   } finally {
     verifyingPasswordResetCode.value = false
   }
@@ -100,7 +100,7 @@ const handleVerifyPasswordResetCode = async () => {
 
 const handleUpdatePassword = async () => {
   if (passwordResetForm.value.password !== passwordResetForm.value.confirmPassword) {
-    setResetFeedback('Las contraseñas no coinciden.', 'error')
+    setResetFeedback(t('auth.recover_toast_pwd_mismatch'), 'error')
     return
   }
 
@@ -126,12 +126,12 @@ const handleUpdatePassword = async () => {
 
     resetStep.value = 'completed'
     clearResetForm()
-    setResetFeedback('Tu contraseña se actualizo correctamente.', 'success')
-    toast.success('contraseña actualizada correctamente.')
+    setResetFeedback(t('auth.recover_toast_pwd_updated'), 'success')
+    toast.success(t('auth.recover_toast_pwd_success'))
   } catch (e: any) {
     console.error(e)
-    setResetFeedback(e.data?.statusMessage || e.message || 'No pudimos actualizar la contraseña.', 'error')
-    toast.error(e.data?.statusMessage || e.message || 'No pudimos actualizar la contraseña.')
+    setResetFeedback(e.data?.statusMessage || e.message || t('auth.recover_toast_pwd_error'), 'error')
+    toast.error(e.data?.statusMessage || e.message || t('auth.recover_toast_pwd_error'))
   } finally {
     updatingPassword.value = false
   }
@@ -147,17 +147,17 @@ const handleUpdatePassword = async () => {
               <div>
                 <div class="flex items-center gap-3 mb-3">
                   <span class="material-symbols-outlined text-amber">lock_reset</span>
-                  <h3 class="text-text font-head font-bold text-lg">Recuperar contraseña</h3>
+                  <h3 class="text-text font-head font-bold text-lg">{{ t('auth.recover_title') }}</h3>
                 </div>
                 <p class="text-[13px] text-text-muted max-w-2xl mb-3">
-                  Enviaremos un código de 6 dígitos al correo con el cual te registraste para validar el cambio antes de guardar una nueva contraseña.
+                  {{ t('auth.recover_desc') }}
                 </p>
                 <form @submit.prevent="handleRequestPasswordResetCode">
                   <AppInput
                     v-model="email"
-                    label="Email"
+                    :label="t('auth.email_label')"
                     type="email"
-                    placeholder="john@example.com"
+                    :placeholder="t('auth.email_placeholder')"
                     required
                   />
                   <AppButton
@@ -165,7 +165,7 @@ const handleUpdatePassword = async () => {
                     :loading="requestingPasswordResetCode"
                     @click="handleRequestPasswordResetCode"
                   >
-                    {{ resetStep === 'idle' ? 'Recuperar contraseña' : 'Reenviar código' }}
+                    {{ resetStep === 'idle' ? t('auth.recover_btn') : t('auth.recover_resend') }}
                   </AppButton>
                 </form>
               </div>
@@ -182,7 +182,7 @@ const handleUpdatePassword = async () => {
             <div v-if="resetStep !== 'idle'" class="mt-6 space-y-5">
               <div>
                 <label class="block text-[12px] text-text-dim font-mono uppercase tracking-wider mb-2">
-                  Código de recuperación
+                  {{ t('auth.recover_code_label') }}
                 </label>
 
                 <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -202,31 +202,31 @@ const handleUpdatePassword = async () => {
                     :loading="verifyingPasswordResetCode"
                     @click="handleVerifyPasswordResetCode"
                   >
-                    Validar código
+                    {{ t('auth.recover_validate_btn') }}
                   </AppButton>
                 </div>
 
                 <p class="text-[12px] text-text-dim mt-2">
-                  El código vence en 15 minutos. Si pediste uno nuevo, solo el más reciente funciona.
+                  {{ t('auth.recover_code_expires') }}
                 </p>
               </div>
 
               <div v-if="resetStep === 'verified'" class="border border-amber/20 bg-amber/5 rounded-xl p-5">
                 <div class="flex items-center gap-2 text-amber mb-4">
                   <span class="material-symbols-outlined text-[18px]">verified</span>
-                  <p class="text-[13px] font-medium">Código validado. Ya puedes definir una nueva contraseña.</p>
+                  <p class="text-[13px] font-medium">{{ t('auth.recover_code_validated') }}</p>
                 </div>
 
                 <div class="grid gap-2 lg:grid-cols-2">
                   <AppInput
                     v-model="passwordResetForm.password"
-                    label="Nueva contraseña"
+                    :label="t('auth.recover_new_pwd')"
                     type="password"
                     placeholder="********"
                   />
                   <AppInput
                     v-model="passwordResetForm.confirmPassword"
-                    label="Confirmar contraseña"
+                    :label="t('auth.recover_confirm_pwd')"
                     type="password"
                     placeholder="********"
                   />
@@ -237,7 +237,7 @@ const handleUpdatePassword = async () => {
                 </p>
 
                 <AppButton :loading="updatingPassword" @click="handleUpdatePassword">
-                  Guardar nueva contraseña
+                  {{ t('auth.recover_save_pwd') }}
                 </AppButton>
               </div>
             </div>
@@ -246,11 +246,11 @@ const handleUpdatePassword = async () => {
           <!-- Success Screen -->
           <div v-if="resetStep === 'completed'" class="text-center py-6">
             <span class="material-symbols-outlined text-green-500 text-5xl mb-4">check_circle</span>
-            <h4 class="text-text font-head font-bold text-xl mb-2">¡Contraseña actualizada!</h4>
-            <p class="text-text-muted text-[13px] mb-6">Tu contraseña ha sido cambiada exitosamente. Ya puedes iniciar sesión con tus nuevas credenciales.</p>
+            <h4 class="text-text font-head font-bold text-xl mb-2">{{ t('auth.recover_success_title') }}</h4>
+            <p class="text-text-muted text-[13px] mb-6">{{ t('auth.recover_success_desc') }}</p>
            <NuxtLink  to="/login" >
             <AppButton variant="primary" class="w-full">
-              Ir a iniciar sesión
+              {{ t('auth.recover_go_login') }}
             </AppButton>
            </NuxtLink>
           </div>

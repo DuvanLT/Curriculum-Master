@@ -6,20 +6,22 @@
 
       <!-- Search Bar -->
       <div class="search-bar mb-6">
-        <AppInput 
-          :label="$t('ofertas.search_keyword_label')" 
-          v-model="keywords" 
-          :placeholder="$t('ofertas.search_keyword_placeholder')" 
-          class="search-field"
-          @keyup.enter="searchJobs"
-        />
-        <AppInput 
-          :label="$t('ofertas.search_location_label')" 
-          v-model="location" 
-          :placeholder="$t('ofertas.search_location_placeholder')" 
-          class="search-field"
-          @keyup.enter="searchJobs"
-        />
+        <div class="search-field">
+          <AppInput 
+            :label="$t('ofertas.search_keyword_label')" 
+            v-model="keywords" 
+            :placeholder="$t('ofertas.search_keyword_placeholder')" 
+            @keyup.enter="searchJobs"
+          />
+        </div>
+        <div class="search-field">
+          <AppInput 
+            :label="$t('ofertas.search_location_label')" 
+            v-model="location" 
+            :placeholder="$t('ofertas.search_location_placeholder')" 
+            @keyup.enter="searchJobs"
+          />
+        </div>
         <div class="search-action">
           <AppButton @click="searchJobs" :loading="loading" class="search-button h-[38px] mb-3 px-6">
             <span class="material-symbols-outlined text-[18px] mr-1">search</span>
@@ -314,7 +316,8 @@ const goToGenerador = (job: JoobleJob) => {
 .search-bar {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  align-items: stretch;
+  width: 100%;
 }
 
 .search-field {
@@ -323,8 +326,15 @@ const goToGenerador = (job: JoobleJob) => {
 }
 
 .search-action {
+  flex: 0 0 15%;
+  max-width: 140px;
   display: flex;
   align-items: flex-end;
+}
+
+.search-action :deep(button),
+.search-button {
+  width: 100%;
 }
 
 .job-card {
@@ -410,15 +420,19 @@ const goToGenerador = (job: JoobleJob) => {
   }
 
   .search-action {
+    flex: none;
     width: 100%;
+    max-width: none;
     align-self: stretch;
   }
 
   .search-button {
     width: 100%;
-    min-height: 56px;
+    min-height: 46px;
     justify-content: center;
     margin-bottom: 0;
+    align-items: center;
+    margin-top: 10px;
   }
 
   .results-count {

@@ -4,7 +4,7 @@
       <div class="logo font-head text-lg font-bold tracking-tighter text-text">
         Bring<span>Jobs</span>
       </div>
-      <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-[var(--bg)]-bg4 border border-border px-1.5 py-0.5 rounded">Beta Cerrada</span>
+      <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-[var(--bg)]-bg4 border border-border px-1.5 py-0.5 rounded">v0.0.1</span>
     </div>
 
     <div class="topbar-actions">

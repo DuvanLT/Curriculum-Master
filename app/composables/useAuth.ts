@@ -33,6 +33,17 @@ export const useAuth = () => {
       await fetchSession()
       await fetchProfile(true)
 
+      // Apply the user's stored language preference
+      if (data.user.preferred_locale && ['es', 'en'].includes(data.user.preferred_locale)) {
+        const i18n = useNuxtApp().$i18n as any
+        if (i18n?.locale) {
+          i18n.locale.value = data.user.preferred_locale
+        }
+        if (import.meta.client) {
+          localStorage.setItem('preferred-locale', data.user.preferred_locale)
+        }
+      }
+
       if (!data.user.is_verified) {
         navigateTo('/verify')
       }

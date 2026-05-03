@@ -7,14 +7,14 @@
       </div>
       <div style="flex-grow: 1; text-align: right;">
         <h1 style="font-size: 18px; font-weight: 800; margin: 0; color: #000000; letter-spacing: -0.025em;">{{ profile.nombre }}</h1>
-        <p style="font-size: 13px; margin: 2px 0; color: #334155;"><span style="font-weight: bold; color: #000;">Ubicado:</span> {{ profile.ubicacion }}</p>
+        <p style="font-size: 13px; margin: 2px 0; color: #334155;"><span style="font-weight: bold; color: #000;">{{ $t('profile.cv_label_location') }}:</span> {{ profile.ubicacion }}</p>
         <p style="font-size: 12px; margin: 1px 0;">
-          <span style="font-weight: bold;">Correo:</span>
+          <span style="font-weight: bold;">{{ $t('profile.cv_label_email') }}:</span>
           <a v-if="profile.email_profile" :href="emailHref" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">{{ profile.email_profile }}</a>
         </p>
-        <p style="font-size: 12px; margin: 1px 0;"><span style="font-weight: bold;">Telefono:</span> {{ profile.telefono }}</p>
+        <p style="font-size: 12px; margin: 1px 0;"><span style="font-weight: bold;">{{ $t('profile.cv_label_phone') }}:</span> {{ profile.telefono }}</p>
         <p v-if="socialLinks.length" style="font-size: 14px; margin: 2px 0;">
-          <span style="font-weight: bold;">Redes:</span>
+          <span style="font-weight: bold;">{{ $t('profile.cv_label_social') }}:</span>
           <template v-for="(link, index) in socialLinks" :key="link.label">
             <span v-if="index > 0"> - </span>
             <a :href="link.href" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
@@ -22,9 +22,9 @@
             </a>
           </template>
         </p>
-        <p style="font-size: 14px; margin: 3px 0; color: #0f172a;"><span style="font-weight: 800;">Rol:</span> {{ aiData.optimized_title || profile.titulo }}</p>
+        <p style="font-size: 14px; margin: 3px 0; color: #0f172a;"><span style="font-weight: 800;">{{ $t('profile.cv_label_role') }}:</span> {{ aiData.optimized_title || profile.titulo }}</p>
         <p v-if="profile.web" style="font-size: 12px; margin: 1px 0;">
-          <span style="font-weight: bold;">Portafolio web:</span>
+          <span style="font-weight: bold;">{{ $t('profile.cv_label_portfolio') }}:</span>
           <a :href="webHref" target="_blank" rel="noopener noreferrer" style="color: #1d4ed8; text-decoration: underline; font-weight: 500;">
             {{ profile.web }}
           </a>
@@ -35,22 +35,22 @@
     <hr style="border: 0; border-top: 2px solid #0f172a; margin-bottom: 10px;">
 
     <section style="margin-bottom: 12px;">
-      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; margin-bottom: 4px;">Resumen Profesional</h2>
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; margin-bottom: 4px;">{{ $t('profile.cv_section_summary') }}</h2>
       <p style="font-size: 11.5px; color: #0f172a; text-align: justify; margin: 0; line-height: 1.35;">
         {{ aiData.summary || profile.resumen }}
       </p>
       <div style="font-size: 11px; margin-top: 6px; color: #0f172a; padding: 4px 6px 4px 0px; border-radius: 4px;">
-        <span style="font-weight: bold; font-style: italic; color: #0f172a;">Habilidades:</span> {{ (aiData.top_skills || []).join(', ') }}
+        <span style="font-weight: bold; font-style: italic; color: #0f172a;">{{ $t('profile.cv_section_skills') }}:</span> {{ (aiData.top_skills || []).join(', ') }}
       </div>
     </section>
 
     <section v-if="workExperiences.length" style="margin-bottom: 14px;">
-      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 1px;">Experiencia profesional</h2>
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 1px;">{{ $t('profile.cv_section_experience') }}</h2>
 
       <div v-for="exp in workExperiences" :key="exp.id" style="margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: baseline;">
           <span style="font-size: 12.5px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
-          <span style="font-size: 11px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
+          <span style="font-size: 11px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || $t('profile.cv_present') }}</span>
         </div>
 
         <ul style="margin: 2px 0 2px 14px; padding: 0; color: #334155; font-size: 11px; line-height: 1.35;">
@@ -60,18 +60,18 @@
         </ul>
 
         <div style="font-size: 10.5px; color: #475569; font-style: italic;">
-          <span style="font-weight: bold; color: #334155;">Herramientas:</span> {{ exp.skills_sugeridas?.join(', ') }}
+          <span style="font-weight: bold; color: #334155;">{{ $t('profile.cv_label_tools') }}:</span> {{ exp.skills_sugeridas?.join(', ') }}
         </div>
       </div>
     </section>
 
     <section v-if="projectExperiences.length" style="margin-bottom: 14px;">
-      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 1px;">Proyectos</h2>
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; padding-bottom: 1px;">{{ $t('profile.cv_section_projects') }}</h2>
 
       <div v-for="exp in projectExperiences" :key="exp.id" style="margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: baseline;">
           <span style="font-size: 12.5px; font-weight: bold; color: #000;">{{ exp.empresa }} - {{ exp.cargo }}</span>
-          <span style="font-size: 11px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || 'Presente' }}</span>
+          <span style="font-size: 11px; color: #475569; font-weight: 600;">{{ exp.inicio }} - {{ exp.fin || $t('profile.cv_present') }}</span>
         </div>
 
         <ul style="margin: 2px 0 2px 14px; padding: 0; color: #334155; font-size: 11px; line-height: 1.35;">
@@ -81,16 +81,16 @@
         </ul>
 
         <div style="font-size: 10.5px; color: #475569; font-style: italic;">
-          <span style="font-weight: bold; color: #334155;">Habilidades:</span> {{ exp.skills_sugeridas?.join(', ') }}
+          <span style="font-weight: bold; color: #334155;">{{ $t('profile.cv_section_skills') }}:</span> {{ exp.skills_sugeridas?.join(', ') }}
         </div>
       </div>
     </section>
 
     <section v-if="normalizedEducations.length">
-      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 6px; padding-bottom: 1px;">Estudios</h2>
+      <h2 style="font-size: 15px; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; margin-bottom: 6px; padding-bottom: 1px;">{{ $t('profile.cv_section_education') }}</h2>
       <div v-for="edu in normalizedEducations" :key="edu.id" style="margin-bottom: 4px;">
         <p style="margin: 0; font-size: 12px; font-weight: bold; color: #0f172a;">{{ edu.titulo }} - {{ edu.institucion }}</p>
-        <p style="margin: 0; font-size: 10.5px; color: #64748b;">{{ edu.inicio }} - {{ edu.fin || 'Actual' }}</p>
+        <p style="margin: 0; font-size: 10.5px; color: #64748b;">{{ edu.inicio }} - {{ edu.fin || $t('profile.cv_current') }}</p>
       </div>
     </section>
 
@@ -98,6 +98,8 @@
 </template>
 
 <script setup>
+const { t } = useI18n()
+
 const props = defineProps({
   profile: Object,
   educations: {
@@ -141,7 +143,7 @@ const socialLinks = computed(() => {
   }
 
   if (props.profile?.otros) {
-    links.push({ label: 'Otros', href: normalizeHref(props.profile.otros) })
+    links.push({ label: t('profile.cv_label_other_links'), href: normalizeHref(props.profile.otros) })
   }
 
   return links
