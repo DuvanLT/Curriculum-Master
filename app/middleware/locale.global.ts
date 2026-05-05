@@ -5,9 +5,11 @@ export default defineNuxtRouteMiddleware((to) => {
   // Don't redirect if already on the language selection page
   if (to.path === '/select-lang') return
 
-  // If no locale preference has been set yet, redirect to language selection
+  // If no locale preference has been set yet, default to English
   const saved = localStorage.getItem('preferred-locale')
   if (!saved || !['es', 'en'].includes(saved)) {
-    return navigateTo('/select-lang')
+    localStorage.setItem('preferred-locale', 'en')
+    
+    // We don't need to force a redirect anymore, the app will use the default locale
   }
 })

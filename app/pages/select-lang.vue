@@ -101,14 +101,14 @@ const selectedLocale = ref<'es' | 'en'>('es')
 const confirmLocale = () => {
   setLocale(selectedLocale.value)
   localStorage.setItem('preferred-locale', selectedLocale.value)
-  navigateTo('/login')
+  navigateTo('/landing')
 }
 
 // If locale is already set, skip this page
 onMounted(() => {
   const saved = localStorage.getItem('preferred-locale')
   if (saved && ['es', 'en'].includes(saved)) {
-    navigateTo('/login')
+    navigateTo('/landing')
   }
 })
 </script>

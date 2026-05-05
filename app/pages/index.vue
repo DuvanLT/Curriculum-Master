@@ -2,7 +2,7 @@
 definePageMeta({
   middleware: [
     function (to, from) {
-      return navigateTo('/login', { replace: true })
+      return navigateTo('/landing', { replace: true })
     }
   ]
 })

@@ -10,8 +10,9 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', file: 'en.json' }
     ],
     defaultLocale: 'en',
+    strategy: 'no_prefix',
     langDir: 'locales',
-    strategy: 'no_prefix'
+    vueI18n: './i18n.config.ts'
   },
   runtimeConfig: {
     // Private keys (available only on server)
