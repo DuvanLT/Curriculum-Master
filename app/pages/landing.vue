@@ -25,7 +25,7 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <div class="relative hidden sm:block">
+          <div class="relative">
             <select
               class="appearance-none bg-transparent pl-3 pr-6 py-2 text-sm font-semibold text-slate-700 outline-none cursor-pointer hover:text-indigo-600 transition"
               :value="locale"
