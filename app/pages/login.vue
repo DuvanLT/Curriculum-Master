@@ -30,7 +30,7 @@
       </div>
       <div class="mt-2 text-center text-[13px] text-text-dim relative z-10">
         {{ t('auth.forgot_password') }} 
-        <NuxtLink to="/recuperar" class="text-amber hover:underline font-medium ml-1">{{ t('auth.recover_it') }}</NuxtLink>
+        <NuxtLink to="/forgot-password" class="text-amber hover:underline font-medium ml-1">{{ t('auth.recover_it') }}</NuxtLink>
       </div>
     </div>
   </div>
@@ -42,6 +42,26 @@ definePageMeta({
 })
 const { login } = useAuth()
 const { t } = useI18n()
+
+useSeoMeta({
+  title: () => t('seo.login.title'),
+  description: () => t('seo.login.description'),
+  ogTitle: () => t('seo.login.title'),
+  ogDescription: () => t('seo.login.description'),
+  ogImage: 'https://bringjobs.qaliby.com/og-image.png',
+  ogUrl: 'https://bringjobs.qaliby.com/login',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => t('seo.login.title'),
+  twitterDescription: () => t('seo.login.description'),
+  twitterImage: 'https://bringjobs.qaliby.com/og-image.png',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://bringjobs.qaliby.com/login' }
+  ]
+})
 const loading = ref(false)
 const error = ref('')
 const form = ref({
@@ -56,7 +76,7 @@ const handleLogin = async () => {
   const result = await login(form.value.email.toLocaleLowerCase(), form.value.password)
   
   if (result.success) {
-    navigateTo('/perfil')
+    navigateTo('/profile')
   } else {
     error.value = result.error
   }

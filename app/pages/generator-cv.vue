@@ -6,7 +6,7 @@
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('generador.title') }} <HelpButton /></div>
           <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('generador.subtitle') }}</div>
         </div>
-        <NuxtLink to="/plantillas" class="generator-hero-link">
+        <NuxtLink to="/templates" class="generator-hero-link">
           <AppButton variant="ghost">
             <span class="material-symbols-outlined text-[16px] mr-1">dashboard_customize</span>
             {{ $t('generador.view_templates') }}

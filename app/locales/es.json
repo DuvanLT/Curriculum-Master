@@ -921,5 +921,19 @@
     "how_title_emphasis": "exito",
     "pricing_title_prefix": "Invierte en tu",
     "pricing_title_emphasis": "futuro"
+  },
+  "seo": {
+    "landing": {
+      "title": "BringJobs | Optimiza tu CV con IA y Supera Filtros ATS",
+      "description": "La plataforma todo-en-uno para crear, optimizar y triunfar en tus aplicaciones laborales. Análisis ATS, Career Coach y simulador de entrevistas."
+    },
+    "login": {
+      "title": "Iniciar Sesión | Accede a tu Panel de BringJobs",
+      "description": "Entra a tu cuenta de BringJobs para gestionar tus aplicaciones laborales, optimizar tu CV y continuar tu búsqueda de empleo con inteligencia artificial."
+    },
+    "signup": {
+      "title": "Crea tu Cuenta Gratis | Únete a BringJobs Hoy",
+      "description": "Regístrate en BringJobs y empieza a usar la inteligencia artificial para crear currículums impactantes, analizar vacantes y practicar entrevistas."
+    }
   }
 }

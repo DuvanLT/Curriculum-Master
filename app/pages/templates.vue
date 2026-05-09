@@ -6,7 +6,7 @@
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('profile.section_cv_template') }}</div>
           <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('profile.cv_template_subtitle') }}</div>
         </div>
-        <NuxtLink to="/generador" class="templates-back-link">
+        <NuxtLink to="/generator-cv" class="templates-back-link">
           <AppButton variant="ghost">
             <span class="material-symbols-outlined text-[16px] mr-1">arrow_back</span>
             {{ $t('generador.title') }}

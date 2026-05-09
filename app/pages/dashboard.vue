@@ -86,7 +86,7 @@
             <div v-if="data.atsScore.demandedSkills.length === 0" class="skills-empty">
               <span class="material-symbols-outlined text-3xl text-text-dim/20 mb-2">bar_chart</span>
               <div class="text-[11px] text-text-dim font-mono">{{ $t('dashboard.skills_empty') }}</div>
-              <AppButton variant="ghost" size="sm" class="mt-3" @click="navigateTo('/analisis')">
+              <AppButton variant="ghost" size="sm" class="mt-3" @click="navigateTo('/analysis')">
                 <span class="material-symbols-outlined text-[14px] mr-1">search</span>
                 {{ $t('dashboard.go_to_analysis') }}
               </AppButton>
@@ -219,7 +219,7 @@
             <div v-if="data.cvHistory.length === 0" class="history-empty">
               <span class="material-symbols-outlined text-3xl text-text-dim/20 mb-2">description</span>
               <div class="text-[11px] text-text-dim font-mono text-center mb-3">{{ $t('dashboard.no_cvs') }}</div>
-              <AppButton variant="ghost" size="sm" @click="navigateTo('/generador')">
+              <AppButton variant="ghost" size="sm" @click="navigateTo('/generator-cv')">
                 <span class="material-symbols-outlined text-[14px] mr-1">description</span>
                 {{ $t('dashboard.generate_first_cv') }}
               </AppButton>
@@ -243,7 +243,7 @@
               </div>
             </div>
             <div v-if="data.cvHistory.length > 0" class="history-footer">
-              <AppButton variant="ghost" size="sm" class="w-full" @click="navigateTo('/generador')">
+              <AppButton variant="ghost" size="sm" class="w-full" @click="navigateTo('/generator-cv')">
                 <span class="material-symbols-outlined text-[14px] mr-1">add</span>
                 {{ $t('dashboard.generate_new_cv') }}
               </AppButton>

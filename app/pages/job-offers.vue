@@ -300,11 +300,11 @@ const buildJobJD = (job: JoobleJob) => {
 }
 
 const goToAnalisis = (job: JoobleJob) => {
-  navigateTo({ path: '/analisis', query: { jd: buildJobJD(job) } })
+  navigateTo({ path: '/analysis', query: { jd: buildJobJD(job) } })
 }
 
 const goToGenerador = (job: JoobleJob) => {
-  navigateTo({ path: '/generador', query: { jd: buildJobJD(job) } })
+  navigateTo({ path: '/generator-cv', query: { jd: buildJobJD(job) } })
 }
 </script>
 

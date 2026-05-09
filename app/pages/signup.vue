@@ -52,6 +52,26 @@ definePageMeta({
 const { signup } = useAuth()
 const { t } = useI18n()
 
+useSeoMeta({
+  title: () => t('seo.signup.title'),
+  description: () => t('seo.signup.description'),
+  ogTitle: () => t('seo.signup.title'),
+  ogDescription: () => t('seo.signup.description'),
+  ogImage: 'https://bringjobs.qaliby.com/og-image.png',
+  ogUrl: 'https://bringjobs.qaliby.com/signup',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => t('seo.signup.title'),
+  twitterDescription: () => t('seo.signup.description'),
+  twitterImage: 'https://bringjobs.qaliby.com/og-image.png',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://bringjobs.qaliby.com/signup' }
+  ]
+})
+
 const loading = ref(false)
 const error = ref('')
 const form = ref({

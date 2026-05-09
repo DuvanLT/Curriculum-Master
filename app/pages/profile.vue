@@ -11,10 +11,10 @@
             {{ hasUnsavedChanges ? $t('profile.unsaved_changes') : $t('profile.no_changes') }}
           </div>
           <div class="profile-action-links">
-            <NuxtLink to="/examen" class="nav-item" active-class="active">
+            <NuxtLink to="/exam" class="nav-item" active-class="active">
               <AppButton variant="ghost">{{ $t('profile.btn_discover_skills') }}</AppButton>
             </NuxtLink>
-            <NuxtLink to="/importar-cv" class="nav-item" active-class="active">
+            <NuxtLink to="/import-cv" class="nav-item" active-class="active">
               <AppButton variant="ghost">{{ $t('profile.btn_import_cv') }}</AppButton>
             </NuxtLink>
           </div>

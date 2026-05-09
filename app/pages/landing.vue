@@ -567,13 +567,23 @@ const changeLanguage = (lang: string) => {
 
 const primaryCta = computed(() => loggedIn.value ? '/dashboard' : '/signup')
 
+useSeoMeta({
+  title: () => t('seo.landing.title'),
+  description: () => t('seo.landing.description'),
+  ogTitle: () => t('seo.landing.title'),
+  ogDescription: () => t('seo.landing.description'),
+  ogImage: 'https://bringjobs.qaliby.com/og-image.png',
+  ogUrl: 'https://bringjobs.qaliby.com/landing',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => t('seo.landing.title'),
+  twitterDescription: () => t('seo.landing.description'),
+  twitterImage: 'https://bringjobs.qaliby.com/og-image.png',
+})
+
 useHead({
-  title: 'BringJobs | Optimiza tu carrera con IA',
-  meta: [
-    {
-      name: 'description',
-      content: 'La plataforma todo-en-uno para crear, optimizar y triunfar en tus aplicaciones laborales.'
-    }
+  link: [
+    { rel: 'canonical', href: 'https://bringjobs.qaliby.com/landing' }
   ]
 })
 </script>

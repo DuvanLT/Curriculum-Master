@@ -301,7 +301,7 @@ const saveAsApplication = async () => {
       }
     })
     toast.success(t('analisis.toast_app_saved'))
-    navigateTo('/aplicaciones')
+    navigateTo('/jobs-applications')
   } catch (e) {
     console.error(e)
     toast.error(t('analisis.toast_app_error'))

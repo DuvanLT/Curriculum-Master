@@ -39,8 +39,8 @@ export const useNavigationHelp = () => {
       group: 'primary'
     },
     {
-      id: 'analisis',
-      to: '/analisis',
+      id: 'analysis',
+      to: '/analysis',
       label: t('sidebar.items.analisis.label'),
       icon: 'search',
       description: t('sidebar.items.analisis.description'),
@@ -48,8 +48,8 @@ export const useNavigationHelp = () => {
       group: 'primary'
     },
     {
-      id: 'generador',
-      to: '/generador',
+      id: 'generator-cv',
+      to: '/generator-cv',
       label: t('sidebar.items.generador.label'),
       icon: 'description',
       description: t('sidebar.items.generador.description'),
@@ -66,8 +66,8 @@ export const useNavigationHelp = () => {
       group: 'primary'
     },
     {
-      id: 'pasos',
-      to: '/pasos',
+      id: 'steps',
+      to: '/steps',
       label: t('sidebar.items.pasos.label'),
       icon: 'fact_check',
       description: t('sidebar.items.pasos.description'),
@@ -75,8 +75,8 @@ export const useNavigationHelp = () => {
       group: 'primary'
     },
     {
-      id: 'entrevista',
-      to: '/entrevista',
+      id: 'interview',
+      to: '/interview',
       label: t('sidebar.items.entrevista.label'),
       icon: 'videocam',
       description: t('sidebar.items.entrevista.description'),
@@ -85,8 +85,8 @@ export const useNavigationHelp = () => {
       badge: 'BETA'
     },
     {
-      id: 'aplicaciones',
-      to: '/aplicaciones',
+      id: 'jobs-applications',
+      to: '/jobs-applications',
       label: t('sidebar.items.aplicaciones.label'),
       icon: 'view_kanban',
       description: t('sidebar.items.aplicaciones.description'),
@@ -94,8 +94,8 @@ export const useNavigationHelp = () => {
       group: 'primary'
     },
     {
-      id: 'ofertas',
-      to: '/ofertas',
+      id: 'job-offers',
+      to: '/job-offers',
       label: t('sidebar.items.ofertas.label'),
       icon: 'work',
       description: t('sidebar.items.ofertas.description'),
@@ -112,8 +112,8 @@ export const useNavigationHelp = () => {
       group: 'settings'
     },
     {
-      id: 'perfil',
-      to: '/perfil',
+      id: 'profile',
+      to: '/profile',
       label: t('sidebar.items.perfil.label'),
       icon: 'person',
       description: t('sidebar.items.perfil.description'),
@@ -127,13 +127,13 @@ export const useNavigationHelp = () => {
       title: t('sidebar.extra_help.importar_cv.title'),
       description: t('sidebar.extra_help.importar_cv.description'),
       tip: t('sidebar.extra_help.importar_cv.tip'),
-      match: path => path === '/importar-cv' || path.startsWith('/importar-cv/')
+      match: path => path === '/import-cv' || path.startsWith('/import-cv/')
     },
     {
       title: t('sidebar.extra_help.examen.title'),
       description: t('sidebar.extra_help.examen.description'),
       tip: t('sidebar.extra_help.examen.tip'),
-      match: path => path === '/examen' || path.startsWith('/examen/')
+      match: path => path === '/exam' || path.startsWith('/exam/')
     }
   ])
 
