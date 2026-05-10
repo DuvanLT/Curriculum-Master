@@ -39,7 +39,9 @@ export default defineEventHandler(async (event) => {
     email: userRecord.email,
     name: userRecord.name,
     is_verified: userRecord.is_verified,
-    preferred_locale: userRecord.preferred_locale || 'es'
+    preferred_locale: userRecord.preferred_locale || 'es',
+    subscription_name: userRecord.subscription_name || null,
+    last_payment_at: userRecord.last_payment_at || null
   }
 
   await setUserSession(event, { user })

@@ -8,10 +8,14 @@
       </main>
     </div>
     <AppToast />
+    <UpgradeModal :show="showUpgradeModal" @close="showUpgradeModal = false" />
   </div>
 </template>
 
 <script setup>
+import { useSubscription } from '~/composables/useSubscription'
+
+const { showUpgradeModal } = useSubscription()
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@
           <div class="page-title font-head text-[22px] font-bold mb-1 tracking-tighter">{{ $t('aplicaciones.title') }} <HelpButton /></div>
           <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('aplicaciones.subtitle') }}</div>
         </div>
-        <AppButton @click="showAddModal = true" variant="primary" class="applications-add-button">
+        <AppButton @click="handleShowAddModal" variant="primary" class="applications-add-button">
           {{ $t('aplicaciones.new_app_btn') }}
         </AppButton>
       </div>
@@ -215,8 +215,18 @@ interface NewApplication {
 
 const applications = ref<Application[]>([])
 const loading = ref(false)
+const handleShowAddModal = () => {
+  if (user.value?.subscription_name !== 'pro') {
+    showUpgradeModal.value = true
+    return
+  }
+  showAddModal.value = true
+}
+
 const showAddModal = ref(false)
 const toast = useToast()
+const { user } = useAuth()
+const { showUpgradeModal } = useSubscription()
 const { t } = useI18n()
 const statusOptions: ApplicationStatus[] = ['Pendiente', 'Aplicado', 'Entrevista', 'Oferta', 'Rechazado']
 

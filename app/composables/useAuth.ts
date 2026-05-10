@@ -36,11 +36,10 @@ export const useAuth = () => {
       // Apply the user's stored language preference
       if (data.user.preferred_locale && ['es', 'en'].includes(data.user.preferred_locale)) {
         const i18n = useNuxtApp().$i18n as any
-        if (i18n?.locale) {
+        if (i18n && typeof i18n.setLocale === 'function') {
+          i18n.setLocale(data.user.preferred_locale)
+        } else if (i18n?.locale) {
           i18n.locale.value = data.user.preferred_locale
-        }
-        if (import.meta.client) {
-          localStorage.setItem('preferred-locale', data.user.preferred_locale)
         }
       }
 

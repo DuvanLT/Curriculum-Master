@@ -24,14 +24,14 @@
             v-model="input" 
             :placeholder="$t('coach.placeholder')" 
             class="!mb-0 flex-1"
-            @keyup.enter="send()"
+            @keyup.enter="handleSend()"
           />
-          <AppButton @click="send()" :disabled="loading || !input.trim()">
+          <AppButton @click="handleSend()" :loading="loading" :disabled="!input.trim()">
             {{ $t('coach.send') }}
           </AppButton>
         </div>
 
-        <div class="flex flex-col sm:flex-row flex-wrap gap-2 mt-4">
+        <div v-if="user?.subscription_name === 'pro'" class="flex flex-col sm:flex-row flex-wrap gap-2 mt-4">
           <button 
             v-for="s in suggestions" 
             :key="s" 
@@ -51,6 +51,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const { user } = useAuth()
+const { showUpgradeModal } = useSubscription()
 const { profile, experiences, fetchProfile } = useAppState()
 const { t, locale } = useI18n()
 
@@ -85,6 +87,14 @@ const scrollToBottom = () => {
       chatContainer.value.scrollTop = chatContainer.value.scrollHeight
     }
   })
+}
+
+const handleSend = (text) => {
+  if (user.value?.subscription_name !== 'pro') {
+    showUpgradeModal.value = true
+    return
+  }
+  send(text)
 }
 
 const send = async (text) => {

@@ -255,7 +255,6 @@ const { locale, setLocale, t } = useI18n()
 const currentLocale = computed(() => locale.value)
 const setPreferredLocale = async (newLocale: 'es' | 'en') => {
   setLocale(newLocale)
-  localStorage.setItem('preferred-locale', newLocale)
   toast.success(t('settings.toast_lang_saved'))
   // Persist to DB so it's available on login from any device
   try {

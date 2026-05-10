@@ -100,14 +100,13 @@ const selectedLocale = ref<'es' | 'en'>('es')
 
 const confirmLocale = () => {
   setLocale(selectedLocale.value)
-  localStorage.setItem('preferred-locale', selectedLocale.value)
   navigateTo('/landing')
 }
 
 // If locale is already set, skip this page
 onMounted(() => {
-  const saved = localStorage.getItem('preferred-locale')
-  if (saved && ['es', 'en'].includes(saved)) {
+  const i18nCookie = useCookie('i18n_redirected')
+  if (i18nCookie.value && ['es', 'en'].includes(i18nCookie.value)) {
     navigateTo('/landing')
   }
 })

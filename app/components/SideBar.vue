@@ -43,6 +43,10 @@
           <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
           <span v-if="showItemText" class="nav-text">{{ item.label }}</span>
           <span v-if="showItemText && item.badge" class="badge-beta">{{ item.badge }}</span>
+          
+          <div v-if="showItemText && isItemPremium(item.id)" class="premium-badge ml-auto">
+            PRO
+          </div>
         </NuxtLink>
       </div>
 
@@ -86,7 +90,9 @@
           </div>
           <div v-if="showProfileText" class="flex flex-col min-w-0">
             <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || $t('sidebar.unnamed') }}</div>
-            <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">{{ $t('sidebar.plan_beta') }}</div>
+            <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">
+              {{ user.subscription_name === 'pro' ? $t('sidebar.plan_pro') : $t('sidebar.plan_free_trial') }}
+            </div>
           </div>
         </NuxtLink>
       </div>
@@ -212,6 +218,12 @@ const tourItems = computed(() => {
 
 const currentTourItem = computed(() => tourItems.value[tourStep.value] ?? null)
 const isLastTourStep = computed(() => tourStep.value === tourItems.value.length - 1)
+
+const isItemPremium = (id: string) => {
+  if (user.value?.subscription_name === 'pro') return false
+  const premiumItems = ['dashboard', 'coach', 'interview', 'jobs-applications']
+  return premiumItems.includes(id)
+}
 
 const isFocusedTourItem = (id: string) => showTour.value && currentTourItem.value?.id === id
 
@@ -541,6 +553,16 @@ watch(isMobile, mobile => {
   color: var(--amber);
   border-left-color: var(--amber);
   background: var(--bg3);
+}
+
+.premium-badge {
+  color: var(--amber);
+  font-size: 10px;
+  font-weight: 800;
+  font-style: italic;
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+  opacity: 0.8;
 }
 
 .nav-icon {

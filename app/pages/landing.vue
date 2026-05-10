@@ -562,7 +562,6 @@ const { t, setLocale, locale } = useI18n()
 
 const changeLanguage = (lang: string) => {
   setLocale(lang as 'es' | 'en')
-  localStorage.setItem('preferred-locale', lang)
 }
 
 const primaryCta = computed(() => loggedIn.value ? '/dashboard' : '/signup')

@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
 import { requireVerifiedUserSession } from '../utils/verified-session'
 import { checkUserAIRateLimit } from '../utils/rate-limit'
+import { FREE_TRIAL_LIMITS, isProUser } from '../utils/subscription'
 
 const MAX_STEPS = 40
 
@@ -38,6 +39,22 @@ export default defineEventHandler(async (event) => {
   const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
   checkUserAIRateLimit(userId)
+
+  const isPro = isProUser(session.user?.subscription_name)
+  if (!isPro) {
+    const db = useDb()
+    const cvsResult = await db.execute({
+      sql: 'SELECT COUNT(*) as count FROM generated_cvs WHERE user_id = ?',
+      args: [userId]
+    })
+    const cvs = Number(cvsResult.rows[0]?.count || 0)
+    if (cvs >= FREE_TRIAL_LIMITS.MAX_CVS) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Has alcanzado el límite de CVs generados en el plan gratuito. Mejora a Pro para continuar.'
+      })
+    }
+  }
   const body = await readBody(event)
   const { profile, experiences, jd, locale = 'es' } = body
   const isEn = locale === 'en'

@@ -108,6 +108,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const { user } = useAuth()
+const { showUpgradeModal } = useSubscription()
 const { profile, experiences } = useAppState()
 const toast = useToast()
 const { t } = useI18n()

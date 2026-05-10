@@ -59,7 +59,16 @@ export const useAppState = () => {
   const loading = useState('app-loading', () => false);
   const initialized = useState('app-profile-initialized', () => false);
   const hasData = useState('app-profile-has-data', () => false);
-  const pendingRequest = useState<Promise<void> | null>('app-profile-pending-request', () => null);
+  const nuxtApp = useNuxtApp();
+  // Store non-serializable promise in the nuxtApp instance (per-request) instead of useState to avoid Devalue errors
+  if (!nuxtApp._profilePendingRequest) {
+    nuxtApp._profilePendingRequest = null;
+  }
+  // We use a computed or getter/setter to maintain the same API for the rest of the composable
+  const pendingRequest = {
+    get value() { return nuxtApp._profilePendingRequest as Promise<void> | null; },
+    set value(v: Promise<void> | null) { nuxtApp._profilePendingRequest = v; }
+  };
 
   const hasProfileData = (value: Profile) => {
     return Boolean(

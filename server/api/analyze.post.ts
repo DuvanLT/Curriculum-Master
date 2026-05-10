@@ -2,12 +2,30 @@ import OpenAI from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import { requireVerifiedUserSession } from '../utils/verified-session'
 import { checkUserAIRateLimit } from '../utils/rate-limit'
+import { FREE_TRIAL_LIMITS, isProUser } from '../utils/subscription'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const session = await requireVerifiedUserSession(event)
   const userId = session.user.id
   checkUserAIRateLimit(userId)
+
+  const isPro = isProUser(session.user?.subscription_name)
+  if (!isPro) {
+    const db = useDb()
+    const analysesResult = await db.execute({
+      sql: 'SELECT COUNT(*) as count FROM job_analyses WHERE user_id = ?',
+      args: [userId]
+    })
+    const analyses = Number(analysesResult.rows[0]?.count || 0)
+    if (analyses >= FREE_TRIAL_LIMITS.MAX_ANALYSES) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Has alcanzado el límite de análisis en el plan gratuito. Mejora a Pro para continuar.'
+      })
+    }
+  }
+
   const { jd, profile, experiences, locale = 'es' } = await readBody(event)
   const isEn = locale === 'en'
 

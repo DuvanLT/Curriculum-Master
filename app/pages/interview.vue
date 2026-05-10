@@ -7,7 +7,7 @@
           <div class="page-sub text-[13px] text-text-dim font-mono">{{ $t('entrevista.subtitle') }}</div>
         </div>
         <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <AppButton v-if="!active" @click="startInterview" variant="primary" class="w-full sm:w-auto">
+          <AppButton v-if="!active" @click="handleStartInterview" variant="primary" class="w-full sm:w-auto">
             {{ $t('entrevista.btn_start') }}
           </AppButton>
           <template v-else>
@@ -53,7 +53,7 @@
               </ul>
             </div>
             <AppButton 
-              @click="saveSelectedSteps" 
+              @click="handleSaveSelectedSteps" 
               class="w-full" 
               variant="primary" 
               :disabled="selectedSteps.length === 0 || savingSteps"
@@ -151,6 +151,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const { user } = useAuth()
+const { showUpgradeModal } = useSubscription()
 const { profile, experiences, fetchProfile } = useAppState()
 const toast = useToast()
 const { t, locale } = useI18n()
@@ -264,6 +266,14 @@ const setupSpeechRecognition = () => {
   }
 }
 
+const handleStartInterview = () => {
+  if (user.value?.subscription_name !== 'pro') {
+    showUpgradeModal.value = true
+    return
+  }
+  startInterview()
+}
+
 const startInterview = async () => {
   results.value = null
   try {
@@ -316,6 +326,14 @@ const toggleSelection = (step: string) => {
   } else {
     selectedSteps.value.push(step)
   }
+}
+
+const handleSaveSelectedSteps = () => {
+  if (user.value?.subscription_name !== 'pro') {
+    showUpgradeModal.value = true
+    return
+  }
+  saveSelectedSteps()
 }
 
 const saveSelectedSteps = async () => {

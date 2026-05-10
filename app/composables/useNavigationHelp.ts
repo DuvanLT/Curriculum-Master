@@ -81,8 +81,7 @@ export const useNavigationHelp = () => {
       icon: 'videocam',
       description: t('sidebar.items.entrevista.description'),
       tip: t('sidebar.items.entrevista.tip'),
-      group: 'primary',
-      badge: 'BETA'
+      group: 'primary'
     },
     {
       id: 'jobs-applications',

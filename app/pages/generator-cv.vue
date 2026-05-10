@@ -214,6 +214,13 @@ onMounted(() => {
 })
 
 const generateAI = async () => {
+  const { canGenerateCV, showUpgradeModal } = useSubscription()
+
+  if (!canGenerateCV.value) {
+    showUpgradeModal.value = true
+    return
+  }
+
   await ensureProfileLoaded()
 
   if (profileLoading.value) {

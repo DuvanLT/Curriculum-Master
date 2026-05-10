@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  ssr: false,
+  ssr: true,
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
   modules: ['nuxt-auth-utils', '@nuxtjs/i18n'],
@@ -12,6 +12,12 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
     strategy: 'no_prefix',
     langDir: 'locales',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+      alwaysRedirect: true
+    },
     vueI18n: './i18n.config.ts'
   },
   runtimeConfig: {

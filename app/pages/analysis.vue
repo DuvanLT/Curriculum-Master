@@ -234,6 +234,13 @@ onMounted(() => {
 })
 
 const runAIMatch = async () => {
+  const { canAnalyzeOffer, showUpgradeModal } = useSubscription()
+
+  if (!canAnalyzeOffer.value) {
+    showUpgradeModal.value = true
+    return
+  }
+
   await ensureProfileLoaded()
 
   if (profileLoading.value) {
