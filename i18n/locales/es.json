@@ -20,6 +20,7 @@
     "role_ai": "Reclutador",
     "btn_speaking": "Hablando... (Click para enviar)",
     "btn_click_to_speak": "Click para hablar",
+    "press_to_talk": "Presionar para hablar",
     "note_listening": "La IA está escuchando... Haz clic de nuevo cuando termines de hablar.",
     "note_practice": "Práctica tu lenguaje corporal y tus respuestas en voz alta.",
     "modal_finish_anyway": "Finalizar de todos modos",

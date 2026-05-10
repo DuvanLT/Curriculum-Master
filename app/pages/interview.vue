@@ -99,7 +99,10 @@
               :disabled="!active || loading"
               @click="toggleListening"
             >
-              <span class="material-symbols-outlined text-[20px] leading-none">mic</span>
+              <div class="flex items-center gap-2.5 px-1">
+                <span class="material-symbols-outlined text-[20px] leading-none">mic</span>
+                <span class="font-bold text-[13px] uppercase tracking-wider">{{ $t('entrevista.press_to_talk') }}</span>
+              </div>
             </AppButton>
           </section>
 
@@ -716,7 +719,7 @@ const scrollToBottom = () => {
 .single-wave-panel {
   position: relative;
   overflow: hidden;
-  min-height: 520px;
+  height: 600px;
   padding: 28px;
   border: 1px solid var(--border);
   border-radius: 28px;
@@ -837,10 +840,9 @@ const scrollToBottom = () => {
 }
 
 .single-wave-panel__cta-icon {
-  width: 52px;
   min-width: 52px;
   height: 52px !important;
-  padding: 0 !important;
+  padding: 0 24px !important;
   border-radius: 999px !important;
   display: inline-flex;
   align-items: center;
@@ -855,7 +857,7 @@ const scrollToBottom = () => {
 }
 
 .compact-chat {
-  min-height: 520px;
+  height: 600px;
 }
 
 .history-card__head {
@@ -947,7 +949,7 @@ const scrollToBottom = () => {
   }
 
   .single-wave-panel {
-    min-height: 380px;
+    height: 400px;
     padding: 22px;
     border-radius: 22px;
   }
@@ -966,7 +968,7 @@ const scrollToBottom = () => {
   }
 
   .compact-chat {
-    min-height: 280px;
+    height: 350px;
   }
 }
 </style>
