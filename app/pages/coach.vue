@@ -19,16 +19,23 @@
           </div>
         </div>
 
-        <div class="flex gap-2">
-          <AppInput 
-            v-model="input" 
-            :placeholder="$t('coach.placeholder')" 
-            class="!mb-0 flex-1"
+        <div class="coach-composer">
+          <input
+            v-model="input"
+            type="text"
+            :placeholder="$t('coach.placeholder')"
+            class="coach-composer-input"
             @keyup.enter="handleSend()"
           />
-          <AppButton @click="handleSend()" :loading="loading" :disabled="!input.trim()">
-            {{ $t('coach.send') }}
-          </AppButton>
+          <button
+            type="button"
+            class="coach-composer-button"
+            :disabled="loading || !input.trim()"
+            @click="handleSend()"
+          >
+            <span v-if="loading" class="coach-composer-spinner" aria-hidden="true"></span>
+            <span>{{ $t('coach.send') }}</span>
+          </button>
         </div>
 
         <div v-if="user?.subscription_name === 'pro'" class="flex flex-col sm:flex-row flex-wrap gap-2 mt-4">
@@ -143,6 +150,87 @@ const renderMarkdown = (text) => {
   border: 1px solid var(--border);
 }
 
+.coach-composer {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.coach-composer-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--amber) 55%, var(--border));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 90%, white 10%), var(--bg));
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.coach-composer-input::placeholder {
+  color: var(--text-dim);
+}
+
+.coach-composer-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 18%, transparent);
+}
+
+.coach-composer-button {
+  min-width: 116px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--amber) 76%, white 24%), var(--amber));
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--amber) 28%, transparent);
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease, filter .18s ease;
+}
+
+.coach-composer-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.coach-composer-button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+  box-shadow: none;
+}
+
+.coach-composer-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, white 35%, transparent);
+  border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+}
+
+@media (max-width: 640px) {
+  .coach-composer {
+    flex-direction: column;
+  }
+
+  .coach-composer-button {
+    width: 100%;
+  }
+}
+
 :deep(.markdown-content) p {
   margin-bottom: 0.75rem;
 }
@@ -166,5 +254,15 @@ const renderMarkdown = (text) => {
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   color: var(--amber);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
