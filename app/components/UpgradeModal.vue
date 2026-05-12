@@ -118,11 +118,17 @@ defineProps({
 const emit = defineEmits(['close'])
 
 const handleUpgrade = () => {
-  // Logic to redirect to payment gateway (Hotmart or Stripe)
-  // For now, emit close and redirect
+  const config = useRuntimeConfig()
+  const { user } = useAuth()
+  
+  const baseUrl = config.public.lemonSqueezyCheckoutUrl
+  if (!baseUrl || !user.value?.id) return
+
+  // Pass user_id as custom data so the webhook knows which user purchased
+  const checkoutUrl = `${baseUrl}?checkout[custom][user_id]=${encodeURIComponent(user.value.id)}&checkout[email]=${encodeURIComponent(user.value.email || '')}`
+  
   emit('close')
-  // TODO: Add correct payment link
-  window.open('https://pay.hotmart.com/E95708849L', '_blank')
+  window.open(checkoutUrl, '_blank')
 }
 </script>
 

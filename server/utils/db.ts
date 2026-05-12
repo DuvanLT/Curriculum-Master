@@ -25,7 +25,8 @@ const ALLOWED_COLUMN_NAMES = new Set([
   'email_profile', 'titulo', 'ubicacion', 'resumen', 'telefono',
   'linkedin', 'github', 'web', 'educacion', 'years',
   'sidebar_tour_completed_at', 'is_verified', 'verification_code',
-  'preferred_locale'
+  'preferred_locale', 'subscription_name', 'last_payment_at',
+  'lemon_squeezy_customer_id', 'lemon_squeezy_order_id'
 ])
 
 async function ensureUserColumn(db: ReturnType<typeof useDb>, name: string, type: string) {
@@ -93,7 +94,11 @@ export const initDb = async () => {
     { name: 'sidebar_tour_completed_at', type: 'DATETIME' },
     { name: 'is_verified', type: 'INTEGER DEFAULT 0' },
     { name: 'verification_code', type: 'TEXT' },
-    { name: 'preferred_locale', type: "TEXT DEFAULT 'es'" }
+    { name: 'preferred_locale', type: "TEXT DEFAULT 'es'" },
+    { name: 'subscription_name', type: "TEXT DEFAULT 'free_trial'" },
+    { name: 'last_payment_at', type: 'DATETIME' },
+    { name: 'lemon_squeezy_customer_id', type: 'TEXT' },
+    { name: 'lemon_squeezy_order_id', type: 'TEXT' }
   ]
   for (const col of columns) {
     try {
@@ -200,6 +205,22 @@ export const initDb = async () => {
     )
   `)
 
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      lemon_squeezy_order_id TEXT NOT NULL,
+      customer_email TEXT,
+      total INTEGER,
+      currency TEXT,
+      status TEXT,
+      event_name TEXT,
+      payload_json TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `)
+
   // ─── Indexes for performance ───
   const indexes = [
     'CREATE INDEX IF NOT EXISTS idx_experiences_user ON experiences(user_id)',
@@ -208,6 +229,8 @@ export const initDb = async () => {
     'CREATE INDEX IF NOT EXISTS idx_applications_user ON applications(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_generated_cvs_user ON generated_cvs(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_next_steps_user ON next_steps(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_orders_ls_order ON orders(lemon_squeezy_order_id)',
     'CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)'
   ]
 

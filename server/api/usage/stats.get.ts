@@ -20,7 +20,13 @@ export default defineEventHandler(async (event) => {
     const cvs = Number(cvsResult.rows[0]?.count || 0)
     const analyses = Number(analysesResult.rows[0]?.count || 0)
 
-    const isPro = isProUser(session.user?.subscription_name)
+    const userResult = await db.execute({
+      sql: 'SELECT subscription_name FROM users WHERE id = ?',
+      args: [userId]
+    })
+    
+    const userRow = userResult.rows[0] as any
+    const isPro = isProUser(userRow?.subscription_name)
     const canGenerateCV = isPro || cvs < FREE_TRIAL_LIMITS.MAX_CVS
     const canAnalyzeOffer = isPro || analyses < FREE_TRIAL_LIMITS.MAX_ANALYSES
     

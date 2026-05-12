@@ -9,6 +9,11 @@ export default defineEventHandler(async (event) => {
       return
     }
 
+    // Skip protection for webhook routes (authenticated via HMAC signature)
+    if (url.pathname.startsWith('/api/webhooks/')) {
+      return
+    }
+
     // 1. Check for valid user session
     const session = await getUserSession(event)
     if (session?.user) {
