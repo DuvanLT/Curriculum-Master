@@ -131,8 +131,14 @@ export const useAppState = () => {
         syncEducationSummary()
         hasData.value = hasProfileData(profile.value) || educations.value.length > 0 || experiences.value.length > 0
         initialized.value = true;
-      } catch (e) {
+      } catch (e: any) {
         console.error('Error fetching profile:', e);
+        // If we get a 401, the session is likely expired
+        if (e.statusCode === 401 && import.meta.client) {
+          const { logout } = useAuth()
+          await logout()
+          navigateTo('/login')
+        }
       } finally {
         loading.value = false;
         pendingRequest.value = null;

@@ -16,7 +16,8 @@ watch(
       return
     }
 
-    if (!initialized.value && !loading.value) {
+    // Only fetch profile on the client to avoid 401s during SSR internal fetches
+    if (import.meta.client && !initialized.value && !loading.value) {
       await fetchProfile()
     }
   },
