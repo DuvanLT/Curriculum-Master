@@ -27,7 +27,7 @@ export function useSubscription() {
     subscriptionName: 'free_trial'
   }))
 
-  const { data, refresh: refreshStats } = useFetch<UsageStatsResponse>('/api/usage/stats', {
+  const { data, status, refresh: refreshStats } = useFetch<UsageStatsResponse>('/api/usage/stats', {
     key: `api-usage-stats-${user.value?.id}`,
     immediate: !!user.value?.id,
     onResponse({ response }) {
@@ -36,6 +36,8 @@ export function useSubscription() {
       }
     }
   })
+
+  const loadingStats = computed(() => status.value === 'pending')
 
   // Sincronizar el usuario de la sesión si detectamos un cambio de plan en los stats respecto a la cookie
   watch(() => usageStats.value.subscriptionName, async (newName) => {
