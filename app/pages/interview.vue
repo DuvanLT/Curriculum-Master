@@ -153,7 +153,7 @@
 // Removed redundant middleware: auth (now global)
 
 const { user } = useAuth()
-const { showUpgradeModal } = useSubscription()
+const { showUpgradeModal, isPro } = useSubscription()
 const { profile, experiences, fetchProfile } = useAppState()
 const toast = useToast()
 const { t, locale } = useI18n()
@@ -268,7 +268,7 @@ const setupSpeechRecognition = () => {
 }
 
 const handleStartInterview = () => {
-  if (user.value?.subscription_name !== 'pro') {
+  if (!isPro.value) {
     showUpgradeModal.value = true
     return
   }
@@ -330,7 +330,7 @@ const toggleSelection = (step: string) => {
 }
 
 const handleSaveSelectedSteps = () => {
-  if (user.value?.subscription_name !== 'pro') {
+  if (!isPro.value) {
     showUpgradeModal.value = true
     return
   }

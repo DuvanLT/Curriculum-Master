@@ -57,7 +57,7 @@
 // Removed redundant middleware: auth (now global)
 
 const { user } = useAuth()
-const { showUpgradeModal } = useSubscription()
+const { showUpgradeModal, isPro } = useSubscription()
 const { profile, experiences, fetchProfile } = useAppState()
 const { t, locale } = useI18n()
 
@@ -95,7 +95,7 @@ const scrollToBottom = () => {
 }
 
 const handleSend = (text) => {
-  if (user.value?.subscription_name !== 'pro') {
+  if (!isPro.value) {
     showUpgradeModal.value = true
     return
   }

@@ -214,7 +214,7 @@ interface NewApplication {
 const applications = ref<Application[]>([])
 const loading = ref(false)
 const handleShowAddModal = () => {
-  if (user.value?.subscription_name !== 'pro') {
+  if (!isPro.value) {
     showUpgradeModal.value = true
     return
   }
@@ -224,7 +224,7 @@ const handleShowAddModal = () => {
 const showAddModal = ref(false)
 const toast = useToast()
 const { user } = useAuth()
-const { showUpgradeModal } = useSubscription()
+const { showUpgradeModal, isPro } = useSubscription()
 const { t } = useI18n()
 const statusOptions: ApplicationStatus[] = ['Pendiente', 'Aplicado', 'Entrevista', 'Oferta', 'Rechazado']
 
