@@ -242,9 +242,7 @@
 <script setup lang="ts">
 import { getPasswordValidationError, passwordRequirementsText } from '../utils/password-validation'
 
-definePageMeta({
-  middleware: 'auth'
-})
+// Removed redundant middleware: auth (now global)
 
 type PasswordResetStep = 'idle' | 'code-sent' | 'verified'
 

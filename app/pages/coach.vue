@@ -54,9 +54,7 @@
 </template>
 
 <script setup>
-definePageMeta({
-  middleware: 'auth'
-})
+// Removed redundant middleware: auth (now global)
 
 const { user } = useAuth()
 const { showUpgradeModal } = useSubscription()

@@ -150,9 +150,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
-})
+// Removed redundant middleware: auth (now global)
 
 interface AuditResult {
   score: number

@@ -140,9 +140,7 @@ import CVTemplate from '../components/templates/CVTemplate.vue'
 import CVminimalist from '../components/templates/CVminimalist.vue'
 import CVdoublecolumn from '../components/templates/CVdoublecolumn.vue'
 
-definePageMeta({
-  middleware: 'auth'
-})
+// Removed redundant middleware: auth (now global)
 
 const { profile, educations, experiences, ensureProfileLoaded, loading: profileLoading } = useAppState()
 const toast = useToast()

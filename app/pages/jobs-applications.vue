@@ -190,9 +190,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
-})
+// Removed redundant middleware: auth (now global)
 
 type ApplicationStatus = 'Pendiente' | 'Aplicado' | 'Entrevista' | 'Oferta' | 'Rechazado'
 

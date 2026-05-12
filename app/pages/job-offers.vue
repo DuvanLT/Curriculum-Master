@@ -141,9 +141,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
-})
+// Removed redundant middleware: auth (now global)
 
 const toast = useToast()
 const { t } = useI18n()

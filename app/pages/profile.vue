@@ -229,9 +229,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
-})
+// Removed redundant middleware: auth (now global)
 
 const { profile, educations, experiences, loading, fetchProfile, saveProfile } = useAppState()
 const toast = useToast()
