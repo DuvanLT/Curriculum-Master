@@ -91,7 +91,7 @@
           <div v-if="showProfileText" class="flex flex-col min-w-0">
             <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || $t('sidebar.unnamed') }}</div>
             <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">
-              {{ user.subscription_name === 'pro' ? $t('sidebar.plan_pro') : $t('sidebar.plan_free_trial') }}
+              {{ isPro ? $t('sidebar.plan_pro') : $t('sidebar.plan_free_trial') }}
             </div>
           </div>
         </NuxtLink>
@@ -162,6 +162,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const { user } = useAuth()
+const { isPro } = useSubscription()
 const {
   primaryNavigationItems,
   settingsNavigationItems,
@@ -220,7 +221,7 @@ const currentTourItem = computed(() => tourItems.value[tourStep.value] ?? null)
 const isLastTourStep = computed(() => tourStep.value === tourItems.value.length - 1)
 
 const isItemPremium = (id: string) => {
-  if (user.value?.subscription_name === 'pro') return false
+  if (isPro.value) return false
   const premiumItems = ['dashboard', 'coach', 'interview', 'jobs-applications']
   return premiumItems.includes(id)
 }

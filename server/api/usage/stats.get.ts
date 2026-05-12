@@ -26,7 +26,19 @@ export default defineEventHandler(async (event) => {
     })
     
     const userRow = userResult.rows[0] as any
-    const isPro = isProUser(userRow?.subscription_name)
+    const dbPlan = userRow?.subscription_name || 'free_trial'
+    
+    // Sync session if it's outdated
+    if (dbPlan !== session.user.subscription_name) {
+      await setUserSession(event, {
+        user: {
+          ...session.user,
+          subscription_name: dbPlan
+        }
+      })
+    }
+
+    const isPro = isProUser(dbPlan)
     const canGenerateCV = isPro || cvs < FREE_TRIAL_LIMITS.MAX_CVS
     const canAnalyzeOffer = isPro || analyses < FREE_TRIAL_LIMITS.MAX_ANALYSES
     

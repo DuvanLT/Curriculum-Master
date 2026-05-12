@@ -31,6 +31,21 @@ export function useSubscription() {
       subscriptionName: 'free_trial'
     })
   })
+  
+  // Sincronizar el usuario de la sesión si detectamos un cambio de plan en los stats respecto a la cookie
+  watch(() => usageStats.value.subscriptionName, async (newName) => {
+    if (newName && user.value && newName !== user.value.subscription_name) {
+      const { fetch: fetchSession } = useUserSession()
+      await fetchSession()
+    }
+  }, { immediate: true })
+
+  // Refrescar stats cuando el usuario vuelve a la pestaña (por si pagó en otra pestaña)
+  if (import.meta.client) {
+    useEventListener(window, 'focus', () => {
+      refreshStats()
+    })
+  }
 
   // Detectar el tipo de plan actual - Priorizamos los datos frescos de la DB sobre la sesión
   const currentPlan = computed(() => usageStats.value.subscriptionName || user.value?.subscription_name || 'free_trial')
