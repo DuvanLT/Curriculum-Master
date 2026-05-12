@@ -40,7 +40,8 @@ export default defineEventHandler(async (event) => {
       canGenerateCV,
       canAnalyzeOffer,
       remainingCVs,
-      remainingAnalyses
+      remainingAnalyses,
+      subscriptionName: userRow?.subscription_name || 'free_trial'
     }
   } catch (error) {
     console.error('Error fetching usage stats:', error)

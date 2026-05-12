@@ -8,6 +8,7 @@ interface UsageStatsResponse {
   canAnalyzeOffer: boolean
   remainingCVs: number
   remainingAnalyses: number
+  subscriptionName: string
 }
 
 export function useSubscription() {
@@ -26,13 +27,15 @@ export function useSubscription() {
       canGenerateCV: true,
       canAnalyzeOffer: true,
       remainingCVs: 1,
-      remainingAnalyses: 3
+      remainingAnalyses: 3,
+      subscriptionName: 'free_trial'
     })
   })
 
-  // Detectar el tipo de plan actual
-  const isFreeTrial = computed(() => user.value?.subscription_name === 'free_trial' || !user.value?.subscription_name)
-  const isPro = computed(() => user.value?.subscription_name === 'pro')
+  // Detectar el tipo de plan actual - Priorizamos los datos frescos de la DB sobre la sesión
+  const currentPlan = computed(() => usageStats.value.subscriptionName || user.value?.subscription_name || 'free_trial')
+  const isFreeTrial = computed(() => currentPlan.value === 'free_trial')
+  const isPro = computed(() => currentPlan.value === 'pro')
 
   // Lógicas de validación
   // Ahora la fuente de verdad proviene del backend
