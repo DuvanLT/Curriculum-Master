@@ -42,8 +42,10 @@ export function useSubscription() {
 
   // Refrescar stats cuando el usuario vuelve a la pestaña (por si pagó en otra pestaña)
   if (import.meta.client) {
-    useEventListener(window, 'focus', () => {
-      refreshStats()
+    const handleFocus = () => refreshStats()
+    window.addEventListener('focus', handleFocus)
+    onBeforeUnmount(() => {
+      window.removeEventListener('focus', handleFocus)
     })
   }
 
