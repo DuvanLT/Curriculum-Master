@@ -89,11 +89,13 @@
             <div class="absolute inset-0 flex items-center justify-center opacity-30">
               <div class="h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl" />
             </div>
-            <img
-              src="/app_mockup.png"
-              alt="Dashboard de BringJobs"
-              class="relative mx-auto w-full max-w-5xl rounded-[2rem] border border-white/70 shadow-[0_35px_120px_rgba(79,70,229,0.25)] transition duration-500 hover:scale-[1.01]"
-            >
+            <div class="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-white/70 shadow-[0_35px_120px_rgba(79,70,229,0.25)]">
+              <img
+                src="/mockup.svg"
+                alt="Dashboard de BringJobs"
+                class="w-full scale-105 object-cover transition duration-500 hover:scale-[1.08]"
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -514,13 +516,13 @@
                   />
                 </svg>
               </div>-->
-              <span class="text-2xl font-black not-italic text-slate-900">
-                Bring<span class="text-indigo-600">Jobs</span>
-              </span>
+              <div class="text-2xl font-black not-italic text-slate-900 flex flex-row">
+            <img src="https://www.qaliby.com/assets/qali-logo.webp" alt="" class="w-8 h-8 mr-2">Qaliby x Bring<span class="text-indigo-600">Jobs</span> </div>
             </div>
             <p class="max-w-xs leading-relaxed text-slate-500 not-italic">
               {{ t('landing.footer_desc') }}
             </p>
+            
           </div>
 
           <div>

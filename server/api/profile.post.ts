@@ -59,7 +59,8 @@ export default defineEventHandler(async (event) => {
       github = ?,
       web = ?,
       educacion = ?,
-      years = ?
+      years = ?,
+      idiomas = ?
       WHERE id = ?`,
     args: [
       profile.email_profile,
@@ -73,6 +74,13 @@ export default defineEventHandler(async (event) => {
       profile.web,
       educationSummary,
       profile.years,
+      JSON.stringify(
+        Array.isArray(profile.idiomas)
+          ? profile.idiomas
+          : (typeof profile.idiomas === 'string'
+            ? profile.idiomas.split(',').map((s: string) => s.trim()).filter(Boolean)
+            : [])
+      ),
       userId
     ]
   })

@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
 
   const userResult = await db.execute({
-    sql: 'SELECT email_profile, name, titulo, ubicacion, resumen, telefono, linkedin, github, web, educacion, years FROM users WHERE id = ?',
+    sql: 'SELECT email_profile, name, titulo, ubicacion, resumen, telefono, linkedin, github, web, educacion, years, idiomas FROM users WHERE id = ?',
     args: [userId]
   })
 
@@ -101,7 +101,8 @@ export default defineEventHandler(async (event) => {
       otros: user.github || '',
       web: user.web || '',
       educacion: buildEducationSummary(educations) || user.educacion || '',
-      years: user.years || ''
+      years: user.years || '',
+      idiomas: user.idiomas ? JSON.parse(user.idiomas as string) : []
     },
     educations,
     experiences

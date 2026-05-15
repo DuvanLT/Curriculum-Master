@@ -57,11 +57,12 @@
           <AppInput :label="$t('profile.label_web')" v-model="profile.web" placeholder="miweb.com" />
           <AppInput :label="$t('profile.label_other')" v-model="profile.otros" :placeholder="$t('profile.placeholder_other')" />
         </div>
-        <div class="profile-grid gap-3 mb-3">
+        <div class="profile-grid profile-grid-two gap-3 mb-3">
           <AppInput :label="$t('profile.label_location')" maxlength="50" v-model="profile.ubicacion" :placeholder="$t('profile.placeholder_location')" />
+          <AppInput :label="$t('profile.label_languages')" maxlength="150" v-model="profile.idiomas" :placeholder="$t('profile.placeholder_languages')" />
         </div>
         <AppInput :label="$t('profile.label_summary')" :maxlength="500" type="textarea" v-model="profile.resumen" :placeholder="$t('profile.placeholder_summary')" />
-        <AppButton class="profile-save-button" :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
+           <AppButton class="profile-save-button" :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
           {{ $t('profile.btn_save_changes') }}
         </AppButton>
       </AppCard>
@@ -74,6 +75,7 @@
               {{ addingEducation ? $t('profile.btn_cancel') : $t('profile.btn_add_study') }}
             </AppButton>
           </div>
+          
         </template>
 
         <div v-if="addingEducation" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
@@ -194,8 +196,11 @@
               @remove="confirmRemoveExperience"
               @edit="startEditingExperience"
             />
+               <AppButton class="profile-save-button" :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
+          {{ $t('profile.btn_save_changes') }}
+        </AppButton>
           </section>
-
+          
           <section v-if="projectExperiences.length">
             <div class="profile-section-header">
               <div class="text-[12px] font-mono text-sky-500 tracking-widest uppercase">{{ $t('profile.lbl_projects') }}</div>
@@ -210,9 +215,12 @@
               @edit="startEditingExperience"
             />
           </section>
+          
         </div>
+           <AppButton class="profile-save-button" :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
+          {{ $t('profile.btn_save_changes') }}
+        </AppButton>
       </AppCard>
-
       <AppModal
         :show="showConfirmDeleteExp"
         :title="$t('profile.modal_del_title')"

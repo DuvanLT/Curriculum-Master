@@ -153,6 +153,15 @@ const normalizeExperienceType = (value) => {
   return value === 'project' ? 'project' : 'work'
 }
 
+const normalizedDate = (date) => {
+  if (!date) return '';
+  const d = String(date).trim().toLowerCase();
+  if (['present', 'presente', 'actual', 'actualidad', 'current', 'currently'].includes(d)) {
+    return '';
+  }
+  return date;
+}
+
 const optimizedExperiences = computed(() => {
   const sourceExperiences = Array.isArray(props.experiences) ? props.experiences : []
   const aiExperiences = Array.isArray(props.aiData?.experiences) ? props.aiData.experiences : []
@@ -161,6 +170,7 @@ const optimizedExperiences = computed(() => {
     return sourceExperiences.map(exp => ({
       ...exp,
       type: normalizeExperienceType(exp.type),
+      fin: normalizedDate(exp.fin),
       logros_optimizados: exp.logros ? [exp.logros] : []
     }))
   }
@@ -172,7 +182,7 @@ const optimizedExperiences = computed(() => {
       ...aiExp,
       type: normalizeExperienceType(aiExp.type || sourceExp.type),
       inicio: aiExp.inicio || sourceExp.inicio || '',
-      fin: aiExp.fin || sourceExp.fin || '',
+      fin: normalizedDate(aiExp.fin || sourceExp.fin || ''),
       logros_optimizados: Array.isArray(aiExp.logros_optimizados)
         ? aiExp.logros_optimizados
         : (sourceExp.logros ? [sourceExp.logros] : []),
@@ -191,7 +201,10 @@ const projectExperiences = computed(() => {
 
 const normalizedEducations = computed(() => {
   if (Array.isArray(props.educations) && props.educations.length) {
-    return props.educations
+    return props.educations.map(edu => ({
+      ...edu,
+      fin: normalizedDate(edu.fin)
+    }))
   }
 
   if (typeof props.profile?.educacion === 'string' && props.profile.educacion.trim()) {

@@ -120,6 +120,7 @@ CRITICAL RULES:
 14. Return ONLY structured JSON.
 15. Language: English.
 16. If a portfolio/web URL is provided, use it only as a declarative reference of the profile and do not invent evidence from it.
+17. For technical skills (top_skills), STRICTLY use the skills explicitly provided by the user in their profile and experiences. Do not invent or add skills they haven't mentioned.
 `
     : `
 Eres un experto en optimizacion de CVs para sistemas ATS y reclutadores.
@@ -148,6 +149,7 @@ REGLAS CRITICAS:
 14. Devuelve unicamente JSON estructurado.
 15. Traduce o manten el idioma segun la vacante: si la vacante esta en ingles, responde en ingles; si esta en espanol, responde en espanol.
 16. Si se proporciona una URL de portafolio/web, usala solo como referencia declarativa del perfil y no inventes evidencia a partir de ella.
+17. Para las habilidades tecnicas (top_skills), utiliza ESTRICTAMENTE las habilidades que el usuario ya ha especificado en su perfil y experiencias. No inventes ni agregues habilidades que no esten en sus datos reales.
 `
 
   const userPrompt = isEn 
@@ -191,7 +193,7 @@ RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
       "metricas_confiables": ["short list of metrics that can be supported by the given info, or empty if none"]
     }
   ],
-  "top_skills": ["list of the 10 most important skills for this role"],
+  "top_skills": ["list of the 10 most important skills for this role, extracted STRICTLY from the ones the user already specified in their data"],
   "advice": ["3-4 key tips to stand out in this selection process"],
   "next_steps": ["3-4 concrete to-do tasks to improve the profile or application"]
 }
@@ -237,7 +239,7 @@ DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
       "metricas_confiables": ["lista corta de metricas que si se pueden sostener con la informacion dada, o vacio si no hay"]
     }
   ],
-  "top_skills": ["lista de las 10 skills mas importantes para este rol"],
+  "top_skills": ["lista de las 10 skills mas importantes para este rol, extraidas ESTRICTAMENTE de las que el usuario ya declaro en sus datos"],
   "advice": ["3-4 consejos clave para destacar en este proceso de seleccion"],
   "next_steps": ["3-4 tareas concretas de to-do para mejorar el perfil o postulacion"]
 }

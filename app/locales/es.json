@@ -413,6 +413,8 @@
     "placeholder_location": "Cali, Colombia",
     "label_summary": "Resumen profesional",
     "placeholder_summary": "Desarrollador backend con 7+ años de experiencia...",
+    "label_languages": "Idiomas (separados por coma)",
+    "placeholder_languages": "Ej: Español, Inglés, Francés",
     "btn_save_changes": "Guardar cambios",
     "section_education": "Formacion Academica",
     "btn_cancel": "Cancelar",

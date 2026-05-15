@@ -413,6 +413,8 @@
     "placeholder_location": "New York, USA",
     "label_summary": "Professional summary",
     "placeholder_summary": "Backend developer with 7+ years of experience...",
+    "label_languages": "Languages (comma separated)",
+    "placeholder_languages": "Ex: English, Spanish, French",
     "btn_save_changes": "Save changes",
     "section_education": "Academic Background",
     "btn_cancel": "Cancel",

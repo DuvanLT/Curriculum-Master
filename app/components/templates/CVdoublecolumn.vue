@@ -99,6 +99,15 @@ const props = defineProps({
   cvImage: String
 });
 
+const normalizedDate = (date) => {
+  if (!date) return '';
+  const d = String(date).trim().toLowerCase();
+  if (['present', 'presente', 'actual', 'actualidad', 'current', 'currently'].includes(d)) {
+    return '';
+  }
+  return date;
+};
+
 const normalizedEntries = computed(() => {
   const experiences = Array.isArray(props.aiData?.experiences) && props.aiData.experiences.length
     ? props.aiData.experiences
@@ -108,6 +117,7 @@ const normalizedEntries = computed(() => {
     ...exp,
     id: exp.id || `entry-${index}`,
     type: exp.type === 'project' ? 'project' : 'work',
+    fin: normalizedDate(exp.fin),
     logros_optimizados: Array.isArray(exp.logros_optimizados)
       ? exp.logros_optimizados
       : (exp.logros ? [exp.logros] : [])
@@ -118,7 +128,7 @@ const featuredEntries = computed(() => {
   const work = normalizedEntries.value.filter(exp => exp.type !== 'project');
   const projects = normalizedEntries.value.filter(exp => exp.type === 'project');
 
-  return [...work, ...projects].slice(0, 3);
+  return [...work.slice(0, 2), ...projects.slice(0, 2)];
 });
 
 const highlightedSkills = computed(() => {
@@ -126,7 +136,7 @@ const highlightedSkills = computed(() => {
   return skills
     .map((skill) => typeof skill === 'string' ? skill : skill?.name)
     .filter(Boolean)
-    .slice(0, 8);
+    .slice(0, 15);
 });
 
 const languageSummary = computed(() => {
@@ -138,7 +148,13 @@ const languageSummary = computed(() => {
   return t('profile.cv_default_languages_compact');
 });
 
-const normalizedEducations = computed(() => props.educations || []);
+const normalizedEducations = computed(() => {
+  const edus = props.educations || [];
+  return edus.map(edu => ({
+    ...edu,
+    fin: normalizedDate(edu.fin)
+  }));
+});
 </script>
 
 <style scoped>

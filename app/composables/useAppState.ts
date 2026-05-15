@@ -10,6 +10,7 @@ export interface Profile {
   educacion: string;
   resumen: string;
   years: string;
+  idiomas: string | string[];
 }
 
 export interface Education {
@@ -51,7 +52,8 @@ export const useAppState = () => {
     web: '',
     educacion: '',
     resumen: '',
-    years: ''
+    years: '',
+    idiomas: ''
   }));
 
   const educations = useState<Education[]>('educations', () => []);
@@ -82,7 +84,8 @@ export const useAppState = () => {
       value.web ||
       value.educacion ||
       value.resumen ||
-      value.years
+      value.years ||
+      (Array.isArray(value.idiomas) ? value.idiomas.length > 0 : !!value.idiomas)
     )
   }
 
@@ -98,7 +101,8 @@ export const useAppState = () => {
       web: '',
       educacion: '',
       resumen: '',
-      years: ''
+      years: '',
+      idiomas: ''
     };
     educations.value = [];
     experiences.value = [];
@@ -125,7 +129,10 @@ export const useAppState = () => {
     pendingRequest.value = (async () => {
       try {
         const data = await $fetch<{ profile: Profile, educations: Education[], experiences: Experience[] }>('/api/profile');
-        profile.value = data.profile;
+        profile.value = {
+          ...data.profile,
+          idiomas: Array.isArray(data.profile.idiomas) ? data.profile.idiomas.join(', ') : data.profile.idiomas || ''
+        };
         educations.value = Array.isArray(data.educations) ? data.educations : [];
         experiences.value = Array.isArray(data.experiences) ? data.experiences : [];
         syncEducationSummary()
@@ -194,7 +201,8 @@ export const useAppState = () => {
       web: data.web || profile.value.web,
       educacion: data.educacion || profile.value.educacion,
       resumen: data.resumen || profile.value.resumen,
-      years: data.years?.toString() || profile.value.years
+      years: data.years?.toString() || profile.value.years,
+      idiomas: data.idiomas || profile.value.idiomas
     };
   };
 

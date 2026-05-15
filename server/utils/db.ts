@@ -23,7 +23,7 @@ export const useDb = () => {
 // ─── Column migration whitelist ───
 const ALLOWED_COLUMN_NAMES = new Set([
   'email_profile', 'titulo', 'ubicacion', 'resumen', 'telefono',
-  'linkedin', 'github', 'web', 'educacion', 'years',
+  'linkedin', 'github', 'web', 'educacion', 'years', 'idiomas',
   'sidebar_tour_completed_at', 'is_verified', 'verification_code',
   'preferred_locale', 'subscription_name', 'last_payment_at',
   'lemon_squeezy_customer_id', 'lemon_squeezy_order_id'
@@ -91,6 +91,7 @@ export const initDb = async () => {
     { name: 'web', type: 'TEXT' },
     { name: 'educacion', type: 'TEXT' },
     { name: 'years', type: 'TEXT' },
+    { name: 'idiomas', type: 'TEXT' },
     { name: 'sidebar_tour_completed_at', type: 'DATETIME' },
     { name: 'is_verified', type: 'INTEGER DEFAULT 0' },
     { name: 'verification_code', type: 'TEXT' },
