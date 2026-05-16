@@ -230,7 +230,7 @@ const normalizedEducations = computed(() => {
 }
 
 .user-name {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 800;
   margin: 0;
   color: #323b4c;
@@ -238,19 +238,19 @@ const normalizedEducations = computed(() => {
 }
 
 .user-role {
-  font-size: 14px;
+  font-size: 11.5px;
   color: #4a5568;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 6px 0 12px;
+  letter-spacing: 0.5px;
+  margin: 6px 0 10px;
   line-height: 1.3;
 }
 
 .user-summary {
-  font-size: 11.5px;
-  line-height: 1.5;
+  font-size: 10.5px;
+  line-height: 1.4;
   color: #718096;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .main-title {

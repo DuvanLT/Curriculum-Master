@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
     }))
     : []
 
-  const systemPrompt = isEn 
+  const systemPrompt = isEn
     ? `
 You are an expert in CV optimization for ATS systems and recruiters.
 Your goal is to adapt the user's CV to a specific job description without inventing experience, context, or metrics.
@@ -152,7 +152,7 @@ REGLAS CRITICAS:
 17. Para las habilidades tecnicas (top_skills), utiliza ESTRICTAMENTE las habilidades que el usuario ya ha especificado en su perfil y experiencias. No inventes ni agregues habilidades que no esten en sus datos reales.
 `
 
-  const userPrompt = isEn 
+  const userPrompt = isEn
     ? `
 PROFILE DATA:
 ${JSON.stringify(profile)}
@@ -173,8 +173,8 @@ ADDITIONAL OUTPUT INSTRUCTIONS:
 - Keep and return the "type" field in each experience.
 - Each "logros_optimizados" must sound specific to the vacancy, not be a simple copy of the original text.
 - If data is missing for a metric, do not invent percentages.
-- Use a maximum of 2 achievements when relevance is low or medium-low.
-- Use 3 or 4 achievements only when the experience is clearly relevant.
+- Use a MAXIMUM of 3 achievements per experience to keep the CV concise.
+- Each achievement must be EXTREMELY short and direct (maximum 2 or 3 lines). Do not write long paragraphs.
 
 RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
 {
@@ -220,8 +220,8 @@ INSTRUCCIONES ADICIONALES DE SALIDA:
 - Conserva y devuelve el campo "type" en cada experiencia.
 - Cada "logros_optimizados" debe sonar especifico para la vacante, no ser una simple copia del texto original.
 - Si faltan datos para una metrica, no inventes porcentajes.
-- Usa maximo 2 logros cuando la relevancia sea baja o media-baja.
-- Usa 3 o 4 logros solo cuando la experiencia sea claramente relevante.
+- Usa MÁXIMO 2 logros (viñetas) por cada experiencia para mantener el CV conciso.
+- Cada logro debe ser EXTREMADAMENTE corto y directo (máximo 1 o 2 líneas). No escribas párrafos largos.
 
 DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
 {
