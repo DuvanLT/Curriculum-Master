@@ -174,7 +174,7 @@ ADDITIONAL OUTPUT INSTRUCTIONS:
 - Each "logros_optimizados" must sound specific to the vacancy, not be a simple copy of the original text.
 - If data is missing for a metric, do not invent percentages.
 - Use a MAXIMUM of 3 achievements per experience to keep the CV concise.
-- Each achievement must be EXTREMELY short and direct (maximum 2 or 3 lines). Do not write long paragraphs.
+- Each achievement must be EXTREMELY short and direct (minimum 3 lines, maximum 5 lines, 5 if the experience is relevant). Do not write long paragraphs.
 
 RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
 {
