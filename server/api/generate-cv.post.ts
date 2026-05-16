@@ -184,7 +184,7 @@ RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
     {
       "id": "same original id",
       "type": "work or project",
-      "relevance_score": 0,
+      "relevance_score": 0, 
       "relevance_reason": "brief explanation of why this experience is or isn't relevant to the vacancy",
       "cargo": "optimized title",
       "empresa": "company name",
