@@ -299,6 +299,8 @@ const normalizedEducations = computed(() => {
   
   .pdf-container {
     margin: 0;
+    width: 100% !important;
+    max-width: none !important;
     padding: 6mm 10mm;
     background-color: #faf8f5 !important;
   }

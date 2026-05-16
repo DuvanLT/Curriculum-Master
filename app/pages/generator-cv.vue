@@ -287,15 +287,15 @@ const exportToPDF = async () => {
         <style>
           @page {
             size: A4;
-            margin: 0mm !important;
+            margin: 0;
           }
 
           html, body {
             margin: 0;
             padding: 0;
             background: #ffffff;
-            width: 210mm;
-            height: 297mm;
+            width: 100%;
+            height: auto;
           }
 
           body {
@@ -308,19 +308,18 @@ const exportToPDF = async () => {
           }
 
           #print-root {
-            width: 210mm;
-            height: 297mm;
+            width: 100%;
+            height: auto;
             margin: 0 auto;
-            overflow: hidden;
+            overflow: visible;
           }
 
           #print-root .pdf-container {
             width: 100% !important;
-            max-width: 210mm !important;
-            height: 297mm !important;
-            padding: 12mm 10mm !important;
-            margin: 0 auto !important;
-            overflow: hidden !important;
+            max-width: none !important;
+            height: auto !important;
+            margin: 0 !important;
+            overflow: visible !important;
           }
 
           #print-root .pdf-section,
@@ -331,19 +330,17 @@ const exportToPDF = async () => {
 
           @media print {
             html, body {
-              width: 210mm !important;
-              height: 297mm !important;
-              max-height: 297mm !important;
-              overflow: hidden !important;
+              width: 100% !important;
+              height: auto !important;
+              max-height: none !important;
+              overflow: visible !important;
             }
 
             #print-root {
-              width: 210mm !important;
-              height: 297mm !important;
-              max-height: 297mm !important;
-              overflow: hidden !important;
-              page-break-inside: avoid !important;
-              page-break-after: avoid !important;
+              width: 100% !important;
+              height: auto !important;
+              max-height: none !important;
+              overflow: visible !important;
             }
           }
         </style>
