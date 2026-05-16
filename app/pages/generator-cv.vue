@@ -355,7 +355,6 @@ const exportToPDF = async () => {
   `)
   printWindow.document.close()
 
-  printWindow.focus()
 
   const handleAfterPrint = () => {
     printWindow.close()
