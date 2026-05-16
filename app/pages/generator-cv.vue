@@ -266,6 +266,8 @@ const exportToPDF = async () => {
     return
   }
 
+  const now = new Date()
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
   const safeName = (profile.value.nombre || 'CV').replace(/\s+/g, '_')
 
   // Get all styles from the current document to preserve CSS classes (crucial for CVminimalist)
@@ -280,7 +282,7 @@ const exportToPDF = async () => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=1024">
-        <title>${safeName}_Optimizado</title>
+        <title>${safeName}_${timeStr}</title>
         ${styles}
         <style>
           @page {
@@ -334,12 +336,12 @@ const exportToPDF = async () => {
 
           @media print {
             html, body {
-              width: auto;
-              height: auto;
+              width: 210mm !important;
+              min-height: 297mm !important;
             }
 
             #print-root {
-              width: auto;
+              width: 210mm !important;
             }
           }
         </style>

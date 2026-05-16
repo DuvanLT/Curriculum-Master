@@ -238,7 +238,7 @@ const normalizedEducations = computed(() => {
 }
 
 .user-role {
-  font-size: 11.5px;
+  font-size: 17.5px;
   color: #4a5568;
   text-transform: uppercase;
   letter-spacing: 0.5px;

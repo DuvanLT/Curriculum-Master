@@ -276,8 +276,8 @@ DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
           ...aiExp,
           id: aiExp?.id || sourceExp?.id || crypto.randomUUID(),
           type: normalizeExperienceType(aiExp?.type || sourceExp?.type),
-          cargo: aiExp?.cargo || sourceExp?.cargo || '',
-          empresa: aiExp?.empresa || sourceExp?.empresa || '',
+          cargo: sourceExp?.cargo || aiExp?.cargo || '',
+          empresa: sourceExp?.empresa || aiExp?.empresa || '',
           inicio: aiExp?.inicio || sourceExp?.inicio || '',
           fin: aiExp?.fin || sourceExp?.fin || '',
           logros_optimizados: Array.isArray(aiExp?.logros_optimizados)

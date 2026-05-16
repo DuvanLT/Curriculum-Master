@@ -494,19 +494,20 @@ watch(isMobile, mobile => {
   padding-right: 12px;
 }
 
-.sidebar-mobile {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 90;
-  width: min(86vw, 320px);
-  height: 100vh;
-  transform: translateX(-100%);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
-}
-
-.sidebar-mobile-open {
-  transform: translateX(0);
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    z-index: 90;
+    width: min(86vw, 320px) !important;
+    height: 100vh;
+    transform: translateX(-100%);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+  }
+  .sidebar.sidebar-mobile-open {
+    transform: translateX(0);
+  }
 }
 
 .tour-sidebar-active {
