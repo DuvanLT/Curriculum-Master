@@ -141,7 +141,8 @@
     "toast_complete_profile": "Completa tu Perfil Maestro antes de generar el CV.",
     "toast_ai_error": "Error al conectar con la IA. Revisa tu API key.",
     "toast_pdf_error": "No se pudo preparar el CV para impresion.",
-    "toast_popup_blocked": "El navegador bloqueo la ventana de impresion."
+    "toast_popup_blocked": "El navegador bloqueo la ventana de impresion.",
+    "mobile_warning": "Para un resultado óptimo, te recomendamos generar y descargar tu CV desde una computadora. Los navegadores móviles suelen limitar la configuración de márgenes y alterar el diseño original."
   },
   "coach": {
     "title": "Ezra AI",
