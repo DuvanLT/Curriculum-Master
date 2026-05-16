@@ -174,7 +174,7 @@ ADDITIONAL OUTPUT INSTRUCTIONS:
 - Each "logros_optimizados" must sound specific to the vacancy, not be a simple copy of the original text.
 - If data is missing for a metric, do not invent percentages.
 - Use a MAXIMUM of 3 achievements per experience to keep the CV concise.
-- Each achievement must be EXTREMELY short and direct (minimum 3 lines, maximum 5 lines, 5 if the experience is relevant). Do not write long paragraphs.
+- Each achievement must be short and direct (minimum 3 lines, maximum 5 lines, 5 if the experience is relevant). Do not write long paragraphs.
 
 RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
 {
@@ -221,7 +221,7 @@ INSTRUCCIONES ADICIONALES DE SALIDA:
 - Cada "logros_optimizados" debe sonar especifico para la vacante, no ser una simple copia del texto original.
 - Si faltan datos para una metrica, no inventes porcentajes.
 - Usa MÁXIMO 2 logros (viñetas) por cada experiencia para mantener el CV conciso.
-- Cada logro debe ser EXTREMADAMENTE corto y directo (máximo 1 o 2 líneas). No escribas párrafos largos.
+- Cada logro debe ser corto y directo (minimo 3  lineas y máximo 5 líneas si la expereincia o proyecto es muy relevante). No escribas párrafos largos.
 
 DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
 {
