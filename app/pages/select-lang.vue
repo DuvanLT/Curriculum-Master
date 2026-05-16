@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-page min-h-screen flex items-center justify-center p-6 bg-[var(--bg)] relative overflow-hidden">
+  <div class="auth-page min-h-dvh flex items-center justify-center p-6 bg-[var(--bg)] relative overflow-hidden">
     <!-- Blurred Background Overlay -->
     <div class="absolute inset-0 backdrop-blur-sm z-0" style="background: rgba(var(--amber-rgb), 0.04)"></div>
 

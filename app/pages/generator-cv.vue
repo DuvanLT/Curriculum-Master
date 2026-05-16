@@ -14,6 +14,13 @@
         </NuxtLink>
       </div>
 
+      <div class="block md:hidden mb-6 p-4 bg-amber/10 border border-amber/30 rounded-lg flex items-start gap-3">
+        <span class="material-symbols-outlined text-amber text-[20px] mt-0.5">warning</span>
+        <p class="text-[13px] text-text-dim leading-relaxed">
+          {{ $t('generador.mobile_warning') }}
+        </p>
+      </div>
+
       <AppCard :title="$t('generador.card_title')">
         <div class="text-[12px] text-text-muted mb-3">
           {{ $t('generador.card_desc') }}

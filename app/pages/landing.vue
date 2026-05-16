@@ -1,5 +1,5 @@
 <template>
-  <div class="landing-page min-h-screen overflow-x-hidden bg-slate-50 text-slate-900">
+  <div class="landing-page min-h-dvh overflow-x-hidden bg-slate-50 text-slate-900">
     <nav class="fixed inset-x-0 top-0 z-50 border-b border-white/40 bg-white/70 backdrop-blur-xl">
       <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <NuxtLink to="/landing" class="flex items-center gap-3">
@@ -28,8 +28,7 @@
           <div class="relative">
             <select
               class="appearance-none bg-transparent pl-3 pr-6 py-2 text-sm font-semibold text-slate-700 outline-none cursor-pointer hover:text-indigo-600 transition"
-              :value="locale"
-              @change="(e) => changeLanguage((e.target as HTMLSelectElement).value)"
+              v-model="currentLocale"
             >
               <option value="en">EN</option>
               <option value="es">ES</option>
@@ -562,9 +561,10 @@ definePageMeta({
 const { loggedIn } = useAuth()
 const { t, setLocale, locale } = useI18n()
 
-const changeLanguage = (lang: string) => {
-  setLocale(lang as 'es' | 'en')
-}
+const currentLocale = computed({
+  get: () => locale.value,
+  set: (val) => setLocale(val as 'es' | 'en')
+})
 
 const primaryCta = computed(() => loggedIn.value ? '/dashboard' : '/signup')
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-page min-h-screen flex items-center justify-center p-6 bg-[var(--bg)]">
+  <div class="auth-page min-h-dvh flex items-center justify-center p-6 bg-[var(--bg)]">
     <div class="auth-card w-full max-w-[400px] border border-border rounded-[8px] p-8 relative overflow-hidden">
       <div class="absolute top-0 right-0 w-32 h-32 bg-amber opacity-5 blur-[80px] -mr-16 -mt-16"></div>
       

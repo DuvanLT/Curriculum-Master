@@ -138,7 +138,7 @@ const handleUpdatePassword = async () => {
 }
 </script>
 <template>
-    <div class="min-h-screen flex items-center justify-center p-6 bg-[var(--bg)]">
+    <div class="min-h-dvh flex items-center justify-center p-6 bg-[var(--bg)]">
       <div class="space-y-6 max-w-[600px] mx-auto">
         <div class="border border-border/60 bg-[var(--bg)]-bg3/50 rounded-xl p-6">
           <!-- Main Reset Flow -->

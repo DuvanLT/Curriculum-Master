@@ -141,7 +141,8 @@
     "toast_complete_profile": "Complete your Master Profile before generating the CV.",
     "toast_ai_error": "Error connecting to the AI. Check your API key.",
     "toast_pdf_error": "Could not prepare the CV for printing.",
-    "toast_popup_blocked": "The browser blocked the print window."
+    "toast_popup_blocked": "The browser blocked the print window.",
+    "mobile_warning": "For optimal results, we recommend generating and downloading your CV from a computer. Mobile browsers often limit margin settings and alter the original layout."
   },
   "coach": {
     "title": "Ezra AI",

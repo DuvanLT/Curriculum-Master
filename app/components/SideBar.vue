@@ -501,7 +501,7 @@ watch(isMobile, mobile => {
     left: 0;
     z-index: 90;
     width: min(86vw, 320px) !important;
-    height: 100vh;
+    height: 100dvh;
     transform: translateX(-100%);
     box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="import-page min-h-screen flex items-center justify-center p-6 bg-[var(--bg)]">
+  <div class="import-page min-h-dvh flex items-center justify-center p-6 bg-[var(--bg)]">
     <div class="import-card w-full max-w-[600px] border border-border rounded-xl p-10 relative overflow-hidden">
       <div class="absolute top-0 right-0 w-64 h-64 bg-amber opacity-5 blur-[100px] -mr-32 -mt-32"></div>
       <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-500 opacity-5 blur-[80px] -ml-24 -mb-24"></div>
