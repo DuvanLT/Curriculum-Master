@@ -342,7 +342,7 @@ const normalizedEducations = computed(() => {
 }
 
 @media print {
-  .cv-wrapper { width: 100%; margin: 0; min-height: 100vh !important; }
+  .cv-wrapper { width: 100%; margin: 0; height: 297mm !important; max-height: 297mm !important; overflow: hidden !important; }
   .sidebar { -webkit-print-color-adjust: exact; }
 }
 </style>
