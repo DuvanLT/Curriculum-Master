@@ -226,23 +226,24 @@ const normalizedEducations = computed(() => {
 /* Contenido Principal */
 .main-content {
   width: 65%;
-  padding: 40px 32px;
+  padding: 24px 32px;
 }
 
 .user-name {
-  font-size: 42px;
+  font-size: 32px;
   font-weight: 800;
   margin: 0;
   color: #323b4c;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .user-role {
-  font-size: 19px;
+  font-size: 14px;
   color: #4a5568;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin: 8px 0 14px;
+  letter-spacing: 1px;
+  margin: 6px 0 12px;
+  line-height: 1.3;
 }
 
 .user-summary {
