@@ -116,7 +116,7 @@ CRITICAL RULES:
 10. Highlight the most relevant experiences more and lower the weight of the less related ones.
 11. When the type is "project", focus the writing on scope, stack, problem solved, deliverable, and learning applied to the role.
 12. When the type is "work", focus the writing on responsibility, collaboration, results, and business context.
-13. The tone must be professional, executive, and concrete. Avoid cliches and empty words.
+13. The tone must be professional, executive, and concrete. ALWAYS write in the FIRST PERSON (e.g., "Developed", "Implemented"). Do not use third person. Avoid cliches and empty words.
 14. Return ONLY structured JSON.
 15. Language: English.
 16. If a portfolio/web URL is provided, use it only as a declarative reference of the profile and do not invent evidence from it.
@@ -145,7 +145,7 @@ REGLAS CRITICAS:
 10. Destaca mas las experiencias mas relevantes y baja el peso de las menos relacionadas.
 11. Cuando el tipo sea "project", enfoca la redaccion en alcance, stack, problema resuelto, entregable y aprendizaje aplicado al rol.
 12. Cuando el tipo sea "work", enfoca la redaccion en responsabilidad, colaboracion, resultados y contexto de negocio.
-13. El tono debe ser profesional, ejecutivo y concreto. Evita cliches y palabras vacias.
+13. El tono debe ser profesional, ejecutivo y concreto. Redacta SIEMPRE en PRIMERA PERSONA (ej. "Desarrollé", "Implementé", "Lideré"). NO uses tercera persona ni forma impersonal ("Se desarrolló", "Implementó"). Evita cliches y palabras vacias.
 14. Devuelve unicamente JSON estructurado.
 15. Traduce o manten el idioma segun la vacante: si la vacante esta en ingles, responde en ingles; si esta en espanol, responde en espanol.
 16. Si se proporciona una URL de portafolio/web, usala solo como referencia declarativa del perfil y no inventes evidencia a partir de ella.
@@ -167,6 +167,7 @@ TARGET VACANCY (JD):
 ${jd || 'N/A (Do a general high-quality optimization if there is no JD)'}
 
 ADDITIONAL OUTPUT INSTRUCTIONS:
+- Ensure all achievements in "logros_optimizados" are written in the FIRST PERSON (e.g., "Developed...", "Led..."). Do NOT use third person.
 - Order "experiences" from highest to lowest relevance for the vacancy.
 - For each experience, analyze if it really contributes to the vacancy and adapt the focus.
 - Keep and return the "type" field in each experience.
@@ -213,6 +214,7 @@ VACANTE OBJETIVO (JD):
 ${jd || 'N/A (Haz una optimizacion general de alta calidad si no hay JD)'}
 
 INSTRUCCIONES ADICIONALES DE SALIDA:
+- Asegúrate de que todos los logros en "logros_optimizados" estén redactados en PRIMERA PERSONA (ej. "Desarrollé...", "Lideré..."). NO uses tercera persona ni formas impersonales.
 - Ordena "experiences" de mayor a menor relevancia para la vacante.
 - Para cada experiencia, analiza si realmente aporta a la vacante y adapta el enfoque.
 - Conserva y devuelve el campo "type" en cada experiencia.
