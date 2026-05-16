@@ -337,7 +337,7 @@ const exportToPDF = async () => {
           @media print {
             html, body {
               width: 210mm !important;
-              min-height: 297mm !important;
+              min-height: 100vh !important;
             }
 
             #print-root {
