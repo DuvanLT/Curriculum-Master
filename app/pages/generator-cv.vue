@@ -287,7 +287,7 @@ const exportToPDF = async () => {
         <style>
           @page {
             size: A4;
-            margin: 0;
+            margin: 0mm !important;
           }
 
           html, body {
@@ -295,6 +295,7 @@ const exportToPDF = async () => {
             padding: 0;
             background: #ffffff;
             width: 210mm;
+            height: 297mm;
           }
 
           body {
@@ -308,16 +309,18 @@ const exportToPDF = async () => {
 
           #print-root {
             width: 210mm;
+            height: 297mm;
             margin: 0 auto;
-            overflow: visible;
+            overflow: hidden;
           }
 
           #print-root .pdf-container {
             width: 100% !important;
             max-width: 210mm !important;
-            min-height: 297mm !important;
+            height: 297mm !important;
             padding: 12mm 10mm !important;
             margin: 0 auto !important;
+            overflow: hidden !important;
           }
 
           #print-root .pdf-section,
@@ -326,22 +329,21 @@ const exportToPDF = async () => {
             page-break-inside: avoid;
           }
 
-          #print-root ul,
-          #print-root li,
-          #print-root p,
-          #print-root div,
-          #print-root section {
-            overflow: visible !important;
-          }
-
           @media print {
             html, body {
               width: 210mm !important;
-              min-height: 100vh !important;
+              height: 297mm !important;
+              max-height: 297mm !important;
+              overflow: hidden !important;
             }
 
             #print-root {
               width: 210mm !important;
+              height: 297mm !important;
+              max-height: 297mm !important;
+              overflow: hidden !important;
+              page-break-inside: avoid !important;
+              page-break-after: avoid !important;
             }
           }
         </style>
