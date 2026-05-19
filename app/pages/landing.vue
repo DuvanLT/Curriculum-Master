@@ -568,17 +568,20 @@ const currentLocale = computed({
 
 const primaryCta = computed(() => loggedIn.value ? '/dashboard' : '/signup')
 
+const seoTitle = computed(() => t('seo.landing.title'))
+const seoDescription = computed(() => t('seo.landing.description'))
+
 useSeoMeta({
-  title: () => t('seo.landing.title'),
-  description: () => t('seo.landing.description'),
-  ogTitle: () => t('seo.landing.title'),
-  ogDescription: () => t('seo.landing.description'),
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
   ogImage: 'https://bringjobs.qaliby.com/og-image.png',
   ogUrl: 'https://bringjobs.qaliby.com/landing',
   ogType: 'website',
   twitterCard: 'summary_large_image',
-  twitterTitle: () => t('seo.landing.title'),
-  twitterDescription: () => t('seo.landing.description'),
+  twitterTitle: seoTitle,
+  twitterDescription: seoDescription,
   twitterImage: 'https://bringjobs.qaliby.com/og-image.png',
 })
 

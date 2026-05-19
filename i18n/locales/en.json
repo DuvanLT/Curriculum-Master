@@ -307,6 +307,7 @@
     "settings": "Settings",
     "unnamed": "Unnamed",
     "plan_beta": "Beta Plan",
+    "plan_pro": "Pro Plan",
     "tour_kicker": "Initial Guide",
     "tour_step": "Step {step} of {total}",
     "tour_skip": "Skip",
