@@ -1,4 +1,18 @@
 {
+  "seo": {
+    "landing": {
+      "title": "BringJobs | Optimize your CV with AI",
+      "description": "Optimize your CV to beat ATS systems, receive personalized coaching, and practice real interviews from a single platform."
+    },
+    "login": {
+      "title": "Log In | BringJobs",
+      "description": "Log in to BringJobs to optimize your CV and prepare for your next job interview."
+    },
+    "signup": {
+      "title": "Sign Up | BringJobs",
+      "description": "Create a free BringJobs account to boost your job search with AI."
+    }
+  },
   "entrevista": {
     "title": "Interview Simulation",
     "subtitle": "Real-time preparation with AI-guided interview simulation - Beta",

@@ -1,4 +1,18 @@
 {
+  "seo": {
+    "landing": {
+      "title": "BringJobs | Optimiza tu CV con IA",
+      "description": "Optimiza tu CV para superar sistemas ATS, recibe coaching personalizado y practica entrevistas reales desde una sola plataforma."
+    },
+    "login": {
+      "title": "Iniciar Sesión | BringJobs",
+      "description": "Inicia sesión en BringJobs para optimizar tu CV y prepararte para tu próxima entrevista laboral."
+    },
+    "signup": {
+      "title": "Registrarse | BringJobs",
+      "description": "Crea una cuenta gratuita en BringJobs para potenciar tu búsqueda de empleo con IA."
+    }
+  },
   "entrevista": {
     "title": "Simulación de Entrevista",
     "subtitle": "Preparación en tiempo real con simulación de entrevista guiado por Inteligencia Artificial - Beta",
