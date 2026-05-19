@@ -52,8 +52,38 @@
 
       <!-- Results -->
       <div v-else>
-        <div class="results-count text-[12px] text-text-dim font-mono mb-4">
-          {{ $t('ofertas.jobs_found', { count: totalCount }) }}
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="results-count text-[12px] text-text-dim font-mono">
+            {{ $t('ofertas.jobs_found', { count: filteredJobs.length }) }}
+          </div>
+          
+          <!-- LinkedIn Filter Toggle -->
+          <div class="linkedin-filter flex items-center gap-2 bg-text-dim/5 border border-border px-3 py-1.5 rounded-full select-none hover:border-amber/30 transition-all">
+            <input 
+              type="checkbox" 
+              id="linkedin-toggle" 
+              v-model="showOnlyLinkedIn"
+              class="sr-only"
+            />
+            <label 
+              for="linkedin-toggle" 
+              class="cursor-pointer flex items-center gap-2 text-[11px] font-mono font-medium text-text-muted transition-colors"
+              :class="{ '!text-text': showOnlyLinkedIn }"
+            >
+              <span 
+                class="toggle-dot w-3.5 h-3.5 rounded-full bg-text-dim/40 border border-border transition-all flex items-center justify-center"
+                :class="{ '!bg-amber !border-amber': showOnlyLinkedIn }"
+              >
+                <span v-if="showOnlyLinkedIn" class="material-symbols-outlined text-[10px] text-bg font-bold">check</span>
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 fill-current text-[#0a66c2]" viewBox="0 0 24 24" v-if="showOnlyLinkedIn">
+                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                </svg>
+                Ver solo LinkedIn
+              </span>
+            </label>
+          </div>
         </div>
        
         <div class="results-note mt-3 flex mb-4 items-center gap-1.5 text-[10px] text-amber/60 font-mono italic">
@@ -62,13 +92,24 @@
         </div>
         <div class="grid gap-3">
           <div 
-            v-for="(job, i) in jobs" 
+            v-for="(job, i) in filteredJobs" 
             :key="i"
             class="job-card relative bg-[var(--bg)]-bg2 border border-border rounded-lg p-5 hover:border-amber/40 transition-all group"
           >
             <div class="job-card-header flex justify-between items-start mb-2">
               <div class="flex-1 min-w-0">
-                <div class="job-title text-[15px] font-medium text-text group-hover:text-amber transition-colors truncate">{{ job.title }}</div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <div class="job-title text-[15px] font-medium text-text group-hover:text-amber transition-colors truncate">{{ job.title }}</div>
+                  <span 
+                    v-if="job.source === 'linkedin'" 
+                    class="badge-linkedin flex items-center gap-1 bg-[#0a66c2]/10 border border-[#0a66c2]/20 text-[#0a66c2] text-[10px] font-mono px-2 py-0.5 rounded"
+                  >
+                    <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                    </svg>
+                    LinkedIn
+                  </span>
+                </div>
                 <div class="job-company text-[13px] text-amber font-mono mt-0.5">{{ job.company }}</div>
               </div>
             </div>
@@ -170,6 +211,34 @@ interface JoobleJob {
 }
 
 const jobs = ref<JoobleJob[]>([])
+const showOnlyLinkedIn = ref(false)
+
+const filteredJobs = computed(() => {
+  if (showOnlyLinkedIn.value) {
+    return jobs.value.filter(job => job.source === 'linkedin')
+  }
+  return jobs.value
+})
+
+const fetchLinkedInJobs = async () => {
+  loading.value = true
+  hasSearched.value = true // Transition out of empty state
+  jobs.value = []
+  
+  try {
+    const data = await $fetch<{ success: boolean; jobs: JoobleJob[]; totalCount: number }>('/api/linkedin-jobs')
+    if (data && data.success) {
+      jobs.value = data.jobs || []
+      totalCount.value = data.totalCount || 0
+      showOnlyLinkedIn.value = true // Default to filtering only LinkedIn since those are the fresh scraping offers loaded
+    }
+  } catch (e: any) {
+    console.error('Error fetching LinkedIn jobs:', e)
+    toast.error('No se pudieron cargar las ofertas de LinkedIn recientes.')
+  } finally {
+    loading.value = false
+  }
+}
 
 // Persist state to sessionStorage
 function saveToSession() {
@@ -180,7 +249,8 @@ function saveToSession() {
       jobs: jobs.value,
       totalCount: totalCount.value,
       currentPage: currentPage.value,
-      hasSearched: hasSearched.value
+      hasSearched: hasSearched.value,
+      showOnlyLinkedIn: showOnlyLinkedIn.value
     }))
   } catch { /* quota exceeded, ignore */ }
 }
@@ -196,13 +266,18 @@ function restoreFromSession() {
     totalCount.value = data.totalCount || 0
     currentPage.value = data.currentPage || 1
     hasSearched.value = data.hasSearched || false
+    showOnlyLinkedIn.value = data.showOnlyLinkedIn || false
     return hasSearched.value
   } catch { return false }
 }
 
 // Restore on mount
-onMounted(() => {
-  restoreFromSession()
+onMounted(async () => {
+  const restored = restoreFromSession()
+  if (!restored) {
+    // Load recent scraped LinkedIn jobs by default on fresh page load
+    await fetchLinkedInJobs()
+  }
 })
 
 const searchJobs = async () => {
@@ -215,6 +290,7 @@ const searchJobs = async () => {
   hasSearched.value = true
   currentPage.value = 1
   jobs.value = []
+  showOnlyLinkedIn.value = false // Auto-turn off filter when doing custom API search to show results
 
   try {
     const data: any = await $fetch<any>('/api/jobs', {

@@ -31,6 +31,7 @@ export default defineNuxtConfig({
     joobleApiKey: '',
     resendApiKey: '',
     lemonSqueezyWebhookSecret: '',
+    neonDbUrl: '',
 
     public: {
       // Public variables (available on both client and server)
