@@ -10,7 +10,7 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', file: 'en.json' }
     ],
     defaultLocale: 'en',
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
     langDir: 'locales',
     detectBrowserLanguage: {
       useCookie: true,
