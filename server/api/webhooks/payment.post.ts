@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
 
   const eventType = payload.type
   const transactionData = payload.data || {}
-  const reference = transactionData.reference || payload.subject || ''
+  const reference = transactionData.metadata?.reference || transactionData.reference || payload.subject || ''
   const transactionId = String(transactionData.transaction_id || transactionData.id || payload.id || '')
 
   console.log(`[Webhook] Received Bold event: ${eventType}, reference: ${reference}, txn: ${transactionId}`)
@@ -117,8 +117,8 @@ export default defineEventHandler(async (event) => {
             transactionId,
             transactionId,
             transactionData.payer_email || null,
-            transactionData.amount || 0,
-            transactionData.currency || 'COP',
+            transactionData.amount?.total || 0,
+            transactionData.amount?.currency || 'COP',
             'APPROVED',
             eventType,
             rawBody
@@ -140,8 +140,8 @@ export default defineEventHandler(async (event) => {
             transactionId,
             transactionId,
             transactionData.payer_email || null,
-            transactionData.amount || 0,
-            transactionData.currency || 'COP',
+            transactionData.amount?.total || 0,
+            transactionData.amount?.currency || 'COP',
             'REJECTED',
             eventType,
             rawBody
@@ -169,7 +169,7 @@ export default defineEventHandler(async (event) => {
             transactionId,
             transactionData.payer_email || null,
             0,
-            transactionData.currency || 'COP',
+            transactionData.amount?.currency || 'COP',
             'REFUNDED',
             eventType,
             rawBody
