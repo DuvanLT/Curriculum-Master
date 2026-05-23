@@ -11,12 +11,10 @@ export default defineEventHandler(async (event) => {
 
   // ─── 2. Verify HMAC-SHA256 signature ───
   const config = useRuntimeConfig()
-  const secret = config.testBoldSecret || config.boldSecret
-
-  if (!secret) {
-    console.error('[Webhook] Bold webhook secret is not configured')
-    throw createError({ statusCode: 500, statusMessage: 'Webhook secret not configured' })
-  }
+  // Bold docs: in test mode, the secret key must be an empty string ''
+  // In production, use the actual secret key (llave secreta)
+  const isTestMode = !!config.testBoldId
+  const secret = isTestMode ? '' : (config.boldSecret || '')
 
   const signatureHeader = getHeader(event, 'x-bold-signature')
 
@@ -25,9 +23,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Missing x-bold-signature header' })
   }
 
+  // Bold's verification process:
+  // 1. Convert raw body to Base64
+  // 2. HMAC-SHA256 the Base64 string using the secret key
+  // 3. Compare the hex digest with x-bold-signature header
+  const encodedBody = Buffer.from(rawBody, 'utf8').toString('base64')
   const hmac = createHmac('sha256', secret)
-  hmac.update(rawBody)
+  hmac.update(encodedBody)
   const digest = hmac.digest('hex')
+
+  console.log(`[Webhook] Signature check - isTestMode: ${isTestMode}, digest: ${digest}, received: ${signatureHeader}`)
 
   const digestBuffer = Buffer.from(digest, 'utf8')
   const signatureBuffer = Buffer.from(signatureHeader, 'utf8')
