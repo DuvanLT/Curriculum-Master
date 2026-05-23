@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
   const signatureHeader = getHeader(event, 'x-bold-signature')
 
   if (!signatureHeader) {
+    console.warn('[Webhook] Missing x-bold-signature header')
     throw createError({ statusCode: 401, statusMessage: 'Missing x-bold-signature header' })
   }
 
@@ -46,22 +47,26 @@ export default defineEventHandler(async (event) => {
 
   const eventType = payload.type
   const transactionData = payload.data || {}
-  const reference = transactionData.reference || ''
-  const transactionId = String(transactionData.transaction_id || transactionData.id || '')
+  const reference = transactionData.reference || payload.subject || ''
+  const transactionId = String(transactionData.transaction_id || transactionData.id || payload.id || '')
 
-  console.log(`[Webhook] Received Bold event: ${eventType} for reference: ${reference}`)
+  console.log(`[Webhook] Received Bold event: ${eventType}, reference: ${reference}, txn: ${transactionId}`)
+  console.log(`[Webhook] Full payload:`, rawBody)
 
   // ─── 4. Extract user_id from reference (format: userId-timestamp) ───
   if (!reference) {
-    console.error('[Webhook] Missing reference in payload data')
-    return { received: true, warning: 'Missing reference in payload data' }
+    console.error('[Webhook] Missing reference in payload')
+    // Return 200 OK so Bold doesn't retry
+    return { received: true, warning: 'Missing reference in payload' }
   }
 
-  const parts = reference.split('-')
-  const userId = parts[0]
+  // The reference format is "userId-timestamp", extract just the userId part
+  // userId itself may contain hyphens (UUID format), so we split by the last hyphen
+  const lastDashIndex = reference.lastIndexOf('-')
+  const userId = lastDashIndex > 0 ? reference.substring(0, lastDashIndex) : reference
 
   if (!userId) {
-    console.error('[Webhook] Invalid reference format (could not extract userId):', reference)
+    console.error('[Webhook] Invalid reference format:', reference)
     return { received: true, warning: 'Invalid reference format' }
   }
 
@@ -71,19 +76,28 @@ export default defineEventHandler(async (event) => {
   try {
     switch (eventType) {
       case 'SALE_APPROVED': {
+        // Check idempotency: don't process the same transaction twice
+        const existingOrder = await db.execute({
+          sql: 'SELECT id FROM orders WHERE gateway_order_id = ? AND status = ?',
+          args: [transactionId, 'APPROVED']
+        })
+
+        if (existingOrder.rows.length > 0) {
+          console.log(`[Webhook] Transaction ${transactionId} already processed, skipping`)
+          return { received: true, info: 'Already processed' }
+        }
+
         // Upgrade user to pro
         await db.execute({
           sql: `UPDATE users 
                 SET subscription_name = 'pro',
                     last_payment_at = CURRENT_TIMESTAMP,
                     gateway_customer_id = ?,
-                    gateway_order_id = ?,
-                    lemon_squeezy_order_id = ?
+                    gateway_order_id = ?
                 WHERE id = ?`,
           args: [
             transactionData.merchant_id || '',
             transactionId,
-            transactionId, // Keep LS column filled for database NOT NULL constraints/indexes compatibility
             userId
           ]
         })
@@ -96,17 +110,40 @@ export default defineEventHandler(async (event) => {
             uuidv4(),
             userId,
             transactionId,
-            transactionId, // Keep LS column filled for database NOT NULL constraints/indexes compatibility
+            transactionId,
             transactionData.payer_email || null,
             transactionData.amount || 0,
             transactionData.currency || 'COP',
-            transactionData.status || 'APPROVED',
+            'APPROVED',
             eventType,
             rawBody
           ]
         })
 
         console.log(`[Webhook] User ${userId} upgraded to pro (transaction: ${transactionId})`)
+        break
+      }
+
+      case 'SALE_REJECTED': {
+        // Log the rejected sale but don't change user status
+        await db.execute({
+          sql: `INSERT INTO orders (id, user_id, gateway_order_id, lemon_squeezy_order_id, customer_email, total, currency, status, event_name, payload_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            uuidv4(),
+            userId,
+            transactionId,
+            transactionId,
+            transactionData.payer_email || null,
+            transactionData.amount || 0,
+            transactionData.currency || 'COP',
+            'REJECTED',
+            eventType,
+            rawBody
+          ]
+        })
+
+        console.log(`[Webhook] Payment rejected for user ${userId} (transaction: ${transactionId})`)
         break
       }
 
@@ -117,7 +154,6 @@ export default defineEventHandler(async (event) => {
           args: [userId]
         })
 
-        // Log the event
         await db.execute({
           sql: `INSERT INTO orders (id, user_id, gateway_order_id, lemon_squeezy_order_id, customer_email, total, currency, status, event_name, payload_json)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -129,13 +165,18 @@ export default defineEventHandler(async (event) => {
             transactionData.payer_email || null,
             0,
             transactionData.currency || 'COP',
-            'refunded',
+            'REFUNDED',
             eventType,
             rawBody
           ]
         })
 
-        console.log(`[Webhook] User ${userId} downgraded to free_trial due to void/refund (transaction: ${transactionId})`)
+        console.log(`[Webhook] User ${userId} downgraded to free_trial (void/refund, txn: ${transactionId})`)
+        break
+      }
+
+      case 'VOID_REJECTED': {
+        console.log(`[Webhook] Void rejected for user ${userId} (txn: ${transactionId}). No action taken.`)
         break
       }
 
@@ -144,8 +185,10 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error(`[Webhook] Error processing event ${eventType}:`, error)
+    // Still return 200 to prevent Bold from retrying
     return { received: true, error: error.message }
   }
 
+  // Always return 200 OK so Bold doesn't retry
   return { received: true }
 })
