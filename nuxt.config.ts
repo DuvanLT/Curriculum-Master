@@ -33,8 +33,10 @@ export default defineNuxtConfig({
     apiToken: '',
     joobleApiKey: '',
     resendApiKey: '',
-    boldApiKey: '',
-    boldWebhookSecret: '',
+    testBoldId: '',
+    testBoldSecret: '',
+    boldId: '',
+    boldSecret: '',
     neonDbUrl: '',
 
     public: {

@@ -11,10 +11,10 @@ export default defineEventHandler(async (event) => {
 
   // ─── 2. Verify HMAC-SHA256 signature ───
   const config = useRuntimeConfig()
-  const secret = config.boldWebhookSecret
+  const secret = config.testBoldSecret || config.boldSecret
 
   if (!secret) {
-    console.error('[Webhook] BOLD_WEBHOOK_SECRET is not configured')
+    console.error('[Webhook] Bold webhook secret is not configured')
     throw createError({ statusCode: 500, statusMessage: 'Webhook secret not configured' })
   }
 

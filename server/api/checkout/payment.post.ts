@@ -6,10 +6,10 @@ export default defineEventHandler(async (event) => {
   const userId = session.user.id
 
   const config = useRuntimeConfig()
-  const boldApiKey = config.boldApiKey
+  const boldApiKey = config.testBoldId || config.boldId
 
   if (!boldApiKey) {
-    console.error('[Checkout] BOLD_API_KEY is not configured')
+    console.error('[Checkout] Bold API Key is not configured')
     throw createError({ statusCode: 500, statusMessage: 'Payment gateway configuration missing' })
   }
 
