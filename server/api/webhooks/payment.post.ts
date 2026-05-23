@@ -83,12 +83,12 @@ export default defineEventHandler(async (event) => {
       case 'SALE_APPROVED': {
         // Check idempotency: don't process the same transaction twice
         const existingOrder = await db.execute({
-          sql: 'SELECT id FROM orders WHERE gateway_order_id = ? AND status = ?',
-          args: [transactionId, 'APPROVED']
+          sql: 'SELECT id FROM orders WHERE (gateway_order_id = ? OR gateway_order_id = ?) AND status = ?',
+          args: [transactionId, reference, 'APPROVED']
         })
 
         if (existingOrder.rows.length > 0) {
-          console.log(`[Webhook] Transaction ${transactionId} already processed, skipping`)
+          console.log(`[Webhook] Transaction ${transactionId} or reference ${reference} already processed, skipping`)
           return { received: true, info: 'Already processed' }
         }
 
@@ -109,12 +109,11 @@ export default defineEventHandler(async (event) => {
 
         // Log the order for audit
         await db.execute({
-          sql: `INSERT INTO orders (id, user_id, gateway_order_id, lemon_squeezy_order_id, customer_email, total, currency, status, event_name, payload_json)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           args: [
             uuidv4(),
             userId,
-            transactionId,
             transactionId,
             transactionData.payer_email || null,
             transactionData.amount?.total || 0,
@@ -132,12 +131,11 @@ export default defineEventHandler(async (event) => {
       case 'SALE_REJECTED': {
         // Log the rejected sale but don't change user status
         await db.execute({
-          sql: `INSERT INTO orders (id, user_id, gateway_order_id, lemon_squeezy_order_id, customer_email, total, currency, status, event_name, payload_json)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           args: [
             uuidv4(),
             userId,
-            transactionId,
             transactionId,
             transactionData.payer_email || null,
             transactionData.amount?.total || 0,
@@ -160,12 +158,11 @@ export default defineEventHandler(async (event) => {
         })
 
         await db.execute({
-          sql: `INSERT INTO orders (id, user_id, gateway_order_id, lemon_squeezy_order_id, customer_email, total, currency, status, event_name, payload_json)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           args: [
             uuidv4(),
             userId,
-            transactionId,
             transactionId,
             transactionData.payer_email || null,
             0,

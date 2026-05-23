@@ -44,8 +44,8 @@
           <span v-if="showItemText" class="nav-text">{{ item.label }}</span>
           <span v-if="showItemText && item.badge" class="badge-beta">{{ item.badge }}</span>
           
-          <div v-if="showItemText && isItemPremium(item.id)" class="premium-badge ml-auto">
-            PRO
+          <div v-if="showItemText && (isItemPremium(item.id) || isItemLimited(item.id))" class="premium-badge ml-auto delayed-fade-in">
+            {{ isItemLimited(item.id) ? $t('sidebar.plan_limited') : 'PRO' }}
           </div>
         </NuxtLink>
       </div>
@@ -90,7 +90,7 @@
           </div>
           <div v-if="showProfileText" class="flex flex-col min-w-0">
             <div class="text-[11px] text-amber/80 font-mono truncate tracking-tight group-hover:text-amber transition-colors">{{ user.name || $t('sidebar.unnamed') }}</div>
-            <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity">
+            <div class="text-[9px] text-text-dim truncate font-mono group-hover:opacity-100 transition-opacity delayed-fade-in">
               {{ isPro ? $t('sidebar.plan_pro') : $t('sidebar.plan_free_trial') }}
             </div>
           </div>
@@ -222,8 +222,14 @@ const isLastTourStep = computed(() => tourStep.value === tourItems.value.length 
 
 const isItemPremium = (id: string) => {
   if (isPro.value) return false
-  const premiumItems = ['dashboard', 'coach', 'interview', 'jobs-applications']
+  const premiumItems = ['coach', 'interview', 'jobs-applications']
   return premiumItems.includes(id)
+}
+
+const isItemLimited = (id: string) => {
+  if (isPro.value) return false
+  const limitedItems = ['analysis', 'generator-cv']
+  return limitedItems.includes(id)
 }
 
 const isFocusedTourItem = (id: string) => showTour.value && currentTourItem.value?.id === id
@@ -565,6 +571,16 @@ watch(isMobile, mobile => {
   font-family: var(--font-mono);
   letter-spacing: 0.5px;
   opacity: 0.8;
+}
+
+@keyframes delayedFadeIn {
+  0% { opacity: 0; }
+  60% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.delayed-fade-in {
+  animation: delayedFadeIn 2s ease;
 }
 
 .nav-icon {

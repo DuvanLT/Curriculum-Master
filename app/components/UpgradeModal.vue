@@ -16,85 +16,85 @@
           </svg>
         </button>
 
-        <div class="group relative overflow-hidden rounded-[2.5rem] bg-white p-8 shadow-[0_20px_80px_rgba(79,70,229,0.25)] ring-1 ring-slate-100 sm:p-10">
+        <div class="group relative overflow-hidden rounded-[2.5rem] bg-white p-6 shadow-[0_20px_80px_rgba(79,70,229,0.25)] ring-1 ring-slate-100 sm:p-10">
           <!-- Decorative Background -->
           <div class="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50 blur-3xl transition duration-500 group-hover:bg-indigo-100" />
 
           <div class="relative z-10">
             <!-- Header: Limit Reached Message -->
-            <div class="mb-8 text-center">
-              <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
-                <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="mb-6 sm:mb-8 text-center">
+              <div class="mx-auto mb-3 sm:mb-4 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
+                <svg class="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h2 class="text-2xl font-black italic text-slate-900 mb-2">¡Mejora tu plan!</h2>
-              <p class="text-sm text-slate-500 font-medium">Has alcanzado el límite de tu plan gratuito. Desbloquea todo el potencial para conseguir tu trabajo ideal.</p>
+              <h2 class="text-xl sm:text-2xl font-black italic text-slate-900 mb-2">¡Mejora tu plan!</h2>
+              <p class="text-xs sm:text-sm text-slate-500 font-medium">Has alcanzado el límite de tu plan gratuito. Desbloquea todo el potencial para conseguir tu trabajo ideal.</p>
             </div>
 
             <!-- Price -->
-            <div class="mb-8 flex items-baseline justify-center gap-3">
-              <span class="text-6xl font-black tracking-tight text-slate-900">$8.99</span>
-              <span class="text-xl font-bold text-slate-300 line-through decoration-2">$14.99</span>
-              <span class="text-sm font-bold text-slate-400">USD</span>
+            <div class="mb-6 sm:mb-8 flex items-baseline justify-center gap-2 sm:gap-3">
+              <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">$32.500</span>
+              <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$44.900</span>
+              <span class="text-xs sm:text-sm font-bold text-slate-400">COP</span>
             </div>
 
             <!-- Benefits List -->
-            <ul class="mb-10 space-y-4 max-h-[40dvh] overflow-y-auto pr-2 custom-scrollbar">
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            <ul class="mb-6 sm:mb-10 space-y-3 sm:space-y-4 max-h-[35dvh] sm:max-h-[40dvh] overflow-y-auto pr-2 custom-scrollbar">
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit1') }}</strong> {{ t('landing.pricing_benefit1_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit1') }}</strong> {{ t('landing.pricing_benefit1_desc') }}</span>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit2') }}</strong> {{ t('landing.pricing_benefit2_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit2') }}</strong> {{ t('landing.pricing_benefit2_desc') }}</span>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit3') }}</strong> {{ t('landing.pricing_benefit3_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit3') }}</strong> {{ t('landing.pricing_benefit3_desc') }}</span>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit4') }}</strong> {{ t('landing.pricing_benefit4_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit4') }}</strong> {{ t('landing.pricing_benefit4_desc') }}</span>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit5') }}</strong> {{ t('landing.pricing_benefit5_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit5') }}</strong> {{ t('landing.pricing_benefit5_desc') }}</span>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit6') }}</strong> {{ t('landing.pricing_benefit6_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit6') }}</strong> {{ t('landing.pricing_benefit6_desc') }}</span>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit7') }}</strong> {{ t('landing.pricing_benefit7_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit7') }}</strong> {{ t('landing.pricing_benefit7_desc') }}</span>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="mt-0.5 sm:mt-1 flex h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                  <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span class="text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit8') }}</strong> {{ t('landing.pricing_benefit8_desc') }}</span>
+                <span class="text-xs sm:text-sm text-slate-600"><strong class="font-bold text-slate-900">{{ t('landing.pricing_benefit8') }}</strong> {{ t('landing.pricing_benefit8_desc') }}</span>
               </li>
             </ul>
 
             <!-- Call to Action -->
             <button
               @click="handleUpgrade"
-              class="block w-full rounded-3xl bg-indigo-600 px-8 py-4 text-center text-lg font-bold text-white shadow-xl shadow-indigo-500/25 transition hover:-translate-y-1 hover:bg-indigo-500"
+              class="block w-full rounded-3xl bg-indigo-600 px-6 sm:px-8 py-3 sm:py-4 text-center text-base sm:text-lg font-bold text-white shadow-xl shadow-indigo-500/25 transition hover:-translate-y-1 hover:bg-indigo-500"
             >
               {{ t('landing.pricing_cta') }}
             </button>

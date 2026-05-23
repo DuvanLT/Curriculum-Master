@@ -38,6 +38,7 @@ export default defineNuxtConfig({
     boldId: '',
     boldSecret: '',
     neonDbUrl: '',
+    boldPaymentAmount: '',
 
     public: {
       // Public variables (available on both client and server)

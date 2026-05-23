@@ -63,15 +63,14 @@ export default defineEventHandler(async (event) => {
 
           // Log the order
           await db.execute({
-            sql: `INSERT INTO orders (id, user_id, gateway_order_id, lemon_squeezy_order_id, customer_email, total, currency, status, event_name, payload_json)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             args: [
               uuidv4(),
               userId,
               reference,
-              reference,
               session.user.email || null,
-              response?.amount?.total || 36000,
+              response?.amount?.total || 32500,
               'COP',
               'APPROVED',
               'FALLBACK_STATUS_CHECK',

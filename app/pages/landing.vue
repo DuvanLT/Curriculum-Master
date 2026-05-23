@@ -403,9 +403,9 @@
 
               <!-- Precio -->
               <div class="mb-8 flex items-baseline gap-3">
-                <span class="text-6xl font-black tracking-tight text-slate-900">$8.99</span>
-                <span class="text-xl font-bold text-slate-300 line-through decoration-2">$14.99</span>
-                <span class="text-sm font-bold text-slate-400">USD</span>
+                <span class="text-6xl font-black tracking-tight text-slate-900">$32.500</span>
+                <span class="text-xl font-bold text-slate-300 line-through decoration-2">$44.900</span>
+                <span class="text-sm font-bold text-slate-400">COP</span>
               </div>
 
               <!-- Lista de beneficios (Lo que evalúa la pasarela) -->
