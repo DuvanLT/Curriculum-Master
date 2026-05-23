@@ -117,18 +117,18 @@ defineProps({
 
 const emit = defineEmits(['close'])
 
-const handleUpgrade = () => {
-  const config = useRuntimeConfig()
-  const { user } = useAuth()
-  
-  const baseUrl = config.public.lemonSqueezyCheckoutUrl
-  if (!baseUrl || !user.value?.id) return
-
-  // Pass user_id as custom data so the webhook knows which user purchased
-  const checkoutUrl = `${baseUrl}?checkout[custom][user_id]=${encodeURIComponent(user.value.id)}&checkout[email]=${encodeURIComponent(user.value.email || '')}`
-  
-  emit('close')
-  window.open(checkoutUrl, '_blank')
+const handleUpgrade = async () => {
+  try {
+    emit('close')
+    const response = await $fetch<{ url: string }>('/api/checkout/payment', {
+      method: 'POST'
+    })
+    if (response?.url) {
+      window.open(response.url, '_blank')
+    }
+  } catch (error) {
+    console.error('Error initiating checkout:', error)
+  }
 }
 </script>
 

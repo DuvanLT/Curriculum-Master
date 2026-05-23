@@ -26,7 +26,8 @@ const ALLOWED_COLUMN_NAMES = new Set([
   'linkedin', 'github', 'web', 'educacion', 'years', 'idiomas',
   'sidebar_tour_completed_at', 'is_verified', 'verification_code',
   'preferred_locale', 'subscription_name', 'last_payment_at',
-  'lemon_squeezy_customer_id', 'lemon_squeezy_order_id'
+  'lemon_squeezy_customer_id', 'lemon_squeezy_order_id',
+  'gateway_customer_id', 'gateway_order_id'
 ])
 
 async function ensureUserColumn(db: ReturnType<typeof useDb>, name: string, type: string) {
@@ -99,7 +100,9 @@ export const initDb = async () => {
     { name: 'subscription_name', type: "TEXT DEFAULT 'free_trial'" },
     { name: 'last_payment_at', type: 'DATETIME' },
     { name: 'lemon_squeezy_customer_id', type: 'TEXT' },
-    { name: 'lemon_squeezy_order_id', type: 'TEXT' }
+    { name: 'lemon_squeezy_order_id', type: 'TEXT' },
+    { name: 'gateway_customer_id', type: 'TEXT' },
+    { name: 'gateway_order_id', type: 'TEXT' }
   ]
   for (const col of columns) {
     try {
@@ -210,7 +213,8 @@ export const initDb = async () => {
     CREATE TABLE IF NOT EXISTS orders (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
-      lemon_squeezy_order_id TEXT NOT NULL,
+      lemon_squeezy_order_id TEXT,
+      gateway_order_id TEXT,
       customer_email TEXT,
       total INTEGER,
       currency TEXT,
@@ -222,6 +226,12 @@ export const initDb = async () => {
     )
   `)
 
+  try {
+    await db.execute('ALTER TABLE orders ADD COLUMN gateway_order_id TEXT')
+  } catch (e: any) {
+    // Column might already exist, ignore error
+  }
+
   // ─── Indexes for performance ───
   const indexes = [
     'CREATE INDEX IF NOT EXISTS idx_experiences_user ON experiences(user_id)',
@@ -232,6 +242,7 @@ export const initDb = async () => {
     'CREATE INDEX IF NOT EXISTS idx_next_steps_user ON next_steps(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_orders_ls_order ON orders(lemon_squeezy_order_id)',
+    'CREATE INDEX IF NOT EXISTS idx_orders_gateway_order ON orders(gateway_order_id)',
     'CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)'
   ]
 

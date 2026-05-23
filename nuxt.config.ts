@@ -33,12 +33,12 @@ export default defineNuxtConfig({
     apiToken: '',
     joobleApiKey: '',
     resendApiKey: '',
-    lemonSqueezyWebhookSecret: '',
+    boldApiKey: '',
+    boldWebhookSecret: '',
     neonDbUrl: '',
 
     public: {
       // Public variables (available on both client and server)
-      lemonSqueezyCheckoutUrl: '',
     }
   },
   postcss: {
