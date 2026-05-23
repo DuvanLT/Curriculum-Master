@@ -37,9 +37,8 @@ export default defineEventHandler(async (event) => {
       body: {
         amount_type: 'CLOSE',
         amount: {
-          total: 36000,
-          tip_amount: 0,
-          taxes: []
+          total_amount: 36000,
+          currency: 'COP'
         },
         description: 'Plan Pro - BringJobs',
         reference,
