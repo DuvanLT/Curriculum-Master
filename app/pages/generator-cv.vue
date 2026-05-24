@@ -14,13 +14,6 @@
         </NuxtLink>
       </div>
 
-      <div class="block md:hidden mb-6 p-4 bg-amber/10 border border-amber/30 rounded-lg flex items-start gap-3">
-        <span class="material-symbols-outlined text-amber text-[20px] mt-0.5">warning</span>
-        <p class="text-[13px] text-text-dim leading-relaxed">
-          {{ $t('generador.mobile_warning') }}
-        </p>
-      </div>
-
       <AppCard :title="$t('generador.card_title')">
         <div class="text-[12px] text-text-muted mb-3">
           {{ $t('generador.card_desc') }}
@@ -257,7 +250,6 @@ const generateAI = async () => {
     loading.value = false
   }
 }
-
 const exportToPDF = async () => {
   if (!aiResult.value) return
 
@@ -267,108 +259,79 @@ const exportToPDF = async () => {
     return
   }
 
-  const printWindow = window.open('', '_blank', 'width=900,height=1200')
-  if (!printWindow) {
-    toast.error(t('generador.toast_popup_blocked'))
-    return
-  }
+  loading.value = true
+  toast.info(t('generador.toast_generating_pdf') || 'Generando PDF...')
 
   const now = new Date()
   const timeStr = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
   const safeName = (profile.value.nombre || 'CV').replace(/\s+/g, '_')
+  const fileName = `${safeName}_${timeStr}.pdf`
 
-  // Get all styles from the current document to preserve CSS classes (crucial for CVminimalist)
-  const styles = Array.from(document.head.querySelectorAll('style, link[rel="stylesheet"]'))
-    .map(style => style.outerHTML)
-    .join('\n')
+  const parentContainer = element.parentElement as HTMLElement
+  const originalParentStyle = parentContainer?.getAttribute('style') || ''
+  const originalElementStyle = element.getAttribute('style') || ''
 
-  printWindow.document.open()
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html lang="es">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=1024">
-        <title>${safeName}_${timeStr}</title>
-        ${styles}
-        <style>
-          @page {
-            size: A4;
-            margin: 0;
-          }
+  try {
+    const { jsPDF } = await import('jspdf')
 
-          html, body {
-            margin: 0;
-            padding: 0;
-            background: #ffffff;
-            width: 100%;
-            height: auto;
-          }
+    // Preparar el elemento para captura
+    parentContainer.style.position = 'static'
+    parentContainer.style.left = 'auto'
+    parentContainer.style.top = 'auto'
+    parentContainer.style.width = '794px'
+    parentContainer.style.margin = '0 auto'
+    parentContainer.style.overflow = 'visible'
+    parentContainer.style.visibility = 'visible'
 
-          body {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
+    element.style.width = '100%'
+    element.style.height = 'auto'
+    element.style.position = 'static'
+    element.style.visibility = 'visible'
+    element.style.minHeight = '297mm'   // ← Forzamos altura A4 completa
 
-          * {
-            box-sizing: border-box;
-          }
+    // Quitamos min-heights heredados de contenedores internos
+    const wrapper = element.querySelector('.cv-wrapper') as HTMLElement
+    if (wrapper) wrapper.style.minHeight = 'unset'
+    const sidebar = element.querySelector('.sidebar') as HTMLElement
+    if (sidebar) sidebar.style.minHeight = 'unset'
+    const sidebarFill = element.querySelector('.sidebar-fill') as HTMLElement
+    if (sidebarFill) sidebarFill.style.display = 'none'
 
-          #print-root {
-            width: 100%;
-            height: auto;
-            margin: 0 auto;
-            overflow: visible;
-          }
+    // Pequeña pausa para que el layout se actualice
+    await new Promise(r => requestAnimationFrame(r))
 
-          #print-root .pdf-container {
-            width: 100% !important;
-            max-width: none !important;
-            height: auto !important;
-            margin: 0 !important;
-            overflow: visible !important;
-          }
+    // Crear documento A4 fijo (siempre una sola página)
+    const doc = new jsPDF({
+      orientation: 'p',
+      unit: 'mm',
+      format: 'a4'   // 210 × 297 mm
+    })
 
-          #print-root .pdf-section,
-          #print-root .pdf-entry {
-            break-inside: avoid;
-            page-break-inside: avoid;
-          }
-
-          @media print {
-            html, body {
-              width: 100% !important;
-              height: auto !important;
-              max-height: none !important;
-              overflow: visible !important;
-            }
-
-            #print-root {
-              width: 100% !important;
-              height: auto !important;
-              max-height: none !important;
-              overflow: visible !important;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div id="print-root">${element.outerHTML}</div>
-      </body>
-    </html>
-  `)
-  printWindow.document.close()
-
-
-  const handleAfterPrint = () => {
-    printWindow.close()
+    await doc.html(element, {
+      callback: (pdf) => {
+        pdf.save(fileName)
+        // Restaurar estilos originales
+        parentContainer?.setAttribute('style', originalParentStyle)
+        element.setAttribute('style', originalElementStyle)
+        if (wrapper) wrapper.style.minHeight = ''
+        if (sidebar) sidebar.style.minHeight = ''
+        if (sidebarFill) sidebarFill.style.display = ''
+        loading.value = false
+        toast.success(t('generador.toast_pdf_success') || '¡CV Descargado!')
+      },
+      x: 0,
+      y: 0,
+      width: 210,
+      windowWidth: 794,
+      autoPaging: false   // Una sola página, sin división
+    })
+  } catch (error) {
+    console.error('Error generando PDF:', error)
+    toast.error(t('generador.toast_pdf_error'))
+    parentContainer?.setAttribute('style', originalParentStyle)
+    element.setAttribute('style', originalElementStyle)
+    loading.value = false
   }
-
-  printWindow.addEventListener('afterprint', handleAfterPrint, { once: true })
-
-  setTimeout(() => {
-    printWindow.print()
-  }, 300)
 }
 </script>
 

@@ -139,10 +139,9 @@
     "download_pdf": "Descargar PDF Final",
     "toast_loading_profile": "Estamos cargando tu Perfil Maestro. Intenta de nuevo en un momento.",
     "toast_complete_profile": "Completa tu Perfil Maestro antes de generar el CV.",
-    "toast_ai_error": "Error al conectar con la IA. Revisa tu API key.",
+    "toast_ai_error": "Error: Un error inesperado a sucedido.",
     "toast_pdf_error": "No se pudo preparar el CV para impresion.",
-    "toast_popup_blocked": "El navegador bloqueo la ventana de impresion.",
-    "mobile_warning": "Para un resultado óptimo, te recomendamos generar y descargar tu CV desde una computadora. Los navegadores móviles suelen limitar la configuración de márgenes y alterar el diseño original."
+    "toast_popup_blocked": "El navegador bloqueo la ventana de impresion."
   },
   "coach": {
     "title": "Ezra AI",
@@ -318,7 +317,7 @@
     "tour_next": "Siguiente",
     "helper": {
       "current_section": "Sección actual",
-      "view_tour": "Ver recorrido del sidebar"
+      "view_tour": "Ver recorrido de la barra lateral"
     },
     "items": {
       "dashboard": {
@@ -334,7 +333,10 @@
       "generador": {
         "label": "Constructor CV",
         "description": "Crea una version de tu Curriculum Vitae enfocada en una oferta usando tu Perfil Maestro como base.",
-        "tip": "Adapta tu perfil a cada oferta al instante y destaca lo que la empresa busca, sin reescribir todo desde cero."
+        "tip": "Adapta tu perfil a cada oferta al instante y destaca lo que la empresa busca, sin reescribir todo desde cero.",
+        "toast_pdf_success": "¡CV generado!",
+        "toast_pdf_error": "Error al generar CV",
+        "toast_generating_pdf": "Generando CV"
       },
       "coach": {
         "label": "Ezra",
@@ -387,7 +389,7 @@
     "fallback_help": {
       "title": "BringJobs",
       "description": "Esta vista forma parte de tu proceso para preparar, mejorar y seguir tus postulaciones.",
-      "tip": "Puedes moverte por el sidebar para cambiar de herramienta cuando lo necesites."
+      "tip": "Puedes moverte por la barra lateral para cambiar de herramienta cuando lo necesites."
     }
   },
   "profile": {

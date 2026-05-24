@@ -1,5 +1,5 @@
 <template>
-  <div id="cv-template" class="pdf-container" style="width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; color: #000; padding: 6mm 8mm; background-color: #fff; font-family: 'Helvetica', 'Arial', sans-serif; line-height: 1.25;">
+  <div id="cv-template" class="pdf-container" style="width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; color: #000; padding: 6mm 8mm; background-color: #fff; font-family: 'Helvetica', 'Arial', sans-serif; line-height: 1.25;    min-height: 297mm;  ">
     
     <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
       <div v-if="cvImage" style="width: 40mm; height: 40mm; margin-right: 4mm; flex-shrink: 0;">

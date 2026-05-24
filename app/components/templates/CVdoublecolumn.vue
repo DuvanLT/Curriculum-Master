@@ -162,7 +162,7 @@ const normalizedEducations = computed(() => {
 .cv-wrapper {
   display: flex;
   width: 210mm;
-  min-height: 297mm;
+  align-items: stretch; 
   margin: 0 auto;
   background: #fff;
   font-family: 'Inter', 'Helvetica', sans-serif;
@@ -172,12 +172,13 @@ const normalizedEducations = computed(() => {
 /* Sidebar Oscuro */
 .sidebar {
   width: 35%;
-  background-color: #323b4c; /* Azul oscuro del diseño */
+  background-color: #323b4c;
   color: #fff;
   padding: 28px 22px;
-  display: flex;
+  display: flex;           /* ← flex para que sidebar-fill funcione */
   flex-direction: column;
 }
+
 
 .avatar-container {
   width: 128px;
@@ -321,7 +322,6 @@ const normalizedEducations = computed(() => {
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  background: #e2e8f0;
   color: #334155;
   font-size: 9.5px;
   font-weight: 700;

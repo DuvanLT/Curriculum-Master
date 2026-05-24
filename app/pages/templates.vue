@@ -15,7 +15,7 @@
       </div>
 
       <div class="template-grid">
-        <div
+     <div
           class="template-option"
           :class="{ 'template-active': selectedTemplate === 'classic' }"
           @click="selectTemplate('classic')"
@@ -50,7 +50,6 @@
             </div>
           </div>
         </div>
-
         <div
           class="template-option"
           :class="{ 'template-active': selectedTemplate === 'minimalist' }"

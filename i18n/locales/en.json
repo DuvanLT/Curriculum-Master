@@ -139,10 +139,9 @@
     "download_pdf": "Download Final PDF",
     "toast_loading_profile": "We are loading your Master Profile. Please try again in a moment.",
     "toast_complete_profile": "Complete your Master Profile before generating the CV.",
-    "toast_ai_error": "Error connecting to the AI. Check your API key.",
+    "toast_ai_error": "Error: An unexpected error occurred.",
     "toast_pdf_error": "Could not prepare the CV for printing.",
-    "toast_popup_blocked": "The browser blocked the print window.",
-    "mobile_warning": "For optimal results, we recommend generating and downloading your CV from a computer. Mobile browsers often limit margin settings and alter the original layout."
+    "toast_popup_blocked": "The browser blocked the print window."
   },
   "coach": {
     "title": "Ezra AI",
@@ -318,7 +317,7 @@
     "tour_next": "Next",
     "helper": {
       "current_section": "Current Section",
-      "view_tour": "View sidebar tour"
+      "view_tour": "View lateral bar tour"
     },
     "items": {
       "dashboard": {
@@ -334,7 +333,10 @@
       "generador": {
         "label": "CV Builder",
         "description": "Create a version of your Resume focused on an offer using your Master Profile as a base.",
-        "tip": "Adapt your profile to each offer instantly and highlight what the company is looking for, without rewriting everything from scratch."
+        "tip": "Adapt your profile to each offer instantly and highlight what the company is looking for, without rewriting everything from scratch.",
+        "toast_pdf_success": "CV Generated!",
+        "toast_pdf_error": "Error generating CV",
+        "toast_generating_pdf": "Generating CV"
       },
       "coach": {
         "label": "Ezra",
@@ -387,7 +389,7 @@
     "fallback_help": {
       "title": "BringJobs",
       "description": "This view is part of your process to prepare, improve, and track your applications.",
-      "tip": "You can move around the sidebar to change tools when you need to."
+      "tip": "You can move around the lateral bar to change tools when you need to."
     }
   },
   "profile": {

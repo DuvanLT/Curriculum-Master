@@ -74,10 +74,9 @@
               <span class="material-symbols-outlined text-[16px] mr-1">{{ addingEducation ? 'close' : 'school' }}</span>
               {{ addingEducation ? $t('profile.btn_cancel') : $t('profile.btn_add_study') }}
             </AppButton>
+            
           </div>
-          
         </template>
-
         <div v-if="addingEducation" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
           <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">{{ editingEducationId ? $t('profile.lbl_edit_study') : $t('profile.lbl_new_study') }}</div>
 
@@ -96,7 +95,6 @@
             <AppButton v-if="editingEducationId" variant="secondary" @click="resetEducationForm">{{ $t('profile.btn_cancel_edit') }}</AppButton>
           </div>
         </div>
-
         <div v-if="educations.length === 0 && !addingEducation" class="text-center py-10 text-text-dim font-mono text-[12px]">
           {{ $t('profile.empty_education') }}
         </div>
@@ -119,8 +117,11 @@
             </div>
           </div>
         </div>
+                <AppButton class="profile-save-button" :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
+          {{ $t('profile.btn_save_changes') }}
+        </AppButton>
       </AppCard>
-
+      
       <AppCard :title="$t('profile.section_experience')" class="profile-card">
         <template #title-action>
           <div class="ml-auto profile-card-action">
@@ -196,9 +197,7 @@
               @remove="confirmRemoveExperience"
               @edit="startEditingExperience"
             />
-               <AppButton class="profile-save-button" :loading="savingProfile" :disabled="!hasUnsavedChanges" @click="handleManualSave">
-          {{ $t('profile.btn_save_changes') }}
-        </AppButton>
+  
           </section>
           
           <section v-if="projectExperiences.length">
