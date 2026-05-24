@@ -141,7 +141,9 @@
     "toast_complete_profile": "Completa tu Perfil Maestro antes de generar el CV.",
     "toast_ai_error": "Error: Un error inesperado a sucedido.",
     "toast_pdf_error": "No se pudo preparar el CV para impresion.",
-    "toast_popup_blocked": "El navegador bloqueo la ventana de impresion."
+    "toast_popup_blocked": "El navegador bloqueo la ventana de impresion.",
+    "toast_pdf_success": "¡CV generado!",
+    "toast_generating_pdf": "Generando CV"
   },
   "coach": {
     "title": "Ezra AI",
