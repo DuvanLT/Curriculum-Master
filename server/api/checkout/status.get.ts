@@ -53,8 +53,9 @@ export default defineEventHandler(async (event) => {
 
         if (userResult.rows[0]?.subscription_name !== 'pro') {
           await db.execute({
-            sql: `UPDATE users 
+            sql: `UPDATE users
                   SET subscription_name = 'pro',
+                      subscription_source = 'bold',
                       last_payment_at = CURRENT_TIMESTAMP,
                       gateway_order_id = ?
                   WHERE id = ?`,

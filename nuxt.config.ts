@@ -39,6 +39,7 @@ export default defineNuxtConfig({
     boldSecret: '',
     neonDbUrl: '',
     boldPaymentAmount: '',
+    lemonSqueezyWebhookSecret: '',
 
     public: {
       // Public variables (available on both client and server)

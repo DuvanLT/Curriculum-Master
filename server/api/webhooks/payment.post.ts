@@ -94,8 +94,9 @@ export default defineEventHandler(async (event) => {
 
         // Upgrade user to pro
         await db.execute({
-          sql: `UPDATE users 
+          sql: `UPDATE users
                 SET subscription_name = 'pro',
+                    subscription_source = 'bold',
                     last_payment_at = CURRENT_TIMESTAMP,
                     gateway_customer_id = ?,
                     gateway_order_id = ?
@@ -151,9 +152,9 @@ export default defineEventHandler(async (event) => {
       }
 
       case 'VOID_APPROVED': {
-        // Downgrade user back to free trial (refund/cancel)
+        // Only downgrade if Bold is the active subscription source
         await db.execute({
-          sql: `UPDATE users SET subscription_name = 'free_trial' WHERE id = ?`,
+          sql: `UPDATE users SET subscription_name = 'free_trial', subscription_source = NULL WHERE id = ? AND subscription_source = 'bold'`,
           args: [userId]
         })
 

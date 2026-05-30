@@ -27,7 +27,8 @@ const ALLOWED_COLUMN_NAMES = new Set([
   'sidebar_tour_completed_at', 'is_verified', 'verification_code',
   'preferred_locale', 'subscription_name', 'last_payment_at',
   'lemon_squeezy_customer_id', 'lemon_squeezy_order_id',
-  'gateway_customer_id', 'gateway_order_id'
+  'gateway_customer_id', 'gateway_order_id',
+  'subscription_source'
 ])
 
 async function ensureUserColumn(db: ReturnType<typeof useDb>, name: string, type: string) {
@@ -102,7 +103,8 @@ export const initDb = async () => {
     { name: 'lemon_squeezy_customer_id', type: 'TEXT' },
     { name: 'lemon_squeezy_order_id', type: 'TEXT' },
     { name: 'gateway_customer_id', type: 'TEXT' },
-    { name: 'gateway_order_id', type: 'TEXT' }
+    { name: 'gateway_order_id', type: 'TEXT' },
+    { name: 'subscription_source', type: 'TEXT' }
   ]
   for (const col of columns) {
     try {
