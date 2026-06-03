@@ -50,6 +50,8 @@
           :rows="4"
           :placeholder="$t('generador.placeholder')"
         />
+
+
         <div class="flex items-center gap-2 mt-4">
           <AppButton @click="generateAI" :disabled="loading" class="flex-1 sm:flex-none">
             <span v-if="loading" class="spinner mr-2"></span>
@@ -115,6 +117,15 @@
               <span class="material-symbols-outlined text-[16px] mr-1">download</span>
               {{ $t('generador.download_pdf') }}
             </AppButton>
+            <AppButton
+              variant="secondary"
+              class="w-full mt-2 !text-[12px]"
+              :disabled="applicationSaved"
+              @click="saveAsApplication"
+            >
+              <span class="material-symbols-outlined text-[16px] mr-1">{{ applicationSaved ? 'check_circle' : 'bookmark_add' }}</span>
+              {{ applicationSaved ? $t('generador.toast_app_saved') : $t('generador.btn_save_application') }}
+            </AppButton>
           </AppCard>
         </div>
       </div>
@@ -173,6 +184,7 @@ interface AIResult {
 
 const aiResult = ref<AIResult | null>(null)
 const cvImage = ref<string | undefined>(undefined)
+const cvLength = 3
 
 // CV Template selection
 const selectedTemplate = ref('classic')
@@ -208,8 +220,43 @@ onMounted(() => {
   const route = useRoute()
   if (route.query.jd) {
     jd.value = String(route.query.jd)
+  } else {
+    const pendingJd = sessionStorage.getItem('pending-jd')
+    if (pendingJd) {
+      jd.value = pendingJd
+      sessionStorage.removeItem('pending-jd')
+    }
   }
 })
+
+const applicationSaved = ref(false)
+
+const saveAsApplication = async () => {
+  if (!aiResult.value) return
+
+  const firstLine = jd.value.split('\n').find(l => l.trim()) || ''
+  const company = firstLine.length > 3 && firstLine.length < 80
+    ? firstLine.trim()
+    : t('generador.unknown_company')
+
+  try {
+    await $fetch('/api/applications', {
+      method: 'POST',
+      body: {
+        company,
+        position: aiResult.value.optimized_title || profile.value.titulo || t('generador.unknown_position'),
+        status: t('analisis.status_applied'),
+        date: new Date().toISOString().split('T')[0],
+        analysis: null
+      }
+    })
+    applicationSaved.value = true
+    toast.success(t('generador.toast_app_saved'))
+  } catch (e) {
+    console.error(e)
+    toast.error(t('generador.toast_app_error'))
+  }
+}
 
 const generateAI = async () => {
   const { canGenerateCV, showUpgradeModal } = useSubscription()
@@ -239,7 +286,8 @@ const generateAI = async () => {
         profile: profile.value,
         experiences: experiences.value,
         jd: jd.value,
-        locale: locale.value
+        locale: locale.value,
+        cvLength: cvLength
       }
     })
     aiResult.value = data
@@ -271,6 +319,18 @@ const exportToPDF = async () => {
   const originalParentStyle = parentContainer?.getAttribute('style') || ''
   const originalElementStyle = element.getAttribute('style') || ''
 
+  let wrapper: HTMLElement | null = null
+  let sidebar: HTMLElement | null = null
+  let sidebarFill: HTMLElement | null = null
+
+  const restoreStyles = () => {
+    parentContainer?.setAttribute('style', originalParentStyle)
+    element.setAttribute('style', originalElementStyle)
+    if (wrapper) wrapper.style.minHeight = ''
+    if (sidebar) sidebar.style.minHeight = ''
+    if (sidebarFill) sidebarFill.style.display = ''
+  }
+
   try {
     const { jsPDF } = await import('jspdf')
 
@@ -283,39 +343,44 @@ const exportToPDF = async () => {
     parentContainer.style.overflow = 'visible'
     parentContainer.style.visibility = 'visible'
 
+    const isMultiPage = cvLength >= 2
+
     element.style.width = '100%'
     element.style.height = 'auto'
     element.style.position = 'static'
     element.style.visibility = 'visible'
-    element.style.minHeight = '297mm'   // ← Forzamos altura A4 completa
+    // Single page: enforce A4 height. Multi-page: let content flow naturally
+    element.style.minHeight = isMultiPage ? 'unset' : '297mm'
 
-    // Quitamos min-heights heredados de contenedores internos
-    const wrapper = element.querySelector('.cv-wrapper') as HTMLElement
+    wrapper = element.querySelector('.cv-wrapper') as HTMLElement
     if (wrapper) wrapper.style.minHeight = 'unset'
-    const sidebar = element.querySelector('.sidebar') as HTMLElement
+    sidebar = element.querySelector('.sidebar') as HTMLElement
     if (sidebar) sidebar.style.minHeight = 'unset'
-    const sidebarFill = element.querySelector('.sidebar-fill') as HTMLElement
+    sidebarFill = element.querySelector('.sidebar-fill') as HTMLElement
     if (sidebarFill) sidebarFill.style.display = 'none'
 
-    // Pequeña pausa para que el layout se actualice
     await new Promise(r => requestAnimationFrame(r))
 
-    // Crear documento A4 fijo (siempre una sola página)
+    // Medir altura real del contenido para saber cuántas páginas se necesitan
+    const contentHeightMm = element.getBoundingClientRect().height * (210 / 794)
+    const expectedPages = Math.ceil(contentHeightMm / 297)
+
     const doc = new jsPDF({
       orientation: 'p',
       unit: 'mm',
-      format: 'a4'   // 210 × 297 mm
+      format: 'a4'
     })
 
     await doc.html(element, {
       callback: (pdf) => {
+        // Eliminar páginas en blanco sobrantes al final
+        const totalPages = pdf.getNumberOfPages()
+        for (let i = totalPages; i > expectedPages; i--) {
+          pdf.deletePage(i)
+        }
+
         pdf.save(fileName)
-        // Restaurar estilos originales
-        parentContainer?.setAttribute('style', originalParentStyle)
-        element.setAttribute('style', originalElementStyle)
-        if (wrapper) wrapper.style.minHeight = ''
-        if (sidebar) sidebar.style.minHeight = ''
-        if (sidebarFill) sidebarFill.style.display = ''
+        restoreStyles()
         loading.value = false
         toast.success(t('generador.toast_pdf_success') || '¡CV Descargado!')
       },
@@ -323,13 +388,12 @@ const exportToPDF = async () => {
       y: 0,
       width: 210,
       windowWidth: 794,
-      autoPaging: false   // Una sola página, sin división
+      autoPaging: isMultiPage ? 'slice' : false
     })
   } catch (error) {
     console.error('Error generando PDF:', error)
     toast.error(t('generador.toast_pdf_error'))
-    parentContainer?.setAttribute('style', originalParentStyle)
-    element.setAttribute('style', originalElementStyle)
+    restoreStyles()
     loading.value = false
   }
 }
@@ -363,5 +427,41 @@ const exportToPDF = async () => {
   .generator-hero-link :deep(button) {
     width: 100%;
   }
+}
+
+.cv-length-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+
+.cv-length-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--amber, #f59e0b);
+  cursor: pointer;
+  border: 2px solid var(--bg, #fff);
+  box-shadow: 0 0 0 2px var(--amber, #f59e0b);
+  transition: box-shadow 0.15s;
+}
+
+.cv-length-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber, #f59e0b) 30%, transparent);
+}
+
+.cv-length-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--amber, #f59e0b);
+  cursor: pointer;
+  border: 2px solid var(--bg, #fff);
 }
 </style>

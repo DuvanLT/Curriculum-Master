@@ -80,13 +80,23 @@ export default defineEventHandler(async (event) => {
     IMPORTANTE: Esto NO es solo para programadores. Puede ser para VENTAS, MARKETING, MEDICINA, CONSTRUCCIÓN, etc. Extrae las habilidades técnicas/específicas de CUALQUIER campo.
   `
 
+  const slimProfile = {
+    titulo: profile?.titulo || '',
+    years: profile?.years || '0',
+    skills: profile?.skills || '',
+    resumen: profile?.resumen || ''
+  }
+  const slimExperiences = Array.isArray(experiences)
+    ? experiences.map((e: any) => ({ cargo: e.cargo, empresa: e.empresa, skills: e.skills, logros: typeof e.logros === 'string' ? e.logros.slice(0, 300) : '' }))
+    : []
+
   const userPrompt = isEn
     ? `
     JOB DESCRIPTION (JD):
     ${jd}
 
     USER PROFILE:
-    ${JSON.stringify({ profile, experiences })}
+    ${JSON.stringify({ profile: slimProfile, experiences: slimExperiences })}
 
     RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
     {
@@ -110,7 +120,7 @@ export default defineEventHandler(async (event) => {
     ${jd}
 
     PERFIL DEL USUARIO:
-    ${JSON.stringify({ profile, experiences })}
+    ${JSON.stringify({ profile: slimProfile, experiences: slimExperiences })}
 
     DEVUELVE ÚNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA:
     {

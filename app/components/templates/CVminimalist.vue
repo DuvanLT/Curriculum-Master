@@ -22,7 +22,7 @@
 
     <!-- RESUMEN / ACERCA DE MÍ -->
     <section class="section">
-      <h2 class="section-title">{{ $t('profile.cv_section_about') }}</h2>
+      <h2 class="section-title">{{ ct('profile.cv_section_about') }}</h2>
       <p class="summary-text">
         {{ aiData.summary || profile.resumen }}
       </p>
@@ -30,39 +30,38 @@
 
     <!-- EXPERIENCIA LABORAL -->
     <section v-if="workExperiences.length" class="section">
-      <h2 class="section-title">{{ $t('profile.cv_section_experience') }}</h2>
+      <h2 class="section-title">{{ ct('profile.cv_section_experience') }}</h2>
       
       <div v-for="exp in workExperiences" :key="exp.id" class="experience-item">
         <div class="exp-header">
           <span class="role">{{ exp.cargo }}</span>
-          <span class="company-date">/ {{ exp.empresa }} - {{ exp.inicio }} – {{ exp.fin || $t('profile.cv_currently') }}</span>
+          <span class="company-date">/ {{ exp.empresa }} - {{ td(exp.inicio) }} – {{ td(exp.fin) || ct('profile.cv_currently') }}</span>
         </div>
         
         <p class="exp-description" v-if="exp.descripcion">{{ exp.descripcion }}</p>
         
-        <ul class="achievements-list">
-          <li v-for="(achievement, index) in exp.logros_optimizados" :key="index">
-            {{ achievement }}
-          </li>
-        </ul>
+        <p class="achievements-paragraph" v-if="exp.logros_optimizados?.length">
+          {{ exp.logros_optimizados.join(' ') }}
+        </p>
+        <a v-if="exp.link" :href="cleanLink(exp.link)" target="_blank" rel="noopener" class="exp-link">↗ {{ linkLabel(exp.link) }}</a>
       </div>
     </section>
 
     <!-- EDUCACIÓN (Diseño en Columnas) -->
     <section v-if="normalizedEducations.length" class="section">
-      <h2 class="section-title">{{ $t('profile.cv_section_education') }}</h2>
+      <h2 class="section-title">{{ ct('profile.cv_section_education') }}</h2>
       <div class="education-grid">
         <div v-for="edu in normalizedEducations" :key="edu.id" class="education-item">
           <h3 class="edu-inst">{{ edu.institucion }}</h3>
           <p class="edu-degree">{{ edu.titulo }}</p>
-          <p class="edu-date">{{ edu.inicio }} – {{ edu.fin }}</p>
+          <p class="edu-date">{{ td(edu.inicio) }} – {{ td(edu.fin) }}</p>
         </div>
       </div>
     </section>
 
     <!-- HABILIDADES TÉCNICAS -->
     <section class="section" v-if="aiData.top_skills">
-      <h2 class="section-title">{{ $t('profile.cv_section_technical_skills') }}</h2>
+      <h2 class="section-title">{{ ct('profile.cv_section_technical_skills') }}</h2>
       <div class="skills-list">
         <span v-for="(skill, index) in aiData.top_skills" :key="index" class="skill-entry">
           <strong>{{ skill.name || skill }}</strong>
@@ -72,8 +71,8 @@
 
     <!-- IDIOMAS -->
     <section class="section">
-      <h2 class="section-title">{{ $t('profile.cv_section_languages') }}</h2>
-      <p class="summary-text">{{ profile.idiomas || $t('profile.cv_default_languages') }}</p>
+      <h2 class="section-title">{{ ct('profile.cv_section_languages') }}</h2>
+      <p class="summary-text">{{ translateIdiomas(profile.idiomas, cvLocale.value) || ct('profile.cv_default_languages') }}</p>
     </section>
 
   </div>
@@ -81,7 +80,9 @@
 
 <script setup>
 import { computed } from 'vue';
-const { t } = useI18n()
+import { translateDate, translateIdiomas } from '~/utils/cvLocalize'
+
+const { t, locale, getLocaleMessage } = useI18n()
 
 const props = defineProps({
   profile: Object,
@@ -91,27 +92,82 @@ const props = defineProps({
   cvImage: { type: String, default: null }
 });
 
-// --- LÓGICA DE PROCESAMIENTO MANTENIDA DE TU CÓDIGO ---
+const cvLocale = computed(() => props.aiData?.cv_locale || locale.value)
+
+function ct(key) {
+  const msgs = getLocaleMessage(cvLocale.value)
+  const result = key.split('.').reduce((obj, part) => obj?.[part], msgs)
+  return typeof result === 'string' ? result : t(key)
+}
+
+const td = (date) => translateDate(date, cvLocale.value)
+
+function cleanLink(raw) {
+  if (!raw) return null
+  const url = raw.replace(/\s+/g, '')
+  return url.startsWith('http') ? url : `https://${url}`
+}
+
+function linkLabel(raw) {
+  try {
+    return new URL(cleanLink(raw)).hostname.replace(/^www\./, '')
+  } catch {
+    return cleanLink(raw)
+  }
+}
+
+const PRESENT_TOKENS = new Set([
+  'present', 'presente', 'actual', 'actualidad', 'current', 'currently', 'now', 'hoy', 'hoje', 'today', ''
+])
+
+function isCurrentExp(fin) {
+  if (fin === null || fin === undefined) return true
+  return PRESENT_TOKENS.has(String(fin).trim().toLowerCase())
+}
+
+function parseExpDate(dateStr) {
+  if (!dateStr) return Date.now()
+  const str = String(dateStr).trim()
+  const direct = new Date(str)
+  if (!isNaN(direct.getTime())) return direct.getTime()
+  const year = str.match(/\b(19|20)\d{2}\b/)
+  if (year) return new Date(`${year[0]}-01-01`).getTime()
+  return 0
+}
+
+function sortByRecency(exps) {
+  return [...exps].sort((a, b) => {
+    const aCur = isCurrentExp(a.fin)
+    const bCur = isCurrentExp(b.fin)
+    if (aCur && !bCur) return -1
+    if (!aCur && bCur) return 1
+    if (aCur && bCur) return parseExpDate(b.inicio) - parseExpDate(a.inicio)
+    return parseExpDate(b.fin) - parseExpDate(a.fin)
+  })
+}
 
 const optimizedExperiences = computed(() => {
   const sourceExperiences = Array.isArray(props.experiences) ? props.experiences : [];
   const aiExperiences = Array.isArray(props.aiData?.experiences) ? props.aiData.experiences : [];
 
+  let merged;
   if (!aiExperiences.length) {
-    return sourceExperiences.map(exp => ({
+    merged = sourceExperiences.map(exp => ({
       ...exp,
       logros_optimizados: exp.logros ? [exp.logros] : []
     }));
+  } else {
+    merged = aiExperiences.map((aiExp) => {
+      const sourceExp = sourceExperiences.find(exp => exp.id === aiExp.id) || {};
+      return {
+        ...sourceExp,
+        ...aiExp,
+        logros_optimizados: Array.isArray(aiExp.logros_optimizados) ? aiExp.logros_optimizados : (sourceExp.logros ? [sourceExp.logros] : [])
+      };
+    });
   }
 
-  return aiExperiences.map((aiExp) => {
-    const sourceExp = sourceExperiences.find(exp => exp.id === aiExp.id) || {};
-    return {
-      ...sourceExp,
-      ...aiExp,
-      logros_optimizados: Array.isArray(aiExp.logros_optimizados) ? aiExp.logros_optimizados : (sourceExp.logros ? [sourceExp.logros] : [])
-    };
-  });
+  return sortByRecency(merged);
 });
 
 const workExperiences = computed(() => optimizedExperiences.value);
@@ -237,16 +293,24 @@ const normalizedEducations = computed(() => {
   font-style: italic;
 }
 
-.achievements-list {
-  margin: 5px 0 0 20px;
-  padding: 0;
+.achievements-paragraph {
+  margin: 5px 0 0;
   font-size: 11px;
+  line-height: 1.5;
+  color: #555;
+  text-align: justify;
 }
 
-.achievements-list li {
-  margin-bottom: 3px;
-  line-height: 1.4;
+.exp-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: #555;
+  text-decoration: none;
+  word-break: break-all;
 }
+
+.exp-link:hover { text-decoration: underline; }
 
 /* Educación en Fila */
 .education-grid {

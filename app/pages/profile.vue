@@ -168,6 +168,8 @@
             {{ $t('profile.help_exp_type') }}
           </div>
 
+          <AppInput :label="$t('profile.label_exp_link')" v-model="newExp.link" type="url" :placeholder="$t('profile.placeholder_exp_link')" />
+
           <div class="profile-form-actions">
             <AppButton @click="saveExp" class="flex-1">{{ editingExpId ? $t('profile.btn_update_exp') : $t('profile.btn_save_exp') }}</AppButton>
             <AppButton v-if="editingExpId" variant="secondary" @click="resetExpForm">{{ $t('profile.btn_cancel_edit') }}</AppButton>
@@ -269,7 +271,8 @@ const emptyExperienceForm = () => ({
   inicio: '',
   fin: '',
   logros: '',
-  skills: ''
+  skills: '',
+  link: ''
 })
 
 const newEducation = ref(emptyEducationForm())
@@ -494,7 +497,8 @@ const saveExp = () => {
       inicio: newExp.value.inicio,
       fin: newExp.value.fin || '',
       logros: newExp.value.logros || '',
-      skills: normalizeSkills(newExp.value.skills)
+      skills: normalizeSkills(newExp.value.skills),
+      link: newExp.value.link || ''
     })
     toast.success(newExp.value.type === 'project' ? t('profile.toast_proj_added') : t('profile.toast_exp_added'))
   }
@@ -517,7 +521,8 @@ const startEditingExperience = (exp: any) => {
     inicio: exp.inicio,
     fin: exp.fin || '',
     logros: exp.logros || '',
-    skills: Array.isArray(exp.skills) ? exp.skills.join(', ') : exp.skills
+    skills: Array.isArray(exp.skills) ? exp.skills.join(', ') : exp.skills,
+    link: exp.link || ''
   }
   adding.value = true
   window.scrollTo({ top: 0, behavior: 'smooth' })

@@ -288,6 +288,7 @@ DEVUELVE UNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA EXACTA:
     const alreadyHasProjects = Array.isArray(parsed?.experiences) && parsed.experiences.some((exp: any) => exp?.type === 'project')
 
     if (!alreadyHasProjects && hasProjectSignals(text)) {
+      const truncatedText = text.slice(0, 6000)
       const projectResponse = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
@@ -322,7 +323,7 @@ DEVUELVE UNICAMENTE JSON:
           },
           {
             role: 'user',
-            content: `TEXTO A PROCESAR:\n\n${text}`
+            content: `TEXTO A PROCESAR:\n\n${truncatedText}`
           }
         ],
         response_format: { type: 'json_object' }

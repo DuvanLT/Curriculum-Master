@@ -110,10 +110,14 @@
           </div>
         </AppCard>
 
-        <div v-if="result" class="flex justify-center mt-6">
-          <AppButton @click="saveAsApplication" variant="primary" class="!px-10">
+        <div v-if="result" class="flex flex-wrap justify-center gap-3 mt-6">
+          <AppButton @click="saveAsApplication" variant="primary" class="!px-8">
             <span class="material-symbols-outlined text-[18px] mr-2">work</span>
             {{ $t('analisis.save_application') }}
+          </AppButton>
+          <AppButton @click="goToGenerateCv" variant="secondary" class="!px-8">
+            <span class="material-symbols-outlined text-[18px] mr-2">description</span>
+            {{ $t('analisis.btn_create_cv') }}
           </AppButton>
         </div>
       </div>
@@ -311,6 +315,13 @@ const saveAsApplication = async () => {
     console.error(e)
     toast.error(t('analisis.toast_app_error'))
   }
+}
+
+const goToGenerateCv = () => {
+  if (jd.value.trim()) {
+    sessionStorage.setItem('pending-jd', jd.value.trim())
+  }
+  navigateTo('/generator-cv')
 }
 
 const formatDate = (dateStr: string) => {

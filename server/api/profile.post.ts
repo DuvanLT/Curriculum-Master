@@ -153,8 +153,8 @@ export default defineEventHandler(async (event) => {
 
   for (const exp of experiences) {
     statements.push({
-      sql: `INSERT INTO experiences (id, user_id, empresa, cargo, inicio, fin, logros, skills, type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      sql: `INSERT INTO experiences (id, user_id, empresa, cargo, inicio, fin, logros, skills, type, link)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         exp.id || uuidv4(),
         userId,
@@ -164,7 +164,8 @@ export default defineEventHandler(async (event) => {
         exp.fin || null,
         exp.logros || null,
         JSON.stringify(exp.skills || []),
-        exp.type === 'project' ? 'project' : 'work'
+        exp.type === 'project' ? 'project' : 'work',
+        exp.link || null
       ]
     })
   }

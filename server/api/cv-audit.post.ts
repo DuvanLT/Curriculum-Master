@@ -64,14 +64,14 @@ RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE EXACT SPANISH KEYS
 {
   "score": 72,
   "fortalezas": [
-    "More than 5 years of clearly documented technical leadership experience.",
-    "Well-defined and updated technology stack.",
-    "Quantifiable achievements in 2 of the 3 listed experiences."
+    "Clearly documented professional experience with well-defined roles.",
+    "Solid and up-to-date skill set aligned with the target industry.",
+    "Quantifiable achievements present in the listed experiences."
   ],
   "debilidades": [
-    "The professional summary is very generic and does not differentiate the candidate.",
-    "Missing metrics or quantifiable impact in the most recent experiences.",
-    "No personal projects or portfolio to reinforce the technical profile."
+    "The professional summary is generic and does not differentiate the candidate.",
+    "Missing metrics or quantifiable impact in recent experiences.",
+    "No personal projects or portfolio to reinforce the professional profile."
   ],
   "recomendacion": "Your profile has a solid foundation but needs more specificity. Prioritize quantifying your achievements and customizing your summary for each type of job."
 }
@@ -84,16 +84,16 @@ DEVUELVE ÚNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA:
 {
   "score": 72,
   "fortalezas": [
-    "Más de 5 años de experiencia en roles de liderazgo técnico claramente documentados.",
-    "Stack tecnológico bien definido y actualizado.",
-    "Logros cuantificables en 2 de las 3 experiencias listadas."
+    "Experiencia profesional claramente documentada con roles bien definidos.",
+    "Stack tecnologico o set de habilidades solido y actualizado.",
+    "Logros cuantificables presentes en las experiencias listadas."
   ],
   "debilidades": [
-    "El resumen profesional es muy genérico y no diferencia al candidato.",
-    "Faltan métricas o impacto cuantificable en las experiencias más recientes.",
-    "No hay proyectos personales ni portfolio que refuerce el perfil técnico."
+    "El resumen profesional es muy generico y no diferencia al candidato.",
+    "Faltan metricas o impacto cuantificable en las experiencias mas recientes.",
+    "No hay proyectos personales ni portfolio que refuerce el perfil profesional."
   ],
-  "recomendacion": "Tu perfil tiene una base sólida pero necesita más especificidad. Prioriza cuantificar tus logros y personalizar tu resumen para cada tipo de vacante."
+  "recomendacion": "Tu perfil tiene una base solida pero necesita mas especificidad. Prioriza cuantificar tus logros y personalizar tu resumen para cada tipo de vacante."
 }
 `
 

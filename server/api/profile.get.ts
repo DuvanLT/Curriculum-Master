@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const expResult = await db.execute({
-    sql: 'SELECT id, empresa, cargo, inicio, fin, logros, skills, type FROM experiences WHERE user_id = ?',
+    sql: 'SELECT id, empresa, cargo, inicio, fin, logros, skills, type, link FROM experiences WHERE user_id = ?',
     args: [userId]
   })
 

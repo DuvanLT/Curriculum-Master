@@ -31,6 +31,7 @@ export interface Experience {
   fin: string;
   logros: string;
   skills: string[];
+  link?: string;
 }
 
 function normalizeEducationSummary(educations: Education[]) {

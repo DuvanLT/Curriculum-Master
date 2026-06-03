@@ -19,7 +19,10 @@ export default defineEventHandler(async (event) => {
   }))
 
   const profile = rawProfile || { nombre: 'Usuario', titulo: 'Profesional', resumen: '', years: '0', educacion: '' }
-  const experiences = rawExperiences || []
+  const slimExperiences = (rawExperiences || []).map((e: any) => ({
+    cargo: e.cargo, empresa: e.empresa, inicio: e.inicio, fin: e.fin, skills: e.skills
+  }))
+  const experiences = slimExperiences
 
   if (!config.openaiApiKey) {
     throw createError({

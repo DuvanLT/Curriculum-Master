@@ -124,12 +124,19 @@ export const initDb = async () => {
       fin TEXT,
       logros TEXT,
       skills TEXT,
+      link TEXT,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `)
 
   try {
     await db.execute('ALTER TABLE experiences ADD COLUMN type TEXT DEFAULT \'work\'')
+  } catch (e: any) {
+    // Column might already exist, ignore error
+  }
+
+  try {
+    await db.execute('ALTER TABLE experiences ADD COLUMN link TEXT')
   } catch (e: any) {
     // Column might already exist, ignore error
   }

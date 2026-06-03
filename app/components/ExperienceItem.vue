@@ -33,6 +33,17 @@
         {{ skill }}
       </span>
     </div>
+
+    <a
+      v-if="experience.link"
+      :href="experience.link"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="exp-link"
+    >
+      <span class="material-symbols-outlined text-[13px]">link</span>
+      {{ experience.link }}
+    </a>
   </div>
 </template>
 
@@ -85,5 +96,24 @@ const achievementLines = computed(() => {
   font-size: 11px;
   color: var(--text3);
   font-family: var(--font-mono);
+}
+
+.exp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--amber);
+  text-decoration: none;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exp-link:hover {
+  text-decoration: underline;
 }
 </style>

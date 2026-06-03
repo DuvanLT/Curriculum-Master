@@ -3,8 +3,8 @@ import { requireVerifiedUserSession } from '../utils/verified-session'
 export default defineEventHandler(async (event) => {
   const session = await requireVerifiedUserSession(event)
   const body = await readBody(event)
-  const { company, position, status, date, analysis, interview_date } = body
-  
+    const { company, position, status, date, analysis } = body
+
   if (!company || !position || !status || !date) {
     throw createError({
       statusCode: 400,
@@ -18,14 +18,14 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const id = crypto.randomUUID()
-  
+
   try {
     await db.execute({
-      sql: 'INSERT INTO applications (id, user_id, company, position, status, date, analysis, interview_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      args: [id, session.user.id, company, position, status, date, analysis ? JSON.stringify(analysis) : null, interview_date || null]
+      sql: 'INSERT INTO applications (id, user_id, company, position, status, date, analysis) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      args: [id, session.user.id, company, position, status, date, analysis ? JSON.stringify(analysis) : null]
     })
-    
-    return { id, company, position, status, date, analysis, interview_date }
+
+    return { id, company, position, status, date, analysis }
   } catch (e: any) {
     console.error('Error creating application:', e)
     throw createError({

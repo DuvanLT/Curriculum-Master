@@ -18,6 +18,38 @@ function normalizeExperienceType(value: unknown) {
   return value === 'project' ? 'project' : 'work'
 }
 
+const PRESENT_TOKENS = new Set([
+  'present', 'presente', 'actual', 'actualidad', 'current', 'currently', 'now', 'hoy', 'hoje', 'today', ''
+])
+
+function isCurrentExp(fin: unknown): boolean {
+  if (fin === null || fin === undefined) return true
+  return PRESENT_TOKENS.has(String(fin).trim().toLowerCase())
+}
+
+function parseExpDate(dateStr: unknown): number {
+  if (!dateStr) return Date.now()
+  const str = String(dateStr).trim()
+  const direct = new Date(str)
+  if (!isNaN(direct.getTime())) return direct.getTime()
+  const year = str.match(/\b(19|20)\d{2}\b/)
+  if (year) return new Date(`${year[0]}-01-01`).getTime()
+  return 0
+}
+
+function sortExperiencesByRecency(exps: any[]): any[] {
+  return [...exps].sort((a, b) => {
+    const aCur = isCurrentExp(a.fin)
+    const bCur = isCurrentExp(b.fin)
+    if (aCur && !bCur) return -1
+    if (!aCur && bCur) return 1
+    // Both current → most recent start date first
+    if (aCur && bCur) return parseExpDate(b.inicio) - parseExpDate(a.inicio)
+    // Both past → most recent end date first
+    return parseExpDate(b.fin) - parseExpDate(a.fin)
+  })
+}
+
 function findSourceExperience(aiExp: any, sourceExperiences: any[]) {
   if (aiExp?.id) {
     const directMatch = sourceExperiences.find((exp: any) => String(exp.id) === String(aiExp.id))
@@ -57,10 +89,59 @@ export default defineEventHandler(async (event) => {
   }
   const body = await readBody(event)
   const { profile, experiences, jd, locale = 'es' } = body
-  const isEn = locale === 'en'
+
+  // Detect CV language from the JD; fall back to user locale when no JD is provided
+  function detectLang(text: string): 'en' | 'es' {
+    const lower = text.toLowerCase()
+    const words = lower.match(/\b[a-záéíóúüñ]+\b/g) || []
+
+    // Exclusive English function words — none of these exist in Spanish
+    const EN = new Set([
+      'the', 'and', 'for', 'with', 'are', 'you', 'this', 'that', 'have', 'will',
+      'our', 'your', 'we', 'is', 'of', 'to', 'in', 'an', 'be', 'at', 'as',
+      'or', 'not', 'from', 'they', 'it', 'was', 'been', 'has', 'do', 'did',
+      'can', 'could', 'would', 'should', 'may', 'might', 'must', 'shall',
+      'about', 'if', 'when', 'what', 'which', 'who', 'how', 'all', 'each',
+      'both', 'their', 'them', 'then', 'than', 'so', 'but', 'by', 'up',
+      'out', 'on', 'more', 'also', 'into', 'its', 'just', 'over', 'after',
+      'before', 'through', 'while', 'team', 'work', 'experience', 'skills',
+      'role', 'join', 'seeking', 'looking', 'required', 'strong', 'proven',
+      'including', 'candidate', 'position', 'responsibilities', 'preferred',
+      'ability', 'knowledge', 'understanding', 'background', 'opportunity'
+    ])
+
+    // Exclusive Spanish function words — none of these exist in English
+    const ES = new Set([
+      'de', 'la', 'el', 'los', 'las', 'con', 'para', 'por', 'una', 'un',
+      'que', 'del', 'se', 'su', 'es', 'al', 'lo', 'le', 'nos', 'como',
+      'más', 'pero', 'ya', 'también', 'todo', 'sin', 'sobre', 'entre',
+      'cuando', 'muy', 'hay', 'ser', 'tener', 'este', 'esta', 'estos',
+      'estas', 'fue', 'han', 'son', 'tiene', 'buscamos', 'equipo',
+      'experiencia', 'conocimientos', 'trabajo', 'empresa', 'años',
+      'requisitos', 'responsabilidades', 'habilidades', 'perfil',
+      'ofrecemos', 'buscamos', 'cargo', 'vacante', 'postular'
+    ])
+
+    let enCount = 0
+    let esCount = 0
+    for (const w of words) {
+      if (EN.has(w)) enCount++
+      if (ES.has(w)) esCount++
+    }
+    // Tie goes to English — better to output English CV than leave a Spanish CV for an English JD
+    return enCount >= esCount ? 'en' : 'es'
+  }
+
+  const jdText = typeof jd === 'string' ? jd.trim() : ''
+  const detectedLocale = jdText.length >= 30 ? detectLang(jdText) : (locale as string)
+  const isEn = detectedLocale === 'en'
+
+  const cvLength = Math.min(3, Math.max(1, Number(body.cvLength) || 1))
+  const maxLogros = cvLength === 1 ? 2 : cvLength === 2 ? 3 : 5
+  const summaryChars = cvLength === 1 ? 280 : cvLength === 2 ? 420 : 600
+  const summaryLines = cvLength === 1 ? '2-3' : cvLength === 2 ? '3-4' : '4-6'
 
   // Validate JD length
-  const jdText = typeof jd === 'string' ? jd.trim() : ''
   if (jdText.length > 15000) {
     throw createError({
       statusCode: 400,
@@ -93,159 +174,71 @@ export default defineEventHandler(async (event) => {
     }))
     : []
 
-  const systemPrompt = isEn
-    ? `
-You are an expert in CV optimization for ATS systems and recruiters.
+  const systemPrompt = `You are an expert in CV optimization for ATS systems and recruiters.
 Your goal is to adapt the user's CV to a specific job description without inventing experience, context, or metrics.
 
 CRITICAL RULES:
-1. First analyze the JD and detect responsibilities, tools, seniority, and expected results.
-2. Then evaluate each user experience and decide how relevant it is for the vacancy.
-3. Respect the type of each entry:
-   - "work" = formal work experience.
-   - "project" = personal, academic, or freelance project. Never present a project as a formal job.
-4. Do not just copy the profile text. Rewrite each achievement to connect it with the vacancy using the available context.
-5. Use the STAR methodology realistically:
-   - Situation/Task: clarify the context or problem.
-   - Action: explain the candidate's action or contribution.
-   - Result: express the impact.
-6. Only use percentages, figures, or volumes when there is explicit evidence in the profile, experiences, or portfolio.
-7. Never invent numbers or exaggerate. Avoid impossible improvements like "reduced times by 100%".
-8. If there is no reliable numerical data, use realistic qualitative results without figures.
-9. Include relevant keywords from the JD only when they honestly fit the candidate's real experience.
-10. Highlight the most relevant experiences more and lower the weight of the less related ones.
-11. When the type is "project", focus the writing on scope, stack, problem solved, deliverable, and learning applied to the role.
-12. When the type is "work", focus the writing on responsibility, collaboration, results, and business context.
-13. The tone must be professional, executive, and concrete. ALWAYS write in the FIRST PERSON (e.g., "Developed", "Implemented"). Do not use third person. Avoid cliches and empty words.
-14. Return ONLY structured JSON.
-15. Language: English.
-16. If a portfolio/web URL is provided, use it only as a declarative reference of the profile and do not invent evidence from it.
-17. For technical skills (top_skills), STRICTLY use the skills explicitly provided by the user in their profile and experiences. Do not invent or add skills they haven't mentioned.
-`
-    : `
-Eres un experto en optimizacion de CVs para sistemas ATS y reclutadores.
-Tu objetivo es adaptar el CV del usuario a una vacante especifica sin inventar experiencia, contexto ni metricas.
+1. Detect the language of the JD (English or Spanish). Set cv_locale to "en" or "es" accordingly. If no JD is provided, use the user profile language.
+2. Write ALL generated text (summary, logros_optimizados, advice, next_steps, optimized_title) in the detected JD language.
+3. Analyze the JD: detect responsibilities, tools, seniority, and expected results.
+4. Evaluate each experience for relevance to the vacancy.
+5. Respect entry types: "work" = formal employment. "project" = personal/academic/freelance. Never present a project as a formal job.
+6. Rewrite achievements to connect them with the vacancy using only available context.
+7. STAR method: Situation/Task → Action (candidate's contribution) → Result (impact).
+8. Use numbers/percentages ONLY when explicitly stated in the user's data. Never invent metrics.
+9. Include JD keywords only when they honestly match the candidate's real experience.
+10. Write in FIRST PERSON. No third person or impersonal form.
+11. For "summary": use ONLY information the user has explicitly provided. Do NOT infer or add competencies not stated by the user.
+12. For top_skills: include ALL skills the user already listed. Do not add new ones. Order by relevance to the JD.
+13. Return ONLY structured JSON.`
 
-REGLAS CRITICAS:
-1. Primero analiza la vacante y detecta responsabilidades, herramientas, seniority y resultados esperados.
-2. Luego evalua cada experiencia del usuario y decide que tan relevante es para la vacante.
-3. Respeta el tipo de cada entrada:
-   - "work" = experiencia laboral.
-   - "project" = proyecto personal, academico, freelance puntual o iniciativa de portafolio.
-   Nunca presentes un proyecto como si fuera empleo formal.
-4. No copies ni maquilles el mismo texto del perfil. Reescribe cada logro para conectarlo con la vacante usando el contexto disponible.
-5. Usa metodologia STAR de forma realista:
-   - Situation/Task: deja claro el contexto o problema.
-   - Action: explica la accion o contribucion del candidato.
-   - Result: expresa el impacto.
-6. Solo usa porcentajes, cifras o volumenes cuando haya evidencia explicita en el perfil, experiencias o portafolio.
-7. Nunca inventes numeros ni exageres. Evita mejoras imposibles o sospechosas como "reduje tiempos en 100%".
-8. Si no hay dato numerico confiable, usa resultados cualitativos verosimiles sin cifra.
-9. Incluye palabras clave relevantes de la vacante solo cuando encajen de forma honesta con la experiencia real del candidato.
-10. Destaca mas las experiencias mas relevantes y baja el peso de las menos relacionadas.
-11. Cuando el tipo sea "project", enfoca la redaccion en alcance, stack, problema resuelto, entregable y aprendizaje aplicado al rol.
-12. Cuando el tipo sea "work", enfoca la redaccion en responsabilidad, colaboracion, resultados y contexto de negocio.
-13. El tono debe ser profesional, ejecutivo y concreto. Redacta SIEMPRE en PRIMERA PERSONA (ej. "Desarrollé", "Implementé", "Lideré"). NO uses tercera persona ni forma impersonal ("Se desarrolló", "Implementó"). Evita cliches y palabras vacias.
-14. Devuelve unicamente JSON estructurado.
-15. Traduce o manten el idioma segun la vacante: si la vacante esta en ingles, responde en ingles; si esta en espanol, responde en espanol.
-16. Si se proporciona una URL de portafolio/web, usala solo como referencia declarativa del perfil y no inventes evidencia a partir de ella.
-17. Para las habilidades tecnicas (top_skills), utiliza ESTRICTAMENTE las habilidades que el usuario ya ha especificado en su perfil y experiencias. No inventes ni agregues habilidades que no esten en sus datos reales.
-`
+  const slimProfile = {
+    nombre: profile?.nombre || '',
+    titulo: profile?.titulo || '',
+    resumen: profile?.resumen || '',
+    years: profile?.years || '0',
+    educacion: profile?.educacion || '',
+    web: profile?.web || ''
+  }
 
-  const userPrompt = isEn
-    ? `
-PROFILE DATA:
-${JSON.stringify(profile)}
+  const userPrompt = `PROFILE:
+${JSON.stringify(slimProfile)}
 
-NORMALIZED EXPERIENCES:
+EXPERIENCES:
 ${JSON.stringify(normalizedExperiences)}
 
-PORTFOLIO/WEB:
-${profile?.web || 'N/A'}
+JD:
+${jd || 'N/A — perform a general high-quality optimization. Use the profile language.'}
 
-TARGET VACANCY (JD):
-${jd || 'N/A (Do a general high-quality optimization if there is no JD)'}
+CV LENGTH LEVEL: ${cvLength}/3
+OUTPUT RULES:
+- Detect the JD language first and set cv_locale ("en" or "es"). Write everything in that language.
+- summary: ${summaryLines} lines, max ${summaryChars} characters. Use ONLY what the user stated — never infer competencies.
+- Order experiences from highest to lowest relevance for the vacancy.
+- MAX ${maxLogros} logros_optimizados per experience. Each one: 1-2 sentences, first person, specific to the vacancy.
+- Do not invent percentages or metrics not present in the user's data.
+${cvLength === 3 ? '- Extended mode: give rich, detailed achievements. Include all relevant experiences.' : ''}
 
-ADDITIONAL OUTPUT INSTRUCTIONS:
-- Ensure all achievements in "logros_optimizados" are written in the FIRST PERSON (e.g., "Developed...", "Led..."). Do NOT use third person.
-- Order "experiences" from highest to lowest relevance for the vacancy.
-- For each experience, analyze if it really contributes to the vacancy and adapt the focus.
-- Keep and return the "type" field in each experience.
-- Each "logros_optimizados" must sound specific to the vacancy, not be a simple copy of the original text.
-- If data is missing for a metric, do not invent percentages.
-- Use a MAXIMUM of 3 achievements per experience to keep the CV concise.
-- Each achievement must be short and direct (minimum 3 lines, maximum 5 lines, 5 if the experience is relevant). Do not write long paragraphs.
-
-RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE SPANISH KEYS):
+RETURN ONLY JSON:
 {
-  "summary": "Optimized professional summary (3-4 lines)",
-  "optimized_title": "Professional title adjusted to the vacancy",
+  "cv_locale": "en or es — detected language of the JD",
+  "summary": "...",
+  "optimized_title": "...",
   "experiences": [
     {
       "id": "same original id",
       "type": "work or project",
-      "relevance_score": 0, 
-      "relevance_reason": "brief explanation of why this experience is or isn't relevant to the vacancy",
-      "cargo": "optimized title",
-      "empresa": "company name",
-      "focus_for_role": "specific focus with which this experience should be presented for the vacancy",
-      "logros_optimizados": ["list of 2-4 adapted and realistic achievements"],
-      "skills_sugeridas": ["list of key skills for this position"],
-      "metricas_confiables": ["short list of metrics that can be supported by the given info, or empty if none"]
-    }
-  ],
-  "top_skills": ["list of the 10 most important skills for this role, extracted STRICTLY from the ones the user already specified in their data"],
-  "advice": ["3-4 key tips to stand out in this selection process"],
-  "next_steps": ["3-4 concrete to-do tasks to improve the profile or application"]
-}
-* IMPORTANT: The JSON keys MUST remain exactly as shown above (e.g. logros_optimizados, skills_sugeridas, cargo, empresa, etc.).
-`
-    : `
-DATOS DEL PERFIL:
-${JSON.stringify(profile)}
-
-EXPERIENCIAS NORMALIZADAS:
-${JSON.stringify(normalizedExperiences)}
-
-PORTAFOLIO/WEB:
-${profile?.web || 'N/A'}
-
-VACANTE OBJETIVO (JD):
-${jd || 'N/A (Haz una optimizacion general de alta calidad si no hay JD)'}
-
-INSTRUCCIONES ADICIONALES DE SALIDA:
-- Asegúrate de que todos los logros en "logros_optimizados" estén redactados en PRIMERA PERSONA (ej. "Desarrollé...", "Lideré..."). NO uses tercera persona ni formas impersonales.
-- Ordena "experiences" de mayor a menor relevancia para la vacante.
-- Para cada experiencia, analiza si realmente aporta a la vacante y adapta el enfoque.
-- Conserva y devuelve el campo "type" en cada experiencia.
-- Cada "logros_optimizados" debe sonar especifico para la vacante, no ser una simple copia del texto original.
-- Si faltan datos para una metrica, no inventes porcentajes.
-- Usa MÁXIMO 2 logros (viñetas) por cada experiencia para mantener el CV conciso.
-- Cada logro debe ser corto y directo (minimo 3  lineas y máximo 5 líneas si la expereincia o proyecto es muy relevante). No escribas párrafos largos.
-
-DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
-{
-  "summary": "Resumen profesional optimizado (3-4 lineas)",
-  "optimized_title": "Titulo profesional ajustado a la vacante",
-  "experiences": [
-    {
-      "id": "mismo id original",
-      "type": "work o project",
       "relevance_score": 0,
-      "relevance_reason": "explicacion breve de por que esta experiencia si o no es relevante para la vacante",
-      "cargo": "titulo optimizado",
-      "empresa": "nombre empresa",
-      "focus_for_role": "enfoque especifico con el que se debe presentar esta experiencia para la vacante",
-      "logros_optimizados": ["lista de 2-4 logros adaptados y realistas"],
-      "skills_sugeridas": ["lista de skills clave para esta posicion"],
-      "metricas_confiables": ["lista corta de metricas que si se pueden sostener con la informacion dada, o vacio si no hay"]
+      "cargo": "...",
+      "empresa": "...",
+      "logros_optimizados": ["max ${maxLogros} achievements in the detected language"],
+      "skills_sugeridas": ["key skills for this role"]
     }
   ],
-  "top_skills": ["lista de las 10 skills mas importantes para este rol, extraidas ESTRICTAMENTE de las que el usuario ya declaro en sus datos"],
-  "advice": ["3-4 consejos clave para destacar en este proceso de seleccion"],
-  "next_steps": ["3-4 tareas concretas de to-do para mejorar el perfil o postulacion"]
-}
-`
+  "top_skills": ["up to 20 skills STRICTLY from user's declared data, ordered by relevance to the JD"],
+  "advice": ["3-4 tips to stand out, in the detected language"],
+  "next_steps": ["3-4 concrete action items, in the detected language"]
+}`
 
   try {
     const response = await openai.chat.completions.create({
@@ -294,6 +287,24 @@ DEVUELVE UN OBJETO JSON CON ESTA ESTRUCTURA:
     } else {
       result.experiences = []
     }
+
+    result.experiences = sortExperiencesByRecency(result.experiences)
+
+    // Use the locale the AI detected from the JD — much more reliable than heuristics
+    const aiLocale = result.cv_locale === 'en' ? 'en' : result.cv_locale === 'es' ? 'es' : null
+    result.cv_locale = aiLocale || detectedLocale
+
+    // Suplementar top_skills con todas las skills declaradas por el usuario que la IA no incluyó
+    const allDeclaredSkills = [
+      ...normalizedExperiences.flatMap((exp: any) => Array.isArray(exp.skills) ? exp.skills : [])
+    ]
+    const aiSkills: string[] = Array.isArray(result.top_skills)
+      ? result.top_skills.map((s: any) => typeof s === 'string' ? s : s?.name).filter(Boolean)
+      : []
+    const aiSkillsLower = new Set(aiSkills.map((s: string) => s.toLowerCase()))
+    const missing = [...new Set(allDeclaredSkills)]
+      .filter((s: string) => s && !aiSkillsLower.has(s.toLowerCase()))
+    result.top_skills = [...aiSkills, ...missing]
 
     if (result.next_steps && Array.isArray(result.next_steps)) {
       const db = useDb()

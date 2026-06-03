@@ -11,26 +11,26 @@
       <div class="sidebar-content">
         <!-- CONTACTO -->
         <section class="sb-section">
-          <h2 class="sb-title">{{ $t('profile.cv_section_contact') }}</h2>
+          <h2 class="sb-title">{{ ct('profile.cv_section_contact') }}</h2>
           <div class="sb-item">
-            <h3 class="sb-label">{{ $t('profile.cv_label_phone') }}</h3>
+            <h3 class="sb-label">{{ ct('profile.cv_label_phone') }}</h3>
             <p class="sb-text">{{ profile.telefono }}</p>
           </div>
           <div class="sb-item">
-            <h3 class="sb-label">{{ $t('profile.cv_label_email') }}</h3>
+            <h3 class="sb-label">{{ ct('profile.cv_label_email') }}</h3>
             <p class="sb-text">{{ profile.email_profile }}</p>
           </div>
           <div class="sb-item">
-            <h3 class="sb-label">{{ $t('profile.cv_label_address') }}</h3>
+            <h3 class="sb-label">{{ ct('profile.cv_label_address') }}</h3>
             <p class="sb-text">{{ profile.ubicacion }}</p>
           </div>
         </section>
 
         <!-- EDUCACIÓN -->
         <section class="sb-section" v-if="normalizedEducations.length">
-          <h2 class="sb-title">{{ $t('profile.cv_section_education') }}</h2>
+          <h2 class="sb-title">{{ ct('profile.cv_section_education') }}</h2>
           <div v-for="edu in normalizedEducations" :key="edu.id" class="sb-item">
-            <h3 class="sb-label">{{ edu.inicio }} - {{ edu.fin || $t('profile.cv_current') }}</h3>
+            <h3 class="sb-label">{{ td(edu.inicio) }} - {{ td(edu.fin) || ct('profile.cv_current') }}</h3>
             <p class="sb-text"><strong>{{ edu.titulo }}</strong></p>
             <p class="sb-subtext">{{ edu.institucion }}</p>
           </div>
@@ -38,7 +38,7 @@
 
         <!-- EXPERTISE / SKILLS -->
         <section class="sb-section" v-if="highlightedSkills.length">
-          <h2 class="sb-title">{{ $t('profile.cv_section_expertise') }}</h2>
+          <h2 class="sb-title">{{ ct('profile.cv_section_expertise') }}</h2>
           <ul class="sb-list">
             <li v-for="skill in highlightedSkills" :key="skill">{{ skill }}</li>
           </ul>
@@ -46,7 +46,7 @@
 
         <!-- IDIOMAS -->
         <section class="sb-section" v-if="languageSummary">
-          <h2 class="sb-title">{{ $t('profile.cv_section_languages') }}</h2>
+          <h2 class="sb-title">{{ ct('profile.cv_section_languages') }}</h2>
           <p class="sb-text sb-text-compact">{{ languageSummary }}</p>
         </section>
       </div>
@@ -62,22 +62,23 @@
 
       <!-- EXPERIENCIA CON LÍNEA DE TIEMPO -->
       <section class="experience-section">
-        <h2 class="main-title">{{ $t('profile.cv_section_experience_projects') }}</h2>
+        <h2 class="main-title">{{ ct('profile.cv_section_experience_projects') }}</h2>
         <div class="timeline">
           <div v-for="exp in featuredEntries" :key="exp.id" class="timeline-item">
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <div class="exp-meta">
-                <span class="exp-date">{{ exp.inicio }} - {{ exp.fin || $t('profile.cv_present') }}</span>
+                <span class="exp-date">{{ td(exp.inicio) }} - {{ td(exp.fin) || ct('profile.cv_present') }}</span>
                 <p class="exp-company">{{ exp.empresa }}</p>
               </div>
               <div class="exp-heading">
                 <h3 class="exp-role">{{ exp.cargo }}</h3>
-                <span v-if="exp.type === 'project'" class="exp-tag">{{ $t('profile.cv_tag_project') }}</span>
+                <span v-if="exp.type === 'project'" class="exp-tag">{{ ct('profile.cv_tag_project') }}</span>
               </div>
               <ul class="exp-achievements">
                 <li v-for="(logro, i) in exp.logros_optimizados" :key="i">{{ logro }}</li>
               </ul>
+              <a v-if="exp.link" :href="cleanLink(exp.link)" target="_blank" rel="noopener" class="exp-link">↗ {{ linkLabel(exp.link) }}</a>
             </div>
           </div>
         </div>
@@ -89,7 +90,9 @@
 
 <script setup>
 import { computed } from 'vue';
-const { t } = useI18n()
+import { translateDate, translateIdiomas } from '~/utils/cvLocalize'
+
+const { t, locale, getLocaleMessage } = useI18n()
 
 const props = defineProps({
   profile: Object,
@@ -98,6 +101,30 @@ const props = defineProps({
   aiData: Object,
   cvImage: String
 });
+
+const cvLocale = computed(() => props.aiData?.cv_locale || locale.value)
+
+function ct(key) {
+  const msgs = getLocaleMessage(cvLocale.value)
+  const result = key.split('.').reduce((obj, part) => obj?.[part], msgs)
+  return typeof result === 'string' ? result : t(key)
+}
+
+const td = (date) => translateDate(date, cvLocale.value)
+
+function cleanLink(raw) {
+  if (!raw) return null
+  const url = raw.replace(/\s+/g, '')
+  return url.startsWith('http') ? url : `https://${url}`
+}
+
+function linkLabel(raw) {
+  try {
+    return new URL(cleanLink(raw)).hostname.replace(/^www\./, '')
+  } catch {
+    return cleanLink(raw)
+  }
+}
 
 const normalizedDate = (date) => {
   if (!date) return '';
@@ -108,20 +135,57 @@ const normalizedDate = (date) => {
   return date;
 };
 
-const normalizedEntries = computed(() => {
-  const experiences = Array.isArray(props.aiData?.experiences) && props.aiData.experiences.length
-    ? props.aiData.experiences
-    : (Array.isArray(props.experiences) ? props.experiences : []);
+const PRESENT_TOKENS = new Set([
+  'present', 'presente', 'actual', 'actualidad', 'current', 'currently', 'now', 'hoy', 'hoje', 'today', ''
+]);
 
-  return experiences.map((exp, index) => ({
-    ...exp,
-    id: exp.id || `entry-${index}`,
-    type: exp.type === 'project' ? 'project' : 'work',
-    fin: normalizedDate(exp.fin),
-    logros_optimizados: Array.isArray(exp.logros_optimizados)
-      ? exp.logros_optimizados
-      : (exp.logros ? [exp.logros] : [])
-  }));
+function isCurrentExp(fin) {
+  if (fin === null || fin === undefined) return true;
+  return PRESENT_TOKENS.has(String(fin).trim().toLowerCase());
+}
+
+function parseExpDate(dateStr) {
+  if (!dateStr) return Date.now();
+  const str = String(dateStr).trim();
+  const direct = new Date(str);
+  if (!isNaN(direct.getTime())) return direct.getTime();
+  const year = str.match(/\b(19|20)\d{2}\b/);
+  if (year) return new Date(`${year[0]}-01-01`).getTime();
+  return 0;
+}
+
+function sortByRecency(exps) {
+  return [...exps].sort((a, b) => {
+    const aCur = isCurrentExp(a.fin);
+    const bCur = isCurrentExp(b.fin);
+    if (aCur && !bCur) return -1;
+    if (!aCur && bCur) return 1;
+    if (aCur && bCur) return parseExpDate(b.inicio) - parseExpDate(a.inicio);
+    return parseExpDate(b.fin) - parseExpDate(a.fin);
+  });
+}
+
+const normalizedEntries = computed(() => {
+  const sourceExperiences = Array.isArray(props.experiences) ? props.experiences : [];
+  const aiExperiences = Array.isArray(props.aiData?.experiences) && props.aiData.experiences.length
+    ? props.aiData.experiences
+    : sourceExperiences;
+
+  const mapped = aiExperiences.map((exp, index) => {
+    const sourceExp = sourceExperiences.find(s => s.id === exp.id) || {};
+    return {
+      ...sourceExp,
+      ...exp,
+      id: exp.id || `entry-${index}`,
+      type: exp.type === 'project' ? 'project' : 'work',
+      fin: normalizedDate(exp.fin),
+      logros_optimizados: Array.isArray(exp.logros_optimizados)
+        ? exp.logros_optimizados
+        : (exp.logros ? [exp.logros] : [])
+    };
+  });
+
+  return sortByRecency(mapped);
 });
 
 const featuredEntries = computed(() => {
@@ -136,16 +200,17 @@ const highlightedSkills = computed(() => {
   return skills
     .map((skill) => typeof skill === 'string' ? skill : skill?.name)
     .filter(Boolean)
-    .slice(0, 15);
+    .slice(0, 20);
 });
 
 const languageSummary = computed(() => {
   const raw = String(props.profile?.idiomas || '').trim();
   if (raw) {
-    return raw.replace(/\n+/g, ' · ');
+    const translated = translateIdiomas(raw, cvLocale.value);
+    return translated.replace(/\n+/g, ' · ');
   }
 
-  return t('profile.cv_default_languages_compact');
+  return ct('profile.cv_default_languages_compact');
 });
 
 const normalizedEducations = computed(() => {
@@ -162,21 +227,38 @@ const normalizedEducations = computed(() => {
 .cv-wrapper {
   display: flex;
   width: 210mm;
-  align-items: stretch; 
+  align-items: flex-start;
   margin: 0 auto;
   background: #fff;
   font-family: 'Inter', 'Helvetica', sans-serif;
   color: #333;
+  position: relative;
+}
+
+/* Franja decorativa izquierda — se ancla top/bottom para no depender de height:100% */
+.cv-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 35%;
+  background-color: #323b4c;
+  z-index: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 /* Sidebar Oscuro */
 .sidebar {
   width: 35%;
-  background-color: #323b4c;
+  background-color: transparent;
   color: #fff;
   padding: 28px 22px;
-  display: flex;           /* ← flex para que sidebar-fill funcione */
+  display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -228,6 +310,8 @@ const normalizedEducations = computed(() => {
 .main-content {
   width: 65%;
   padding: 24px 32px;
+  position: relative;
+  z-index: 1;
 }
 
 .user-name {
@@ -341,8 +425,36 @@ const normalizedEducations = computed(() => {
   break-inside: avoid;
 }
 
+.exp-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 9.5px;
+  color: #4a5568;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.exp-link:hover { text-decoration: underline; }
+
 @media print {
-  .cv-wrapper { width: 100%; margin: 0; height: auto !important; max-height: none !important; overflow: visible !important; }
-  .sidebar { -webkit-print-color-adjust: exact; }
+  .cv-wrapper {
+    width: 100%;
+    margin: 0;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* En print, fixed repite el fondo en cada página */
+  .cv-wrapper::before {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 35%;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 </style>
