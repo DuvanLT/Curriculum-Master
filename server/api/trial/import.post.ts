@@ -1,4 +1,4 @@
-import OpenAI from 'openai'
+﻿import OpenAI from 'openai'
 import { extractText, resolvePDFJSImport } from 'unpdf'
 import { getOrCreateAnonId, getClientIpHash } from '../../utils/anon-trial'
 import { checkAnonAIRateLimit } from '../../utils/rate-limit'
@@ -15,20 +15,20 @@ function normalizeExperienceDescription(raw: unknown) {
 
   let lines = sanitized
     .split(/\n+/)
-    .map(line => line.replace(/^[\-\*•\s]+/, '').trim())
+    .map(line => line.replace(/^[\-\*\u2022\s]+/, '').trim())
     .filter(Boolean)
 
   if (lines.length === 1) {
     lines = sanitized
       .split(/(?<=[\.\!\?])\s+|;\s+/)
-      .map(line => line.replace(/^[\-\*•\s]+/, '').trim())
+      .map(line => line.replace(/^[\-\*\u2022\s]+/, '').trim())
       .filter(Boolean)
   }
 
   if (lines.length === 1) {
     lines = sanitized
       .split(/,\s+(?=[A-Z0-9])/)
-      .map(line => line.replace(/^[\-\*•\s]+/, '').trim())
+      .map(line => line.replace(/^[\-\*\u2022\s]+/, '').trim())
       .filter(Boolean)
   }
 
@@ -73,11 +73,16 @@ export default defineEventHandler(async (event) => {
   checkAnonAIRateLimit(event)
 
   const db = useDb()
-  const existing = await db.execute({
-    sql: 'SELECT import_used FROM anonymous_trials WHERE id = ?',
-    args: [anonId]
+  const claim = await db.execute({
+    sql: `INSERT INTO anonymous_trials (id, ip_hash, import_used)
+          VALUES (?, ?, 1)
+          ON CONFLICT(id) DO UPDATE SET
+            import_used = 1,
+            ip_hash = excluded.ip_hash
+          WHERE anonymous_trials.import_used = 0`,
+    args: [anonId, getClientIpHash(event)]
   })
-  if (existing.rows[0] && Number(existing.rows[0].import_used) === 1) {
+  if (claim.rowsAffected === 0) {
     throw createError({
       statusCode: 403,
       statusMessage: 'Ya usaste tu importación gratuita. Crea una cuenta para continuar.'
@@ -358,20 +363,15 @@ DEVUELVE UNICAMENTE JSON:
     const { educations: parsedEducations, experiences: parsedExperiences, ...profileFields } = parsed
 
     await db.execute({
-      sql: `INSERT INTO anonymous_trials (id, ip_hash, profile_json, experiences_json, educations_json, import_used)
-            VALUES (?, ?, ?, ?, ?, 1)
-            ON CONFLICT(id) DO UPDATE SET
-              ip_hash = excluded.ip_hash,
-              profile_json = excluded.profile_json,
-              experiences_json = excluded.experiences_json,
-              educations_json = excluded.educations_json,
-              import_used = 1`,
+      sql: `UPDATE anonymous_trials
+            SET profile_json = ?, experiences_json = ?, educations_json = ?, ip_hash = ?
+            WHERE id = ?`,
       args: [
-        anonId,
-        getClientIpHash(event),
         JSON.stringify(profileFields),
         JSON.stringify(parsedExperiences || []),
-        JSON.stringify(parsedEducations || [])
+        JSON.stringify(parsedEducations || []),
+        getClientIpHash(event),
+        anonId
       ]
     })
 
@@ -384,3 +384,5 @@ DEVUELVE UNICAMENTE JSON:
     })
   }
 })
+
+
