@@ -73,21 +73,6 @@ export default defineEventHandler(async (event) => {
   checkAnonAIRateLimit(event)
 
   const db = useDb()
-  const claim = await db.execute({
-    sql: `INSERT INTO anonymous_trials (id, ip_hash, import_used)
-          VALUES (?, ?, 1)
-          ON CONFLICT(id) DO UPDATE SET
-            import_used = 1,
-            ip_hash = excluded.ip_hash
-          WHERE anonymous_trials.import_used = 0`,
-    args: [anonId, getClientIpHash(event)]
-  })
-  if (claim.rowsAffected === 0) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Ya usaste tu importación gratuita. Crea una cuenta para continuar.'
-    })
-  }
 
   await resolvePDFJSImport()
 
@@ -139,6 +124,22 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 422,
       message: 'No se pudo extraer texto suficiente del archivo. Este importador solo admite PDFs con texto seleccionable y no procesa PDFs escaneados o basados en imagen.'
+    })
+  }
+
+  const claim = await db.execute({
+    sql: `INSERT INTO anonymous_trials (id, ip_hash, import_used)
+          VALUES (?, ?, 1)
+          ON CONFLICT(id) DO UPDATE SET
+            import_used = 1,
+            ip_hash = excluded.ip_hash
+          WHERE anonymous_trials.import_used = 0`,
+    args: [anonId, getClientIpHash(event)]
+  })
+  if (claim.rowsAffected === 0) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Ya usaste tu importación gratuita. Crea una cuenta para continuar.'
     })
   }
 
