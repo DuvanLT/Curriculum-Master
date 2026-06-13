@@ -20,6 +20,29 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const { profile, experiences, locale = 'es' } = await readBody(event)
+  const isEn = locale === 'en'
+
+  // Validate profile and experiences types
+  if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'profile debe ser un objeto.'
+    })
+  }
+  if (!Array.isArray(experiences)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'experiences debe ser un arreglo.'
+    })
+  }
+
+  // Validate input size
+  const inputSize = JSON.stringify({ profile, experiences }).length
+  if (inputSize > 30000) {
+    throw createError({ statusCode: 400, statusMessage: 'Input data is too large (max 30,000 characters).' })
+  }
+
   const claim = await db.execute({
     sql: 'UPDATE anonymous_trials SET audit_used = 1 WHERE id = ? AND audit_used = 0',
     args: [anonId]
@@ -29,15 +52,6 @@ export default defineEventHandler(async (event) => {
       statusCode: 403,
       statusMessage: 'Ya usaste tu auditoría gratuita. Crea una cuenta para continuar.'
     })
-  }
-
-  const { profile, experiences, locale = 'es' } = await readBody(event)
-  const isEn = locale === 'en'
-
-  // Validate input size
-  const inputSize = JSON.stringify({ profile, experiences }).length
-  if (inputSize > 30000) {
-    throw createError({ statusCode: 400, statusMessage: 'Input data is too large (max 30,000 characters).' })
   }
 
   if (!config.openaiApiKey) {
