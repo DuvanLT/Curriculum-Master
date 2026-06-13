@@ -9,6 +9,7 @@ interface RateLimitEntry {
 // ─── Stores ───
 const ipStore = new Map<string, RateLimitEntry>()
 const userAIStore = new Map<string, RateLimitEntry>()
+const anonAIStore = new Map<string, RateLimitEntry>()
 
 // ─── Constants ───
 const AUTH_WINDOW_MS = 15 * 60 * 1000   // 15 minutes
@@ -17,7 +18,16 @@ const AUTH_MAX_REQUESTS = 10             // 10 attempts per window
 const AI_WINDOW_MS = 60 * 60 * 1000     // 1 hour
 const AI_MAX_REQUESTS = 30              // 30 AI calls per hour per user
 
+const ANON_AI_WINDOW_MS = 60 * 60 * 1000 // 1 hour
+const ANON_AI_MAX_REQUESTS = 10          // 10 trial AI calls per hour per IP
+
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000 // Clean expired entries every 5 min
+
+// ─── Shared helpers ───
+export function getClientIp(event: H3Event) {
+  const forwarded = getHeader(event, 'x-forwarded-for')
+  return forwarded?.split(',')[0]?.trim() || getRequestIP(event) || 'unknown'
+}
 
 // ─── Automatic cleanup ───
 function cleanStore(store: Map<string, RateLimitEntry>) {
@@ -32,12 +42,12 @@ function cleanStore(store: Map<string, RateLimitEntry>) {
 setInterval(() => {
   cleanStore(ipStore)
   cleanStore(userAIStore)
+  cleanStore(anonAIStore)
 }, CLEANUP_INTERVAL_MS)
 
 // ─── IP-based rate limit (for auth endpoints) ───
 export function checkIpRateLimit(event: H3Event) {
-  const forwarded = getHeader(event, 'x-forwarded-for')
-  const ip = forwarded?.split(',')[0]?.trim() || getRequestIP(event) || 'unknown'
+  const ip = getClientIp(event)
   const now = Date.now()
 
   const entry = ipStore.get(ip)
@@ -70,6 +80,26 @@ export function checkUserAIRateLimit(userId: string) {
     throw createError({
       statusCode: 429,
       statusMessage: 'AI usage limit exceeded. Please try again in 1 hour.'
+    })
+  }
+}
+
+// ─── IP-based rate limit (for anonymous /api/trial/* AI endpoints) ───
+export function checkAnonAIRateLimit(event: H3Event) {
+  const ip = getClientIp(event)
+  const now = Date.now()
+
+  const entry = anonAIStore.get(ip)
+  if (!entry || now > entry.resetAt) {
+    anonAIStore.set(ip, { count: 1, resetAt: now + ANON_AI_WINDOW_MS })
+    return
+  }
+
+  entry.count++
+  if (entry.count > ANON_AI_MAX_REQUESTS) {
+    throw createError({
+      statusCode: 429,
+      statusMessage: 'Too many trial requests from this network. Please try again later.'
     })
   }
 }
