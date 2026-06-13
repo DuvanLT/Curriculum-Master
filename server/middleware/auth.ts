@@ -14,6 +14,11 @@ export default defineEventHandler(async (event) => {
       return
     }
 
+    // Skip protection for anonymous free-trial routes (own usage limits apply)
+    if (url.pathname.startsWith('/api/trial/')) {
+      return
+    }
+
     // 1. Check for valid user session
     const session = await getUserSession(event)
     if (session?.user) {
