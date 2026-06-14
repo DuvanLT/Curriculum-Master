@@ -73,6 +73,7 @@ INSTRUCTIONS:
    - Phrase these opportunities positively and action-oriented.
    - Examples: "Automatically adapt your CV to each job listing using AI", "Detect missing keywords for specific industries", "Quantify your achievements to pass stricter ATS filters".
    - DO NOT use negative or critical tone.
+   - IMPORTANT: Even though you should frame these as opportunities/improvement areas in their *content* (positive, action-oriented tone), the JSON key for this array in your output MUST be exactly "debilidades" — do NOT use "oportunidades", "opportunities", "areas_de_mejora", or any other key name.
 5. Provide a 2-line executive recommendation that connects the profile with the platform's potential.
 6. You must reply in English.
 `
@@ -88,6 +89,7 @@ INSTRUCCIONES:
    - Formula estas oportunidades en positivo y orientadas a la acción de la plataforma.
    - Ejemplos de tono correcto: "Adaptar tu CV automáticamente a cada vacante con IA", "Detectar keywords que te faltan en sectores específicos", "Cuantificar tus logros para pasar filtros ATS más exigentes".
    - NO uses tono negativo ni crítico hacia el candidato. El candidato ya valió por llegar hasta aquí.
+   - IMPORTANTE: Aunque debes formular el CONTENIDO de estos elementos como oportunidades de mejora (en positivo, orientado a la acción), la clave JSON de este arreglo en tu respuesta DEBE ser exactamente "debilidades" — NO uses "oportunidades", "opportunities", "areas_de_mejora" ni ningún otro nombre.
 5. Da una recomendación ejecutiva en 2 líneas motivadora que conecte el perfil con el potencial de la plataforma.
 6. Responde siempre en Español.
 `
