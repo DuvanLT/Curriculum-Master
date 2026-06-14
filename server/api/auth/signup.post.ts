@@ -68,6 +68,7 @@ export default defineEventHandler(async (event) => {
   })
 
   // ─── Migrate anonymous trial data, if any ───
+  let fromTrial = false
   try {
     const anonId = getAnonId(event)
     if (anonId) {
@@ -133,6 +134,7 @@ export default defineEventHandler(async (event) => {
         })
 
         clearAnonId(event)
+        fromTrial = true
       }
     }
   } catch (error) {
@@ -177,7 +179,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const user = { id, email, name, is_verified: 0, preferred_locale: locale, subscription_name: 'free_trial', last_payment_at: null }
+  const user = { id, email, name, is_verified: 0, preferred_locale: locale, subscription_name: 'free_trial', last_payment_at: null, from_trial: fromTrial }
 
   // Set session
   await setUserSession(event, { user })

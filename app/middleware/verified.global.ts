@@ -15,6 +15,6 @@ export default defineNuxtRouteMiddleware((to) => {
 
   // If user is verified and trying to access the verify page
   if (user.value && user.value.is_verified && to.path === '/verify') {
-    return navigateTo('/import-cv')
+    return navigateTo(user.value.from_trial ? '/profile' : '/import-cv')
   }
 })
