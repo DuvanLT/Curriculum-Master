@@ -565,6 +565,48 @@
     "btn_skip": "Import later",
     "toast_error": "There was an error processing your file. Please try again."
   },
+  "free_trial": {
+    "title": "Try your CV for free",
+    "subtitle": "No sign-up required. Upload your CV and discover your potential in seconds.",
+    "upload_title": "Upload your CV",
+    "upload_desc": "We'll analyze your CV with AI and give you an instant quality diagnosis.",
+    "upload_text": "Click to upload your CV (PDF)",
+    "btn_start": "Analyze my CV",
+    "loading_import_title": "Analyzing your CV...",
+    "loading_import_desc": "We are extracting your information and preparing your diagnosis.",
+    "audit_title": "Diagnosis of your CV",
+    "audit_score_label": "Overall quality score · ",
+    "score_solid": "Solid profile",
+    "score_potential": "Profile with potential",
+    "score_needs_improvement": "Needs improvement",
+    "strengths_title": "What you do well",
+    "weaknesses_title": "What BringJobs will improve with you",
+    "jd_card_title": "Got a job listing in mind?",
+    "jd_card_desc": "Paste a job description and find out how well your profile matches.",
+    "jd_placeholder": "Paste the job description here...",
+    "btn_analyze": "Analyze match",
+    "loading_analyze_title": "Comparing your profile with the job listing...",
+    "loading_analyze_desc": "This will only take a few seconds.",
+    "result_title": "Analysis result",
+    "match": "Match",
+    "detected_company": "Detected company",
+    "company_not_found": "Not detected",
+    "position": "Position",
+    "position_not_found": "Not detected",
+    "detailed_analysis": "Detailed analysis",
+    "recommendations": "Recommendations",
+    "keywords_present": "Keywords present",
+    "keywords_missing": "Keywords missing",
+    "cta_title": "Create your free account",
+    "cta_desc": "Save this result, generate your optimized CV with AI, and apply to more jobs without limits.",
+    "cta_btn": "Create free account",
+    "already_used_title": "You already used your free trial",
+    "already_used_desc": "Create a free account to keep optimizing your CV without limits.",
+    "toast_error": "There was an error processing your file. Please try again.",
+    "toast_audit_error": "Error generating the diagnosis. Please try again.",
+    "toast_analysis_error": "Error running the AI analysis.",
+    "toast_already_used": "You already used this feature. Create an account to continue."
+  },
   "auth": {
     "welcome_back": "Welcome back",
     "create_account": "Create your account",
@@ -959,6 +1001,10 @@
     "signup": {
       "title": "Create your Free Account | Join BringJobs Today",
       "description": "Sign up for BringJobs and start using artificial intelligence to create impactful resumes, analyze job listings, and practice interviews."
+    },
+    "free_trial": {
+      "title": "Free Trial | Analyze your CV with AI - BringJobs",
+      "description": "Upload your CV, get an AI quality diagnosis, and compare it against a real job listing. No account required."
     }
   }
 }

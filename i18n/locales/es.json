@@ -565,6 +565,48 @@
     "btn_skip": "Importar despues",
     "toast_error": "Hubo un error al procesar tu archivo. Por favor intenta de nuevo."
   },
+  "free_trial": {
+    "title": "Prueba tu CV gratis",
+    "subtitle": "Sin registro. Sube tu CV y descubre tu potencial en segundos.",
+    "upload_title": "Sube tu CV",
+    "upload_desc": "Analizaremos tu CV con IA y te daremos un diagnóstico instantáneo de calidad.",
+    "upload_text": "Haz clic para subir tu CV (PDF)",
+    "btn_start": "Analizar mi CV",
+    "loading_import_title": "Analizando tu CV...",
+    "loading_import_desc": "Estamos extrayendo tu información y preparando tu diagnóstico.",
+    "audit_title": "Diagnóstico de tu CV",
+    "audit_score_label": "Puntuación general de calidad · ",
+    "score_solid": "Perfil sólido",
+    "score_potential": "Perfil con potencial",
+    "score_needs_improvement": "Necesita mejoras",
+    "strengths_title": "Lo que haces bien",
+    "weaknesses_title": "Lo que BringJobs mejorará contigo",
+    "jd_card_title": "¿Tienes una vacante en mente?",
+    "jd_card_desc": "Pega la descripción de una vacante y descubre qué tan bien calza tu perfil.",
+    "jd_placeholder": "Pega aquí la descripción de la vacante...",
+    "btn_analyze": "Analizar coincidencia",
+    "loading_analyze_title": "Comparando tu perfil con la vacante...",
+    "loading_analyze_desc": "Esto tomará solo unos segundos.",
+    "result_title": "Resultado del análisis",
+    "match": "Match",
+    "detected_company": "Empresa detectada",
+    "company_not_found": "No detectada",
+    "position": "Posición",
+    "position_not_found": "No detectada",
+    "detailed_analysis": "Análisis detallado",
+    "recommendations": "Recomendaciones",
+    "keywords_present": "Palabras clave presentes",
+    "keywords_missing": "Palabras clave faltantes",
+    "cta_title": "Crea tu cuenta gratis",
+    "cta_desc": "Guarda este resultado, genera tu CV optimizado con IA y aplica a más vacantes sin límites.",
+    "cta_btn": "Crear cuenta gratis",
+    "already_used_title": "Ya usaste tu prueba gratuita",
+    "already_used_desc": "Crea una cuenta gratis para seguir optimizando tu CV sin límites.",
+    "toast_error": "Hubo un error al procesar tu archivo. Por favor intenta de nuevo.",
+    "toast_audit_error": "Error al generar el diagnóstico. Por favor intenta de nuevo.",
+    "toast_analysis_error": "Error al realizar el análisis con IA.",
+    "toast_already_used": "Ya usaste esta función. Crea una cuenta para continuar."
+  },
   "auth": {
     "welcome_back": "Bienvenido de nuevo",
     "create_account": "Crea tu cuenta",
@@ -959,6 +1001,10 @@
     "signup": {
       "title": "Crea tu Cuenta Gratis | Únete a BringJobs Hoy",
       "description": "Regístrate en BringJobs y empieza a usar la inteligencia artificial para crear currículums impactantes, analizar vacantes y practicar entrevistas."
+    },
+    "free_trial": {
+      "title": "Prueba Gratis | Analiza tu CV con IA - BringJobs",
+      "description": "Sube tu CV, recibe un diagnóstico de calidad con IA y compáralo con una vacante real. Sin necesidad de crear una cuenta."
     }
   }
 }
