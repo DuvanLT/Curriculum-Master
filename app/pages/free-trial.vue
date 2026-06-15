@@ -176,12 +176,12 @@
             <div>
               <div class="mb-5 pb-4 border-b border-border/50">
                 <div class="flex flex-col gap-1">
-                  <span class="text-[10px] text-amber uppercase font-mono tracking-widest opacity-70">{{ t('free_trial.detected_company') }}</span>
-                  <span class="text-[18px] font-bold text-text">{{ (analysisResult.company && analysisResult.company !== 'N/A' && analysisResult.company !== 'null') ? analysisResult.company : t('free_trial.company_not_found') }}</span>
+                  <span class="text-[10px] text-amber uppercase font-mono tracking-widest opacity-70">{{ t('free_trial.position') }}</span>
+                  <span class="text-[18px] font-bold text-text">{{ (analysisResult.position && analysisResult.position !== 'N/A' && analysisResult.position !== 'null') ? analysisResult.position : t('free_trial.position_not_found') }}</span>
                 </div>
-                <div class="flex flex-col gap-1 mt-3">
-                  <span class="text-[10px] text-amber-light uppercase font-mono tracking-widest opacity-70">{{ t('free_trial.position') }}</span>
-                  <span class="text-[14px] text-text-muted">{{ (analysisResult.position && analysisResult.position !== 'N/A' && analysisResult.position !== 'null') ? analysisResult.position : t('free_trial.position_not_found') }}</span>
+                <div v-if="analysisResult.company && analysisResult.company !== 'N/A' && analysisResult.company !== 'null'" class="flex flex-col gap-1 mt-3">
+                  <span class="text-[10px] text-amber-light uppercase font-mono tracking-widest opacity-70">{{ t('free_trial.detected_company') }}</span>
+                  <span class="text-[14px] text-text-muted">{{ analysisResult.company }}</span>
                 </div>
               </div>
               <div class="mb-3">
@@ -213,8 +213,8 @@
           </div>
         </AppCard>
 
-        <!-- Persistent CTA -->
-        <AppCard class="mb-6">
+        <!-- Persistent CTA (only after the visitor has uploaded their CV) -->
+        <AppCard v-if="status.importUsed" class="mb-6">
           <div class="text-center py-2">
             <h3 class="font-head text-lg font-bold text-text mb-2">{{ t('free_trial.cta_title') }}</h3>
             <p class="text-[13px] text-text-dim mb-5">{{ t('free_trial.cta_desc') }}</p>

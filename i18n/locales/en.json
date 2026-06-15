@@ -544,7 +544,7 @@
   "importar_cv": {
     "magic_loading_title": "Doing magic...",
     "magic_loading_desc": "We are analyzing your career path to extract experiences, projects, and studies with more context.",
-    "audit_loading_title": "Analyzing your CV...",
+    "audit_loading_title": "Analyzing your résumé...",
     "audit_loading_desc": "Just a moment, we are generating your initial diagnosis.",
     "audit_title": "Your employability diagnosis",
     "audit_score_label": "Employability score · ",
@@ -568,11 +568,11 @@
   "free_trial": {
     "title": "Find out how ready your CV is to land the job",
     "subtitle": "Instant AI-powered analysis. No sign-up. No fluff.",
-    "upload_title": "Upload your CV",
+    "upload_title": "Upload your résumé",
     "upload_desc": "We'll analyze your CV with AI and give you an instant quality diagnosis.",
     "upload_text": "Click to upload your CV (PDF)",
     "btn_start": "Analyze my CV",
-    "loading_import_title": "Analyzing your CV...",
+    "loading_import_title": "Analyzing your résumé...",
     "loading_import_desc": "We are extracting your information and preparing your diagnosis.",
     "audit_title": "Your employability diagnosis",
     "audit_score_label": "Employability score · ",

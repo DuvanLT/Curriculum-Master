@@ -544,7 +544,7 @@
   "importar_cv": {
     "magic_loading_title": "Haciendo la magia...",
     "magic_loading_desc": "Estamos analizando tu trayectoria para extraer experiencias, proyectos y estudios con mas contexto.",
-    "audit_loading_title": "Analizando tu CV...",
+    "audit_loading_title": "Analizando tu Currículum...",
     "audit_loading_desc": "Un momento, estamos generando tu diagnóstico inicial.",
     "audit_title": "Tu diagnóstico de empleabilidad",
     "audit_score_label": "Puntaje de empleabilidad · ",
@@ -568,11 +568,11 @@
   "free_trial": {
     "title": "Descubre qué tan listo está tu CV para conseguir el trabajo",
     "subtitle": "Análisis instantáneo basado en IA. Sin registro. Sin rodeos.",
-    "upload_title": "Sube tu CV",
+    "upload_title": "Sube tu Currículum",
     "upload_desc": "Analizaremos tu CV con IA y te daremos un diagnóstico instantáneo de calidad.",
     "upload_text": "Haz clic para subir tu CV (PDF)",
     "btn_start": "Analizar mi CV",
-    "loading_import_title": "Analizando tu CV...",
+    "loading_import_title": "Analizando tu Currículum...",
     "loading_import_desc": "Estamos extrayendo tu información y preparando tu diagnóstico.",
     "audit_title": "Tu diagnóstico de empleabilidad",
     "audit_score_label": "Puntaje de empleabilidad · ",
