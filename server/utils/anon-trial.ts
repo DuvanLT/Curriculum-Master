@@ -83,3 +83,31 @@ export function getClientIpHash(event: H3Event): string {
   const ip = getClientIp(event)
   return createHash('sha256').update(ip).digest('hex')
 }
+
+// ─── Persisted per-IP trial quota (prevents cookie-clearing to reset credits) ───
+const TRIAL_IP_MAX = 2 // max trials that may consume the import credit per IP / window
+const TRIAL_IP_WINDOW = '-24 hours'
+
+/**
+ * Throws 403 when this IP has already consumed the import credit on
+ * TRIAL_IP_MAX other (non-current) anonymous trials within the rolling
+ * window. This is the persisted backstop against clearing the
+ * `bj_anon_id` cookie to obtain fresh trial credits: even with a brand
+ * new anon id, the IP is still on the hook for its recent trials.
+ */
+export async function assertTrialIpQuota(db: ReturnType<typeof useDb>, event: H3Event, anonId: string) {
+  const ipHash = getClientIpHash(event)
+  const result = await db.execute({
+    sql: `SELECT COUNT(*) AS count FROM anonymous_trials
+          WHERE ip_hash = ? AND import_used = 1 AND id != ?
+            AND created_at > datetime('now', ?)`,
+    args: [ipHash, anonId, TRIAL_IP_WINDOW]
+  })
+  const count = Number((result.rows[0] as any)?.count || 0)
+  if (count >= TRIAL_IP_MAX) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Has alcanzado el límite de pruebas gratuitas desde tu red. Crea una cuenta gratis para continuar.'
+    })
+  }
+}
