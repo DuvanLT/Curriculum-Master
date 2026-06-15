@@ -124,8 +124,8 @@
           </div>
         </AppCard>
 
-        <!-- JD analyze card -->
-        <AppCard v-if="status.auditUsed && !status.analyzeUsed" :title="t('free_trial.jd_card_title')" class="mb-6 relative overflow-hidden">
+        <!-- JD analyze card (one free analysis: hide once used or once a result exists) -->
+        <AppCard v-if="status.auditUsed && !status.analyzeUsed && !analysisResult" :title="t('free_trial.jd_card_title')" class="mb-6 relative overflow-hidden">
           <div v-if="analyzing" class="absolute inset-0 z-10 bg-[var(--bg2)]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center">
             <div class="magic-loader mb-6">
               <div class="magic-circle"></div>

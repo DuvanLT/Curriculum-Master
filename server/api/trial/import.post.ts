@@ -1,6 +1,6 @@
 ﻿import OpenAI from 'openai'
 import { extractText, resolvePDFJSImport } from 'unpdf'
-import { getOrCreateAnonId, getClientIpHash } from '../../utils/anon-trial'
+import { getOrCreateAnonId, getClientIpHash, assertTrialIpQuota } from '../../utils/anon-trial'
 import { checkAnonAIRateLimit } from '../../utils/rate-limit'
 
 if (typeof globalThis.DOMMatrix === 'undefined') {
@@ -73,6 +73,10 @@ export default defineEventHandler(async (event) => {
   checkAnonAIRateLimit(event)
 
   const db = useDb()
+
+  // Persisted per-IP backstop: clearing the bj_anon_id cookie to obtain a
+  // fresh trial does not reset credits — the IP is capped across anon ids.
+  await assertTrialIpQuota(db, event, anonId)
 
   await resolvePDFJSImport()
 
