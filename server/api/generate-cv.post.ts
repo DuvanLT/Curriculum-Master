@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
     }
   }
   const body = await readBody(event)
-  const { profile, experiences, jd, locale = 'es' } = body
+  const { profile, experiences, educations, jd, locale = 'es' } = body
 
   // Detect CV language from the JD; fall back to user locale when no JD is provided
   function detectLang(text: string): 'en' | 'es' {
@@ -201,11 +201,18 @@ CRITICAL RULES:
     web: profile?.web || ''
   }
 
+  const slimEducations = Array.isArray(educations)
+    ? educations.map((edu: any) => ({ id: edu.id, titulo: edu.titulo || '', institucion: edu.institucion || '' }))
+    : []
+
   const userPrompt = `PROFILE:
 ${JSON.stringify(slimProfile)}
 
 EXPERIENCES:
 ${JSON.stringify(normalizedExperiences)}
+
+EDUCATIONS:
+${JSON.stringify(slimEducations)}
 
 JD:
 ${jd || 'N/A — perform a general high-quality optimization. Use the profile language.'}
@@ -216,6 +223,8 @@ OUTPUT RULES:
 - summary: ${summaryLines} lines, max ${summaryChars} characters. Use ONLY what the user stated — never infer competencies.
 - Order experiences from highest to lowest relevance for the vacancy.
 - MAX ${maxLogros} logros_optimizados per experience. Each one: 1-2 sentences, first person, specific to the vacancy.
+- Translate cargo (role/title) of each experience to the detected language. Keep empresa (company name) unchanged.
+- For translated_educations: translate titulo (degree name) to the detected language. Keep institucion unchanged.
 - Do not invent percentages or metrics not present in the user's data.
 ${cvLength === 3 ? '- Extended mode: give rich, detailed achievements. Include all relevant experiences.' : ''}
 
@@ -229,11 +238,14 @@ RETURN ONLY JSON:
       "id": "same original id",
       "type": "work or project",
       "relevance_score": 0,
-      "cargo": "...",
-      "empresa": "...",
+      "cargo": "role translated to the detected language",
+      "empresa": "company name unchanged",
       "logros_optimizados": ["max ${maxLogros} achievements in the detected language"],
       "skills_sugeridas": ["key skills for this role"]
     }
+  ],
+  "translated_educations": [
+    { "id": "same original id", "titulo": "degree name translated to the detected language" }
   ],
   "top_skills": ["up to 20 skills STRICTLY from user's declared data, ordered by relevance to the JD"],
   "advice": ["3-4 tips to stand out, in the detected language"],
@@ -269,7 +281,7 @@ RETURN ONLY JSON:
           ...aiExp,
           id: aiExp?.id || sourceExp?.id || crypto.randomUUID(),
           type: normalizeExperienceType(aiExp?.type || sourceExp?.type),
-          cargo: sourceExp?.cargo || aiExp?.cargo || '',
+          cargo: aiExp?.cargo || sourceExp?.cargo || '',
           empresa: sourceExp?.empresa || aiExp?.empresa || '',
           inicio: aiExp?.inicio || sourceExp?.inicio || '',
           fin: aiExp?.fin || sourceExp?.fin || '',
@@ -293,6 +305,17 @@ RETURN ONLY JSON:
     // Use the locale the AI detected from the JD — much more reliable than heuristics
     const aiLocale = result.cv_locale === 'en' ? 'en' : result.cv_locale === 'es' ? 'es' : null
     result.cv_locale = aiLocale || detectedLocale
+
+    // Merge translated education titles back into the educations array
+    if (Array.isArray(result.translated_educations) && Array.isArray(educations)) {
+      const translationMap = new Map(
+        result.translated_educations.map((e: any) => [e.id, e.titulo])
+      )
+      result.translated_educations = educations.map((edu: any) => ({
+        ...edu,
+        titulo: translationMap.get(edu.id) || edu.titulo
+      }))
+    }
 
     // Suplementar top_skills con todas las skills declaradas por el usuario que la IA no incluyó
     const allDeclaredSkills = [

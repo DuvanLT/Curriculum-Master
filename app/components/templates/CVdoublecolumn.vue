@@ -92,7 +92,8 @@
 import { computed } from 'vue';
 import { translateDate, translateIdiomas } from '~/utils/cvLocalize'
 
-const { t, locale, getLocaleMessage } = useI18n()
+const { locale } = useI18n()
+const { $i18n } = useNuxtApp()
 
 const props = defineProps({
   profile: Object,
@@ -103,12 +104,7 @@ const props = defineProps({
 });
 
 const cvLocale = computed(() => props.aiData?.cv_locale || locale.value)
-
-function ct(key) {
-  const msgs = getLocaleMessage(cvLocale.value)
-  const result = key.split('.').reduce((obj, part) => obj?.[part], msgs)
-  return typeof result === 'string' ? result : t(key)
-}
+const ct = (key) => $i18n.t(key, cvLocale.value)
 
 const td = (date) => translateDate(date, cvLocale.value)
 
@@ -214,12 +210,15 @@ const languageSummary = computed(() => {
 });
 
 const normalizedEducations = computed(() => {
-  const edus = props.educations || [];
-  return edus.map(edu => ({
+  const base = Array.isArray(props.educations) ? props.educations : []
+  const translated = Array.isArray(props.aiData?.translated_educations) ? props.aiData.translated_educations : []
+  const map = new Map(translated.map(e => [e.id, e.titulo]))
+  return base.map(edu => ({
     ...edu,
-    fin: normalizedDate(edu.fin)
-  }));
-});
+    fin: normalizedDate(edu.fin),
+    titulo: map.get(edu.id) || edu.titulo
+  }))
+})
 </script>
 
 <style scoped>

@@ -285,6 +285,7 @@ const generateAI = async () => {
       body: {
         profile: profile.value,
         experiences: experiences.value,
+        educations: educations.value,
         jd: jd.value,
         locale: locale.value,
         cvLength: cvLength

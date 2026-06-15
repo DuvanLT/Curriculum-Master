@@ -239,6 +239,24 @@ export const initDb = async () => {
     // Column might already exist, ignore error
   }
 
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS anonymous_trials (
+      id TEXT PRIMARY KEY,
+      ip_hash TEXT,
+      profile_json TEXT,
+      experiences_json TEXT,
+      educations_json TEXT,
+      import_used INTEGER DEFAULT 0,
+      audit_used INTEGER DEFAULT 0,
+      audit_result_json TEXT,
+      analyze_used INTEGER DEFAULT 0,
+      jd_text TEXT,
+      analysis_result_json TEXT,
+      migrated_to_user_id TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
   // ─── Indexes for performance ───
   const indexes = [
     'CREATE INDEX IF NOT EXISTS idx_experiences_user ON experiences(user_id)',

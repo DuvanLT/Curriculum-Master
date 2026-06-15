@@ -9,6 +9,7 @@ declare module '#auth-utils' {
     preferred_locale?: string | null;
     subscription_name?: SubscriptionPlan | string | null;
     last_payment_at?: string | null;
+    from_trial?: boolean;
   }
 }
 

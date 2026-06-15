@@ -566,7 +566,7 @@ const currentLocale = computed({
   set: (val) => setLocale(val as 'es' | 'en')
 })
 
-const primaryCta = computed(() => loggedIn.value ? '/dashboard' : '/signup')
+const primaryCta = computed(() => loggedIn.value ? '/dashboard' : '/free-trial')
 
 const seoTitle = computed(() => t('seo.landing.title'))
 const seoDescription = computed(() => t('seo.landing.description'))

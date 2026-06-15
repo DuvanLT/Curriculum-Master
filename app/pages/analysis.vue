@@ -69,16 +69,16 @@
             <div>
               <div class="mb-5 pb-4 border-b border-border/50">
                 <div class="flex flex-col gap-1">
-                  <span class="text-[10px] text-amber uppercase font-mono tracking-widest opacity-70">{{ $t('analisis.detected_company') }}</span>
-                  <span class="text-[18px] font-bold text-text">{{ (result.company && result.company !== 'N/A' && result.company !== 'null') ? result.company : $t('analisis.company_not_found') }}</span>
+                  <span class="text-[10px] text-amber uppercase font-mono tracking-widest opacity-70">{{ $t('analisis.position') }}</span>
+                  <span class="text-[18px] font-bold text-text">{{ (result.position && result.position !== 'N/A' && result.position !== 'null') ? result.position : $t('analisis.position_not_found') }}</span>
                 </div>
-                <div class="flex flex-col gap-1 mt-3">
-                  <span class="text-[10px] text-amber-light uppercase font-mono tracking-widest opacity-70">{{ $t('analisis.position') }}</span>
-                  <span class="text-[14px] text-text-muted">{{ (result.position && result.position !== 'N/A' && result.position !== 'null') ? result.position : $t('analisis.position_not_found') }}</span>
+                <div v-if="result.company && result.company !== 'N/A' && result.company !== 'null'" class="flex flex-col gap-1 mt-3">
+                  <span class="text-[10px] text-amber-light uppercase font-mono tracking-widest opacity-70">{{ $t('analisis.detected_company') }}</span>
+                  <span class="text-[14px] text-text-muted">{{ result.company }}</span>
                 </div>
               </div>
               <div class="mb-3">
-                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">{{ $t('analisis.detailed_analysis') }}</div>
+                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">{{ $t('analisis.detailed_analysis', { score: result.score }) }}</div>
                 <div class="text-[13px] text-text-muted leading-relaxed">{{ result.analisis }}</div>
               </div>
               <div v-if="result.recomendaciones?.length > 0">
@@ -142,8 +142,8 @@
             <div class="absolute top-0 right-0 p-2 opacity-5">
               <span class="material-symbols-outlined text-2xl">description</span>
             </div>
-            <div class="text-[11px] font-bold text-text truncate mb-0.5">{{ (item.company && item.company !== 'N/A' && item.company !== 'null') ? item.company : $t('analisis.company_not_found') }}</div>
-            <div class="text-[10px] text-amber-light truncate opacity-80 mb-2">{{ (item.position && item.position !== 'N/A' && item.position !== 'null') ? item.position : $t('analisis.position_not_found') }}</div>
+            <div class="text-[11px] font-bold text-text truncate mb-0.5">{{ (item.position && item.position !== 'N/A' && item.position !== 'null') ? item.position : $t('analisis.position_not_found') }}</div>
+            <div v-if="item.company && item.company !== 'N/A' && item.company !== 'null'" class="text-[10px] text-amber-light truncate opacity-80 mb-2">{{ item.company }}</div>
             <div class="flex items-center justify-between">
               <div class="text-[9px] font-mono text-text-dim">{{ formatDate(item.created_at) }}</div>
               <div class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--bg)]-bg4" :style="{ color: getScoreColor(item.score) }">
