@@ -185,7 +185,7 @@
                 </div>
               </div>
               <div class="mb-3">
-                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">{{ t('free_trial.detailed_analysis') }}</div>
+                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">{{ t('free_trial.detailed_analysis', { score: analysisResult.score }) }}</div>
                 <div class="text-[13px] text-text-muted leading-relaxed">{{ analysisResult.analisis }}</div>
               </div>
               <div v-if="analysisResult.recomendaciones?.length > 0">

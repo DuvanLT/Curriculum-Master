@@ -67,8 +67,9 @@ export default defineEventHandler(async (event) => {
     1. Identify the most important Hard Skills in the JD.
     2. Compare those skills with the user's profile and experiences.
     3. Calculate a match score from 0 to 100.
-    4. Provide a brief analysis and concrete recommendations.
-    5. Language: English.
+    4. In "analisis", EXPLAIN the score with cause and effect, addressing the candidate in the second person ("you"): say what puts them ahead of or behind other candidates for THIS role, and what the concrete weak point is against the requirements. Be specific, not generic.
+    5. In "recomendaciones", give specific, actionable steps focused on CLOSING the gap toward 100%: each recommendation must say exactly what to do and why it brings them closer to the role.
+    6. Language: English.
 
     IMPORTANT: This is NOT just for programmers. It can be for SALES, MARKETING, MEDICINE, CONSTRUCTION, etc. Extract technical/specific skills from ANY field.
   `
@@ -79,8 +80,9 @@ export default defineEventHandler(async (event) => {
     1. Identifica las Hard Skills (Habilidades Técnicas) más importantes de la vacante.
     2. Compara esas habilidades con el perfil y experiencias del usuario.
     3. Calcula un puntaje de coincidencia (score) de 0 a 100.
-    4. Proporciona un análisis breve y recomendaciones concretas.
-    5. Idioma: Español.
+    4. En "analisis", EXPLICA el puntaje con causa y efecto, hablándole al candidato en segunda persona ("tú"): di qué lo pone por delante o por detrás de otros candidatos para ESTE rol y cuál es el punto débil concreto frente a los requisitos. Sé específico, nada genérico.
+    5. En "recomendaciones", da pasos específicos y accionables enfocados en CERRAR la brecha hacia el 100%: cada recomendación debe decir exactamente qué hacer y por qué eso lo acerca al puesto.
+    6. Idioma: Español.
 
     IMPORTANTE: Esto NO es solo para programadores. Puede ser para VENTAS, MARKETING, MEDICINA, CONSTRUCCIÓN, etc. Extrae las habilidades técnicas/específicas de CUALQUIER campo.
   `
@@ -113,8 +115,8 @@ export default defineEventHandler(async (event) => {
       "hard_skills_jd": [
         { "skill": "Skill Name", "count": 3 }
       ],
-      "analisis": "Your profile has a match...",
-      "recomendaciones": ["Improve X", "Learn Y"]
+      "analisis": "Your experience with [skill A] and [skill B] puts you ahead of most candidates for this role. The only weak point is [missing requirement], which is listed as a requirement; everything else is directly aligned with what they're looking for.",
+      "recomendaciones": ["Add [missing skill] to your profile: with just the fundamentals you close the gap that separates you from the role.", "Put your [key skill] projects front and center: this role wants practical evidence, not just years of experience."]
     }
     * Note: 'hard_skills_jd' must be a list of the most mentioned or important skills in the JD with an estimated importance (count).
     * Note: If 'company' or 'position' cannot be detected from the JD, set their value to null.
@@ -137,8 +139,8 @@ export default defineEventHandler(async (event) => {
       "hard_skills_jd": [
         { "skill": "Nombre Skill", "count": 3 }
       ],
-      "analisis": "Tu perfil tiene una coincidencia...",
-      "recomendaciones": ["Mejora X", "Aprende Y"]
+      "analisis": "Tu experiencia con [skill A] y [skill B] te pone por delante de la mayoría de candidatos para este rol. El único punto débil es [requisito faltante], que figura como requisito en la vacante; todo lo demás está directamente alineado con lo que buscan.",
+      "recomendaciones": ["Suma [skill faltante] a tu perfil: con los fundamentos básicos ya cierras la brecha que te separa del puesto.", "Pon tus proyectos con [skill clave] al frente: este rol busca evidencia práctica, no solo años de experiencia."]
     }
     * Nota: 'hard_skills_jd' debe ser una lista de las habilidades más mencionadas o importantes en la vacante con una estimación de su importancia (count).
     * Nota: Si no se puede detectar 'company' o 'position' en la vacante, asigna su valor a null.

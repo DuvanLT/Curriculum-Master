@@ -78,7 +78,7 @@
                 </div>
               </div>
               <div class="mb-3">
-                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">{{ $t('analisis.detailed_analysis') }}</div>
+                <div class="text-[12px] text-text-dim font-mono mb-1.5 uppercase opacity-60">{{ $t('analisis.detailed_analysis', { score: result.score }) }}</div>
                 <div class="text-[13px] text-text-muted leading-relaxed">{{ result.analisis }}</div>
               </div>
               <div v-if="result.recomendaciones?.length > 0">
