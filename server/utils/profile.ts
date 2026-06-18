@@ -1,5 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
 
+function normalizeSkills(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return raw.map(s => String(s).trim()).filter(Boolean)
+  }
+  if (typeof raw === 'string') {
+    return raw.split(',').map(s => s.trim()).filter(Boolean)
+  }
+  return []
+}
+
 function buildEducationSummary(educations: any[]) {
   return educations
     .map(edu => [edu.titulo, edu.institucion, edu.fin || edu.inicio].filter(Boolean).join(' | '))
@@ -159,7 +169,7 @@ export async function saveUserProfile(db: ReturnType<typeof useDb>, userId: stri
         exp.inicio,
         exp.fin || null,
         exp.logros || null,
-        JSON.stringify(exp.skills || []),
+        JSON.stringify(normalizeSkills(exp.skills)),
         exp.type === 'project' ? 'project' : 'work',
         exp.link || null
       ]

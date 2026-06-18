@@ -565,6 +565,15 @@
     "btn_skip": "Importar despues",
     "toast_error": "Hubo un error al procesar tu archivo. Por favor intenta de nuevo."
   },
+  "error_page": {
+    "title_404": "Página no encontrada",
+    "desc_404": "La página que buscas no existe o fue movida. Revisa la dirección o vuelve por donde llegaste.",
+    "title_generic": "Algo salió mal",
+    "desc_generic": "Ocurrió un error inesperado. Inténtalo de nuevo en un momento.",
+    "code_label": "Código de error",
+    "btn_back": "Volver atrás",
+    "link_home": "Ir al inicio"
+  },
   "free_trial": {
     "title": "Descubre qué tan listo está tu CV para conseguir el trabajo",
     "subtitle": "Análisis instantáneo basado en IA. Sin registro. Sin rodeos.",
