@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest run"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
@@ -32,6 +33,7 @@
     "@tailwindcss/postcss": "^4.2.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/uuid": "^10.0.0",
-    "postcss": "^8.5.8"
+    "postcss": "^8.5.8",
+    "vitest": "^2.1.9"
   }
 }
