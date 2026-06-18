@@ -23,13 +23,17 @@ export default defineOAuthGoogleEventHandler({
       locale,
     )
 
+    let fromTrial = false
     if (isNew) {
-      await migrateAnonymousTrial(event, db, record.id)
+      fromTrial = await migrateAnonymousTrial(event, db, record.id)
     }
 
     await setUserSession(event, { user: buildSessionUser(record) })
 
-    return sendRedirect(event, '/profile')
+    // Usuario nuevo sin datos de trial -> onboarding de importar CV.
+    // Usuario existente (vinculado) o que ya migró su trial -> perfil.
+    const destination = isNew && !fromTrial ? '/import-cv' : '/profile'
+    return sendRedirect(event, destination)
   },
   onError(event, error) {
     console.error('Google OAuth error:', error)
