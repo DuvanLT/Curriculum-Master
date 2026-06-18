@@ -72,7 +72,7 @@
         </AppButton>
       </div>
 
-      <div v-if="!auditResult" class="relative z-10">
+      <div v-if="!auditResult && !cvRejected" class="relative z-10">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-12 h-12 bg-amber/10 rounded-xl flex items-center justify-center">
             <span class="material-symbols-outlined text-amber text-3xl">auto_fix_high</span>
@@ -145,6 +145,23 @@
           </button>
         </div>
       </div>
+
+      <div v-if="cvRejected && !importing" class="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-400 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-red/10 border-2 border-red/30">
+          <span class="material-symbols-outlined text-3xl text-red">description_off</span>
+        </div>
+        <h2 class="font-head text-2xl font-bold text-text tracking-tight mb-3">{{ t('importar_cv.cv_rejected_title') }}</h2>
+        <p class="text-[14px] text-text-muted leading-relaxed mb-8">{{ t('importar_cv.cv_rejected_desc') }}</p>
+
+        <AppButton variant="primary" size="lg" class="w-full !h-14 font-bold" @click="goCreateFromScratch">
+          <span class="material-symbols-outlined text-[18px] mr-2">edit_document</span>
+          {{ t('importar_cv.cv_rejected_cta') }}
+        </AppButton>
+
+        <button @click="resetRejection" class="mt-4 text-[13px] text-text-dim hover:text-text transition-colors underline">
+          {{ t('importar_cv.cv_rejected_retry') }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -168,6 +185,16 @@ const auditRunning = ref(false)
 const selectedFile = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const auditResult = ref<AuditResult | null>(null)
+const cvRejected = ref(false)
+
+const goCreateFromScratch = () => {
+  navigateTo('/profile')
+}
+
+const resetRejection = () => {
+  cvRejected.value = false
+  selectedFile.value = null
+}
 
 const scoreColor = computed(() => {
   const s = auditResult.value?.score ?? 0
@@ -236,7 +263,11 @@ const runMagicImport = async () => {
     }
   } catch (e: any) {
     console.error(e)
-    toast.error(t('importar_cv.toast_error'))
+    if (isCvNotReadable(e)) {
+      cvRejected.value = true
+    } else {
+      toast.error(t('importar_cv.toast_error'))
+    }
   } finally {
     importing.value = false
     auditRunning.value = false
