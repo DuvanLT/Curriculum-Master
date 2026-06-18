@@ -6,8 +6,9 @@
       </div>
       <span class="logo-tag font-mono text-[10px] text-text-dim ml-2 bg-[var(--bg)]-bg4 border border-border px-1.5 py-0.5 rounded">v0.0.1</span>
     </div>
-
     <div class="topbar-actions">
+      <span class="mail">
+        <a href="mailto:duvanmncll@gmail.com">help@bringjobs</a></span>
     </div>
   </header>
 </template>
@@ -37,7 +38,10 @@
 .logo span {
   color: var(--amber);
 }
-
+.mail{
+  font-size: 10px;
+  color: var(--text2);
+}
 .logo-tag {
   font-family: var(--font-mono);
   font-size: 10px;

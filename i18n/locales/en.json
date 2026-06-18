@@ -565,6 +565,15 @@
     "btn_skip": "Import later",
     "toast_error": "There was an error processing your file. Please try again."
   },
+  "error_page": {
+    "title_404": "Page not found",
+    "desc_404": "The page you're looking for doesn't exist or was moved. Check the address or go back the way you came.",
+    "title_generic": "Something went wrong",
+    "desc_generic": "An unexpected error occurred. Please try again in a moment.",
+    "code_label": "Error code",
+    "btn_back": "Go back",
+    "link_home": "Go to home"
+  },
   "free_trial": {
     "title": "Find out how ready your CV is to land the job",
     "subtitle": "Instant AI-powered analysis. No sign-up. No fluff.",
