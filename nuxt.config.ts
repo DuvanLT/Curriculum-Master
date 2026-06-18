@@ -44,6 +44,13 @@ export default defineNuxtConfig({
     neonDbUrl: '',
     boldPaymentAmount: '',
 
+    oauth: {
+      google: {
+        clientId: '',
+        clientSecret: '',
+      },
+    },
+
     public: {
       // Public variables (available on both client and server)
     }

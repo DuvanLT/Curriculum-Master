@@ -4,7 +4,7 @@ declare module '#auth-utils' {
   interface User {
     id: string;
     email: string;
-    name?: string;
+    name?: string | null;
     is_verified: number;
     preferred_locale?: string | null;
     subscription_name?: SubscriptionPlan | string | null;

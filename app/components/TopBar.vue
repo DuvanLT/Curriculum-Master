@@ -60,6 +60,10 @@
 }
 
 @media (max-width: 767px) {
+
+  .mail{
+    margin-right: 50px;
+  }
   .topbar {
     padding: 0 16px 0 20px;
   }
