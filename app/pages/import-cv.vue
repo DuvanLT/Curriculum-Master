@@ -194,6 +194,8 @@ const goCreateFromScratch = () => {
 const resetRejection = () => {
   cvRejected.value = false
   selectedFile.value = null
+  // Limpiar el DOM del input: reseleccionar el mismo archivo no dispara 'change'.
+  if (fileInput.value) fileInput.value.value = ''
 }
 
 const scoreColor = computed(() => {
