@@ -542,6 +542,10 @@
     "toast_cv_template_saved": "CV template updated"
   },
   "importar_cv": {
+    "cv_rejected_title": "We couldn't read your CV",
+    "cv_rejected_desc": "Your file looks like an image-based or scanned PDF with no selectable text. Our system —and most of the automated filters (ATS) recruiters use— can't read it, so it would be discarded. Let's create one that actually works.",
+    "cv_rejected_cta": "Build my CV from scratch",
+    "cv_rejected_retry": "Choose another file",
     "magic_loading_title": "Doing magic...",
     "magic_loading_desc": "We are analyzing your career path to extract experiences, projects, and studies with more context.",
     "audit_loading_title": "Analyzing your résumé...",
@@ -575,6 +579,10 @@
     "link_home": "Go to home"
   },
   "free_trial": {
+    "cv_rejected_title": "We couldn't read your CV",
+    "cv_rejected_desc": "Your file looks like an image-based or scanned PDF with no selectable text. Our system —and most of the automated filters (ATS) recruiters use— can't read it, so it would be discarded. Create an account and we'll help you build one that works.",
+    "cv_rejected_cta": "Create account and start",
+    "cv_rejected_retry": "Choose another file",
     "title": "Find out how ready your CV is to land the job",
     "subtitle": "Instant AI-powered analysis. No sign-up. No fluff.",
     "upload_title": "Upload your résumé",

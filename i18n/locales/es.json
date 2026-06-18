@@ -542,6 +542,10 @@
     "toast_cv_template_saved": "Plantilla de CV actualizada"
   },
   "importar_cv": {
+    "cv_rejected_title": "No pudimos leer tu CV",
+    "cv_rejected_desc": "Tu archivo parece un PDF basado en imagen o escaneado, sin texto seleccionable. Nuestro sistema —y la mayoría de los filtros automáticos (ATS) que usan los reclutadores— no pueden leerlo, así que sería descartado. Te ayudamos a crear uno que sí funcione.",
+    "cv_rejected_cta": "Crear mi CV desde cero",
+    "cv_rejected_retry": "Elegir otro archivo",
     "magic_loading_title": "Haciendo la magia...",
     "magic_loading_desc": "Estamos analizando tu trayectoria para extraer experiencias, proyectos y estudios con mas contexto.",
     "audit_loading_title": "Analizando tu Currículum...",
@@ -575,6 +579,10 @@
     "link_home": "Ir al inicio"
   },
   "free_trial": {
+    "cv_rejected_title": "No pudimos leer tu CV",
+    "cv_rejected_desc": "Tu archivo parece un PDF basado en imagen o escaneado, sin texto seleccionable. Nuestro sistema —y la mayoría de los filtros automáticos (ATS) que usan los reclutadores— no pueden leerlo, así que sería descartado. Crea una cuenta y te ayudamos a armar uno que sí funcione.",
+    "cv_rejected_cta": "Crear cuenta y empezar",
+    "cv_rejected_retry": "Elegir otro archivo",
     "title": "Descubre qué tan listo está tu CV para conseguir el trabajo",
     "subtitle": "Análisis instantáneo basado en IA. Sin registro. Sin rodeos.",
     "upload_title": "Sube tu Currículum",
