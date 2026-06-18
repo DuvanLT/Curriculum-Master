@@ -24,8 +24,20 @@
         </div>
       </form>
 
+      <div class="flex items-center gap-3 my-6 relative z-10">
+        <div class="h-px flex-1 bg-border"></div>
+        <span class="font-mono text-[11px] text-text-dim uppercase">{{ t('auth.or') }}</span>
+        <div class="h-px flex-1 bg-border"></div>
+      </div>
+
+      <a href="/auth/google"
+         class="relative z-10 flex items-center justify-center gap-2 w-full h-[45px] border border-border rounded-[4px] text-[14px] font-medium text-text hover:bg-bg transition-colors">
+        <img src="https://www.google.com/favicon.ico" alt="" class="w-4 h-4" />
+        {{ t('auth.continue_with_google') }}
+      </a>
+
       <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
-        {{ t('auth.no_account') }} 
+        {{ t('auth.no_account') }}
         <NuxtLink to="/signup" class="text-amber hover:underline font-medium ml-1">{{ t('auth.register_free') }}</NuxtLink>
       </div>
       <div class="mt-2 text-center text-[13px] text-text-dim relative z-10">
@@ -67,6 +79,13 @@ const error = ref('')
 const form = ref({
   email: '',
   password: ''
+})
+
+const route = useRoute()
+onMounted(() => {
+  if (route.query.error === 'google') {
+    error.value = t('auth.google_error')
+  }
 })
 
 const handleLogin = async () => {
