@@ -27,7 +27,7 @@
         </AppCard>
 
         <!-- Upload card -->
-        <AppCard v-if="!status.importUsed" :title="t('free_trial.upload_title')" class="mb-6 relative overflow-hidden">
+        <AppCard v-if="!status.importUsed && !cvRejected" :title="t('free_trial.upload_title')" class="mb-6 relative overflow-hidden">
           <div v-if="importing" class="absolute inset-0 z-10 bg-[var(--bg2)]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center">
             <div class="magic-loader mb-6">
               <div class="magic-circle"></div>
@@ -75,6 +75,24 @@
           >
             {{ t('free_trial.btn_start') }}
           </AppButton>
+        </AppCard>
+
+        <!-- CV rejected -->
+        <AppCard v-if="cvRejected && !importing" class="mb-6">
+          <div class="text-center py-2">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-red/10 border-2 border-red/30">
+              <span class="material-symbols-outlined text-3xl text-red">image_not_supported</span>
+            </div>
+            <h3 class="font-head text-xl font-bold text-text mb-3">{{ t('free_trial.cv_rejected_title') }}</h3>
+            <p class="text-[14px] text-text-muted leading-relaxed mb-6">{{ t('free_trial.cv_rejected_desc') }}</p>
+            <AppButton variant="primary" size="lg" class="w-full !h-14 font-bold" @click="goToSignup">
+              <span class="material-symbols-outlined text-[18px] mr-2">person_add</span>
+              {{ t('free_trial.cv_rejected_cta') }}
+            </AppButton>
+            <button @click="resetRejection" class="mt-4 text-[13px] text-text-dim hover:text-text transition-colors underline">
+              {{ t('free_trial.cv_rejected_retry') }}
+            </button>
+          </div>
         </AppCard>
 
         <!-- Audit result -->
@@ -281,6 +299,15 @@ const status = ref({ importUsed: false, auditUsed: false, analyzeUsed: false })
 const selectedFile = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const importing = ref(false)
+const cvRejected = ref(false)
+
+const resetRejection = () => {
+  cvRejected.value = false
+  selectedFile.value = null
+  // Limpiar el DOM del input: reseleccionar el mismo archivo no dispara 'change'.
+  if (fileInput.value) fileInput.value.value = ''
+}
+
 const analyzing = ref(false)
 
 const profile = ref<Record<string, any> | null>(null)
@@ -341,7 +368,9 @@ const runImport = async () => {
     await runAudit()
   } catch (e: any) {
     console.error('Error importing CV:', e)
-    if (e?.statusCode === 403) {
+    if (isCvNotReadable(e)) {
+      cvRejected.value = true
+    } else if (e?.statusCode === 403) {
       status.value.importUsed = true
     } else {
       toast.error(t('free_trial.toast_error'))

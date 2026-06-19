@@ -2,6 +2,7 @@ import OpenAI from 'openai'
 import { extractText, resolvePDFJSImport } from 'unpdf'
 import { requireVerifiedUserSession } from '../utils/verified-session'
 import { checkUserAIRateLimit } from '../utils/rate-limit'
+import { cvNotReadableError } from '../utils/cv-import'
 
 if (typeof globalThis.DOMMatrix === 'undefined') {
   globalThis.DOMMatrix = class { } as any
@@ -100,10 +101,7 @@ export default defineEventHandler(async (event) => {
         text = String(result.text || '')
       } catch (pdfError: any) {
         console.error('PDF Parsing Error:', pdfError)
-        throw createError({
-          statusCode: 422,
-          message: `No se pudo leer el archivo PDF: ${pdfError.message || 'Error desconocido'}. Solo se admiten PDFs con texto seleccionable.`
-        })
+        throw cvNotReadableError(`No se pudo leer el archivo PDF: ${pdfError.message || 'Error desconocido'}. Solo se admiten PDFs con texto seleccionable.`)
       }
     } else if (file) {
       text = file.data.toString('utf-8')
@@ -119,10 +117,7 @@ export default defineEventHandler(async (event) => {
   const isEn = locale === 'en'
 
   if (!text || text.trim().length < 10) {
-    throw createError({
-      statusCode: 422,
-      message: 'No se pudo extraer texto suficiente del archivo. Este importador solo admite PDFs con texto seleccionable y no procesa PDFs escaneados o basados en imagen.'
-    })
+    throw cvNotReadableError('No se pudo extraer texto suficiente del archivo. Este importador solo admite PDFs con texto seleccionable y no procesa PDFs escaneados o basados en imagen.')
   }
 
   const openai = new OpenAI({
