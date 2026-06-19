@@ -78,14 +78,14 @@
         </AppCard>
 
         <!-- CV rejected -->
-        <AppCard v-if="cvRejected" class="mb-6">
+        <AppCard v-if="cvRejected && !importing" class="mb-6">
           <div class="text-center py-2">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-red/10 border-2 border-red/30">
               <span class="material-symbols-outlined text-3xl text-red">description_off</span>
             </div>
             <h3 class="font-head text-xl font-bold text-text mb-3">{{ t('free_trial.cv_rejected_title') }}</h3>
             <p class="text-[14px] text-text-muted leading-relaxed mb-6">{{ t('free_trial.cv_rejected_desc') }}</p>
-            <AppButton variant="primary" size="lg" class="w-full !h-14 font-bold" @click="goCreateAccount">
+            <AppButton variant="primary" size="lg" class="w-full !h-14 font-bold" @click="goToSignup">
               <span class="material-symbols-outlined text-[18px] mr-2">person_add</span>
               {{ t('free_trial.cv_rejected_cta') }}
             </AppButton>
@@ -300,10 +300,6 @@ const selectedFile = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const importing = ref(false)
 const cvRejected = ref(false)
-
-const goCreateAccount = () => {
-  navigateTo('/signup')
-}
 
 const resetRejection = () => {
   cvRejected.value = false
