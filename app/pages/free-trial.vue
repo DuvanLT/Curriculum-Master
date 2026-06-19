@@ -81,7 +81,7 @@
         <AppCard v-if="cvRejected && !importing" class="mb-6">
           <div class="text-center py-2">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-red/10 border-2 border-red/30">
-              <span class="material-symbols-outlined text-3xl text-red">description_off</span>
+              <span class="material-symbols-outlined text-3xl text-red">image_not_supported</span>
             </div>
             <h3 class="font-head text-xl font-bold text-text mb-3">{{ t('free_trial.cv_rejected_title') }}</h3>
             <p class="text-[14px] text-text-muted leading-relaxed mb-6">{{ t('free_trial.cv_rejected_desc') }}</p>

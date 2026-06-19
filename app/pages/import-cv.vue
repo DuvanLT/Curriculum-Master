@@ -148,7 +148,7 @@
 
       <div v-if="cvRejected && !importing" class="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-400 text-center">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-red/10 border-2 border-red/30">
-          <span class="material-symbols-outlined text-3xl text-red">description_off</span>
+          <span class="material-symbols-outlined text-3xl text-red">image_not_supported</span>
         </div>
         <h2 class="font-head text-2xl font-bold text-text tracking-tight mb-3">{{ t('importar_cv.cv_rejected_title') }}</h2>
         <p class="text-[14px] text-text-muted leading-relaxed mb-8">{{ t('importar_cv.cv_rejected_desc') }}</p>
