@@ -1,6 +1,20 @@
 <template>
-  <div class="trial-page min-h-dvh bg-[var(--bg)] py-12 px-4 sm:px-6">
-    <div class="max-w-[640px] mx-auto">
+  <div class="trial-page min-h-dvh bg-[var(--bg)]">
+    <!-- Full-width scarcity banner -->
+    <div
+      v-if="slotsRemaining !== null"
+      class="trial-banner sticky top-0 z-30 w-full bg-amber/10 border-b border-amber/40 px-4 py-3 text-center animate-in fade-in slide-in-from-top-4 duration-500"
+    >
+      <div class="flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-amber text-[20px] trial-banner-icon">local_fire_department</span>
+        <span class="text-[13px] sm:text-[14px] font-semibold text-text">
+          {{ t('free_trial.slots_banner', { count: slotsRemaining }) }}
+        </span>
+      </div>
+    </div>
+
+    <div class="py-12 px-4 sm:px-6">
+      <div class="max-w-[640px] mx-auto">
       <!-- Header -->
       <div class="text-center mb-8">
         <h1 class="font-head text-[28px] sm:text-[32px] font-bold text-text tracking-tighter mb-2">
@@ -8,17 +22,6 @@
         </h1>
         <h2 class="font-head text-[20px] font-bold text-text mb-1">{{ t('free_trial.title') }}</h2>
         <p class="text-[13px] text-text-dim font-mono">{{ t('free_trial.subtitle') }}</p>
-      </div>
-
-      <!-- Scarcity banner -->
-      <div
-        v-if="slotsRemaining !== null"
-        class="flex items-center justify-center gap-2 bg-amber/10 border border-amber/30 rounded-xl px-4 py-3 mb-6 text-center animate-in fade-in duration-300"
-      >
-        <span class="material-symbols-outlined text-amber text-[20px]">local_fire_department</span>
-        <span class="text-[13px] sm:text-[14px] font-medium text-text">
-          {{ t('free_trial.slots_banner', { count: slotsRemaining }) }}
-        </span>
       </div>
 
       <!-- Status loading -->
@@ -254,6 +257,7 @@
           </div>
         </AppCard>
       </template>
+      </div>
     </div>
   </div>
 </template>
@@ -468,6 +472,34 @@ const goToSignup = () => {
   background-image:
     radial-gradient(circle at 2px 2px, rgba(37, 99, 235, 0.06) 1px, transparent 0);
   background-size: 40px 40px;
+}
+
+/* Banner de escasez: pulso sutil para captar la atención. */
+.trial-banner {
+  animation: bannerAttention 2.8s ease-in-out infinite;
+  backdrop-filter: blur(4px);
+}
+
+.trial-banner-icon {
+  display: inline-block;
+  animation: bannerIconPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes bannerAttention {
+  0%, 100% { background-color: rgba(var(--amber-rgb, 255, 191, 0), 0.08); }
+  50% { background-color: rgba(var(--amber-rgb, 255, 191, 0), 0.18); }
+}
+
+@keyframes bannerIconPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.18); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trial-banner,
+  .trial-banner-icon {
+    animation: none;
+  }
 }
 
 .magic-loader {
