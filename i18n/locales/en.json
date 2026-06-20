@@ -579,6 +579,7 @@
     "link_home": "Go to home"
   },
   "free_trial": {
+    "slots_banner": "Only {count} free analyses left! Don't miss out on yours.",
     "cv_rejected_title": "We couldn't read your CV",
     "cv_rejected_desc": "Your file looks like an image-based or scanned PDF with no selectable text. Our system —and most of the automated filters (ATS) recruiters use— can't read it, so it would be discarded. Create an account and we'll help you build one that works.",
     "cv_rejected_cta": "Create account and start",

@@ -579,6 +579,7 @@
     "link_home": "Ir al inicio"
   },
   "free_trial": {
+    "slots_banner": "¡Solo quedan {count} análisis gratis disponibles! No te quedes sin el tuyo.",
     "cv_rejected_title": "No pudimos leer tu CV",
     "cv_rejected_desc": "Tu archivo parece un PDF basado en imagen o escaneado, sin texto seleccionable. Nuestro sistema —y la mayoría de los filtros automáticos (ATS) que usan los reclutadores— no pueden leerlo, así que sería descartado. Crea una cuenta y te ayudamos a armar uno que sí funcione.",
     "cv_rejected_cta": "Crear cuenta y empezar",
