@@ -1,7 +1,13 @@
 import { getAnonId } from '../../utils/anon-trial'
+import { computeTrialSlots } from '../../utils/trial-slots'
 
 export default defineEventHandler(async (event) => {
   const anonId = getAnonId(event)
+  const db = useDb()
+
+  // Cupos de escasez: depende del total de trials, no del visitante.
+  const countResult = await db.execute('SELECT COUNT(*) AS c FROM anonymous_trials')
+  const slotsRemaining = computeTrialSlots(Number((countResult.rows[0] as any).c || 0))
 
   const empty = {
     importUsed: false,
@@ -11,12 +17,12 @@ export default defineEventHandler(async (event) => {
     experiences: [] as any[],
     auditResult: null,
     jdText: '',
-    analysisResult: null
+    analysisResult: null,
+    slotsRemaining
   }
 
   if (!anonId) return empty
 
-  const db = useDb()
   const result = await db.execute({
     sql: `SELECT profile_json, experiences_json, import_used, audit_used, audit_result_json,
                  analyze_used, jd_text, analysis_result_json
@@ -35,6 +41,7 @@ export default defineEventHandler(async (event) => {
     experiences: row.experiences_json ? JSON.parse(row.experiences_json as string) : [],
     auditResult: row.audit_result_json ? JSON.parse(row.audit_result_json as string) : null,
     jdText: row.jd_text || '',
-    analysisResult: row.analysis_result_json ? JSON.parse(row.analysis_result_json as string) : null
+    analysisResult: row.analysis_result_json ? JSON.parse(row.analysis_result_json as string) : null,
+    slotsRemaining
   }
 })
