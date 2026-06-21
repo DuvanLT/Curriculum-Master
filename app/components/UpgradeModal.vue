@@ -33,10 +33,17 @@
             </div>
 
             <!-- Price -->
-            <div class="mb-6 sm:mb-8 flex items-baseline justify-center gap-2 sm:gap-3">
-              <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">$32.500</span>
-              <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$44.900</span>
-              <span class="text-xs sm:text-sm font-bold text-slate-400">COP</span>
+            <div class="mb-6 sm:mb-8 flex flex-wrap items-baseline justify-center gap-x-2 sm:gap-x-3 gap-y-1">
+              <template v-if="appliedDiscount">
+                <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">${{ appliedDiscount.final_amount.toLocaleString('es-CO') }}</span>
+                <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$32.500</span>
+                <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs sm:text-sm font-bold text-green-700">−{{ appliedDiscount.discount_percent }}%</span>
+              </template>
+              <template v-else>
+                <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">$32.500</span>
+                <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$44.900</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-400">COP</span>
+              </template>
             </div>
 
             <!-- Benefits List -->
@@ -92,31 +99,44 @@
             </ul>
 
             <!-- Discount code -->
-            <div class="mb-4">
-              <label class="block text-xs font-semibold text-slate-700 mb-2">{{ t('checkout.code_label') }}</label>
-              <div v-if="!appliedDiscount" class="flex gap-2">
+            <div class="mb-5 sm:mb-6">
+              <label class="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+                <svg class="h-3.5 w-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 014 9V4a1 1 0 011-1z"/></svg>
+                {{ t('checkout.code_label') }}
+              </label>
+
+              <div v-if="!appliedDiscount" class="flex flex-col sm:flex-row gap-2">
                 <input
                   v-model="codeInput"
                   type="text"
                   :placeholder="t('checkout.code_placeholder')"
-                  class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm uppercase focus:border-indigo-500 focus:outline-none"
+                  :class="codeError ? 'border-red-400 focus:border-red-500' : 'border-slate-300 focus:border-indigo-500'"
+                  class="min-w-0 flex-1 rounded-xl border bg-slate-50 px-3.5 py-2.5 text-sm font-medium uppercase tracking-wide text-slate-900 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  @input="codeError = false"
                   @keyup.enter="applyCode"
                 />
                 <button
                   type="button"
                   @click="applyCode"
                   :disabled="codeLoading || !codeInput.trim()"
-                  class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  class="shrink-0 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  {{ t('checkout.code_apply') }}
+                  <span v-if="codeLoading" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white align-middle"></span>
+                  <span v-else>{{ t('checkout.code_apply') }}</span>
                 </button>
               </div>
-              <p v-if="codeError" class="mt-2 text-xs font-medium text-red-600">{{ t('checkout.code_invalid') }}</p>
-              <div v-if="appliedDiscount" class="flex items-center justify-between rounded-xl bg-green-50 border border-green-200 px-3 py-2">
-                <span class="text-xs font-medium text-green-800">
-                  {{ t('checkout.code_applied', { code: appliedDiscount.code, seller: appliedDiscount.seller_name, percent: appliedDiscount.discount_percent, amount: appliedDiscount.final_amount.toLocaleString('es-CO') }) }}
+
+              <p v-if="codeError && !appliedDiscount" class="mt-2 flex items-center gap-1 text-xs font-semibold text-red-600">
+                <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ t('checkout.code_invalid') }}
+              </p>
+
+              <div v-if="appliedDiscount" class="flex items-center justify-between gap-2 rounded-xl border border-green-200 bg-green-50 px-3.5 py-2.5">
+                <span class="flex min-w-0 items-center gap-2">
+                  <svg class="h-4 w-4 shrink-0 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  <span class="truncate text-xs sm:text-sm font-bold text-green-800">{{ appliedDiscount.code }} · −{{ appliedDiscount.discount_percent }}%</span>
                 </span>
-                <button type="button" @click="removeCode" class="ml-2 text-xs font-semibold text-green-700 underline">{{ t('checkout.code_remove') }}</button>
+                <button type="button" @click="removeCode" class="shrink-0 text-xs font-semibold text-green-700 underline hover:text-green-900">{{ t('checkout.code_remove') }}</button>
               </div>
             </div>
 
@@ -146,6 +166,7 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
+const toast = useToast()
 const loading = ref(false)
 
 const codeInput = ref('')
@@ -167,6 +188,17 @@ const applyCode = async () => {
         discount_percent: res.discount_percent,
         final_amount: res.final_amount,
       }
+      // Mensaje de confirmación como toast lateral de 10 segundos.
+      toast.show(
+        t('checkout.code_applied', {
+          code: res.code,
+          seller: res.seller_name,
+          percent: res.discount_percent,
+          amount: Number(res.final_amount).toLocaleString('es-CO'),
+        }),
+        'success',
+        10000,
+      )
     } else {
       codeError.value = true
     }
