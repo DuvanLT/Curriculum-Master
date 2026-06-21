@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware((to) => {
   const { loggedIn } = useAuth()
   
   // Define public routes that don't require login
-  const publicRoutes = ['/landing', '/login', '/signup', '/forgot-password', '/select-lang', '/free-trial']
+  const publicRoutes = ['/landing', '/login', '/signup', '/forgot-password', '/select-lang', '/free-trial', '/tools/conversor']
   
   // If the user is on the root path, landing handles it (index.vue redirects to landing)
   if (to.path === '/' || publicRoutes.includes(to.path)) {
