@@ -8,7 +8,7 @@
            y conserva margen arriba/abajo (p-4 / sm:py-8) -->
       <div class="relative flex min-h-full items-center justify-center p-4 sm:py-8">
         <!-- Modal Panel -->
-        <div class="relative w-full max-w-md transform transition-all">
+        <div class="relative w-full max-w-lg transform transition-all">
         <!-- Close button -->
         <button 
           @click="$emit('close')" 
