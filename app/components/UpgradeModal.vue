@@ -31,7 +31,7 @@
             </div>
 
             <!-- Price -->
-            <div class="mb-6 sm:mb-8 flex flex-wrap items-baseline justify-center gap-x-2 sm:gap-x-3 gap-y-1">
+            <div class="mb-3 flex flex-wrap items-baseline justify-center gap-x-2 sm:gap-x-3 gap-y-1">
               <template v-if="appliedDiscount">
                 <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">${{ appliedDiscount.final_amount.toLocaleString('es-CO') }}</span>
                 <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$32.500</span>
@@ -42,6 +42,22 @@
                 <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$44.900</span>
                 <span class="text-xs sm:text-sm font-bold text-slate-400">COP</span>
               </template>
+            </div>
+
+            <!-- Precio en moneda local -->
+            <div class="mb-6 sm:mb-8 flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500">
+              <span>Ver en</span>
+              <select
+                v-model="displayCurrency"
+                class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm font-semibold text-slate-700 focus:border-indigo-500 focus:outline-none"
+              >
+                <option value="COP">COP</option>
+                <option v-for="c in currencies" :key="c.code" :value="c.code">{{ c.code }}</option>
+              </select>
+              <span v-if="priceLoading" class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500"></span>
+              <span v-else-if="converted != null" class="font-bold text-slate-700">
+                ≈ {{ displaySymbol }}{{ converted.toLocaleString('es-CO', { maximumFractionDigits: 2 }) }} {{ displayCurrency }}
+              </span>
             </div>
 
             <!-- Benefits List -->
@@ -164,6 +180,8 @@
 </template>
 
 <script setup lang="ts">
+import { SUPPORTED_CURRENCIES } from '#shared/currency/currencies'
+
 const { t } = useI18n()
 const toast = useToast()
 const loading = ref(false)
@@ -213,6 +231,20 @@ const removeCode = () => {
   codeInput.value = ''
   codeError.value = false
 }
+
+// ─── Precio en moneda local ───
+const BASE_PRICE_COP = 32500
+const {
+  currencies,
+  displayCurrency,
+  converted,
+  loading: priceLoading,
+} = useLocalPrice(() => appliedDiscount.value?.final_amount ?? BASE_PRICE_COP)
+
+const displaySymbol = computed(() => {
+  const code = displayCurrency.value
+  return code === 'COP' ? '$' : (SUPPORTED_CURRENCIES[code]?.symbol || '')
+})
 
 defineProps({
   show: {
