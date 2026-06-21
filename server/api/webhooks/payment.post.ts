@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { v4 as uuidv4 } from 'uuid'
+import { getCheckoutDiscountCode } from '../../utils/discount'
 
 export default defineEventHandler(async (event) => {
   // ─── 1. Read raw body (needed for HMAC verification) ───
@@ -107,10 +108,11 @@ export default defineEventHandler(async (event) => {
           ]
         })
 
-        // Log the order for audit
+        // Log the order for audit (atribuido al código de descuento si lo hubo)
+        const approvedDiscountCode = await getCheckoutDiscountCode(db, reference)
         await db.execute({
-          sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json, discount_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           args: [
             uuidv4(),
             userId,
@@ -120,7 +122,8 @@ export default defineEventHandler(async (event) => {
             transactionData.amount?.currency || 'COP',
             'APPROVED',
             eventType,
-            rawBody
+            rawBody,
+            approvedDiscountCode
           ]
         })
 

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { requireVerifiedUserSession } from '../../utils/verified-session'
+import { getCheckoutDiscountCode } from '../../utils/discount'
 
 export default defineEventHandler(async (event) => {
   // ─── 1. Authenticate user session ───
@@ -61,10 +62,11 @@ export default defineEventHandler(async (event) => {
             args: [reference, userId]
           })
 
-          // Log the order
+          // Log the order (atribuido al código de descuento si lo hubo)
+          const fallbackDiscountCode = await getCheckoutDiscountCode(db, reference)
           await db.execute({
-            sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            sql: `INSERT INTO orders (id, user_id, gateway_order_id, customer_email, total, currency, status, event_name, payload_json, discount_code)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             args: [
               uuidv4(),
               userId,
@@ -74,7 +76,8 @@ export default defineEventHandler(async (event) => {
               'COP',
               'APPROVED',
               'FALLBACK_STATUS_CHECK',
-              JSON.stringify(response)
+              JSON.stringify(response),
+              fallbackDiscountCode
             ]
           })
 
