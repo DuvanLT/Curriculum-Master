@@ -1,11 +1,14 @@
 <template>
   <Transition name="modal">
-    <div v-if="show" class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <div v-if="show" class="fixed inset-0 z-[200] overflow-y-auto">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="$emit('close')"></div>
+      <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" @click="$emit('close')"></div>
 
-      <!-- Modal Panel -->
-      <div class="relative w-full max-w-md transform transition-all">
+      <!-- Centering wrapper: scrolls cuando el modal es más alto que la ventana,
+           y conserva margen arriba/abajo (p-4 / sm:py-8) -->
+      <div class="relative flex min-h-full items-center justify-center p-4 sm:py-8">
+        <!-- Modal Panel -->
+        <div class="relative w-full max-w-md transform transition-all">
         <!-- Close button -->
         <button 
           @click="$emit('close')" 
@@ -158,6 +161,7 @@
               </span>
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>
