@@ -91,6 +91,35 @@
               </li>
             </ul>
 
+            <!-- Discount code -->
+            <div class="mb-4">
+              <label class="block text-xs font-semibold text-slate-700 mb-2">{{ t('checkout.code_label') }}</label>
+              <div v-if="!appliedDiscount" class="flex gap-2">
+                <input
+                  v-model="codeInput"
+                  type="text"
+                  :placeholder="t('checkout.code_placeholder')"
+                  class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm uppercase focus:border-indigo-500 focus:outline-none"
+                  @keyup.enter="applyCode"
+                />
+                <button
+                  type="button"
+                  @click="applyCode"
+                  :disabled="codeLoading || !codeInput.trim()"
+                  class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  {{ t('checkout.code_apply') }}
+                </button>
+              </div>
+              <p v-if="codeError" class="mt-2 text-xs font-medium text-red-600">{{ t('checkout.code_invalid') }}</p>
+              <div v-if="appliedDiscount" class="flex items-center justify-between rounded-xl bg-green-50 border border-green-200 px-3 py-2">
+                <span class="text-xs font-medium text-green-800">
+                  {{ t('checkout.code_applied', { code: appliedDiscount.code, seller: appliedDiscount.seller_name, percent: appliedDiscount.discount_percent, amount: appliedDiscount.final_amount.toLocaleString('es-CO') }) }}
+                </span>
+                <button type="button" @click="removeCode" class="ml-2 text-xs font-semibold text-green-700 underline">{{ t('checkout.code_remove') }}</button>
+              </div>
+            </div>
+
             <!-- Call to Action -->
             <button
               @click="handleUpgrade"
@@ -119,6 +148,41 @@
 const { t } = useI18n()
 const loading = ref(false)
 
+const codeInput = ref('')
+const codeLoading = ref(false)
+const codeError = ref(false)
+const appliedDiscount = ref<{ code: string; seller_name: string; discount_percent: number; final_amount: number } | null>(null)
+
+const applyCode = async () => {
+  const code = codeInput.value.trim().toUpperCase()
+  if (!code || codeLoading.value) return
+  codeLoading.value = true
+  codeError.value = false
+  try {
+    const res = await $fetch<any>('/api/checkout/validate-code', { method: 'POST', body: { code } })
+    if (res?.valid) {
+      appliedDiscount.value = {
+        code: res.code,
+        seller_name: res.seller_name,
+        discount_percent: res.discount_percent,
+        final_amount: res.final_amount,
+      }
+    } else {
+      codeError.value = true
+    }
+  } catch {
+    codeError.value = true
+  } finally {
+    codeLoading.value = false
+  }
+}
+
+const removeCode = () => {
+  appliedDiscount.value = null
+  codeInput.value = ''
+  codeError.value = false
+}
+
 defineProps({
   show: {
     type: Boolean,
@@ -133,7 +197,8 @@ const handleUpgrade = async () => {
   loading.value = true
   try {
     const response = await $fetch<{ url: string }>('/api/checkout/payment', {
-      method: 'POST'
+      method: 'POST',
+      body: { code: appliedDiscount.value?.code || undefined }
     })
     if (response?.url) {
       // Redirect in the same window to prevent mobile pop-up blockers
