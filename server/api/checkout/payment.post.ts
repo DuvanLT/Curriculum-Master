@@ -1,4 +1,6 @@
 import { requireVerifiedUserSession } from '../../utils/verified-session'
+import { getBasePrice } from '../../utils/pricing'
+import { lookupActiveDiscount } from '../../utils/discount'
 
 export default defineEventHandler(async (event) => {
   // ─── 1. Authenticate user session ───
@@ -17,6 +19,23 @@ export default defineEventHandler(async (event) => {
   // ─── 2. Build unique reference and redirect URL ───
   // Reference format: userId-timestamp (max 60 chars for Bold)
   const reference = `${userId}-${Date.now()}`
+
+  const db = useDb()
+  const basePrice = getBasePrice(config)
+
+  const rawBody = await readBody(event).catch(() => ({}))
+  const code = String(rawBody?.code || '').trim().toUpperCase()
+
+  let amount = basePrice
+  let appliedCode: string | null = null
+  if (code) {
+    const discount = await lookupActiveDiscount(db, code, basePrice)
+    if (!discount) {
+      throw createError({ statusCode: 400, statusMessage: 'Código de descuento inválido' })
+    }
+    amount = discount.final_amount
+    appliedCode = discount.code
+  }
 
   // Dynamically determine host to support both localhost dev and production
   const host = getHeader(event, 'host') || 'bringjobs.qaliby.com'
@@ -37,7 +56,7 @@ export default defineEventHandler(async (event) => {
       body: {
         amount_type: 'CLOSE',
         amount: {
-          total_amount: 32500,
+          total_amount: amount,
           currency: 'COP'
         },
         description: 'Plan Pro - BringJobs',
@@ -55,6 +74,11 @@ export default defineEventHandler(async (event) => {
       console.error('[Checkout] Bold API response is missing url:', JSON.stringify(response))
       throw createError({ statusCode: 502, statusMessage: 'Failed to create payment link from Bold' })
     }
+
+    await db.execute({
+      sql: 'INSERT INTO checkout_sessions (reference, user_id, discount_code, amount) VALUES (?, ?, ?, ?)',
+      args: [reference, userId, appliedCode, amount]
+    })
 
     return { url: paymentUrl, reference }
   } catch (error: any) {

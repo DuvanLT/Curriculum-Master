@@ -1,4 +1,12 @@
 {
+  "checkout": {
+    "code_label": "Have a discount code?",
+    "code_placeholder": "Enter your code",
+    "code_apply": "Apply",
+    "code_invalid": "Invalid or inactive code",
+    "code_applied": "Code {code} ({seller}): {percent}% off. New price: ${amount} COP",
+    "code_remove": "Remove"
+  },
   "entrevista": {
     "title": "Interview Simulation",
     "subtitle": "Real-time preparation with AI-guided interview simulation - Beta",

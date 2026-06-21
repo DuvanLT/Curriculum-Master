@@ -242,6 +242,33 @@ export const initDb = async () => {
     // Column might already exist, ignore error
   }
 
+  // ─── Discount codes (afiliados) ───
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS discount_codes (
+      code TEXT PRIMARY KEY,
+      seller_name TEXT NOT NULL,
+      discount_percent INTEGER NOT NULL,
+      active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS checkout_sessions (
+      reference TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      discount_code TEXT,
+      amount INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  try {
+    await db.execute('ALTER TABLE orders ADD COLUMN discount_code TEXT')
+  } catch (e: any) {
+    // Column might already exist, ignore error
+  }
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS anonymous_trials (
       id TEXT PRIMARY KEY,
