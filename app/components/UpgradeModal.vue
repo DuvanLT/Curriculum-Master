@@ -19,6 +19,13 @@
           </svg>
         </button>
 
+        <!-- Selector de divisa (esquina superior izquierda) -->
+        <CurrencyFlagSelect
+          v-model="displayCurrency"
+          :options="currencies"
+          class="absolute left-4 top-4 z-50"
+        />
+
         <div class="group relative overflow-hidden rounded-[2.5rem] bg-white p-6 shadow-[0_20px_80px_rgba(79,70,229,0.25)] ring-1 ring-slate-100 sm:p-10">
           <!-- Decorative Background -->
           <div class="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50 blur-3xl transition duration-500 group-hover:bg-indigo-100" />
@@ -30,34 +37,21 @@
               <p class="text-xs sm:text-sm text-slate-500 font-medium">Has alcanzado el límite de tu plan gratuito. Desbloquea todo el potencial para conseguir tu trabajo ideal.</p>
             </div>
 
-            <!-- Price -->
-            <div class="mb-3 flex flex-wrap items-baseline justify-center gap-x-2 sm:gap-x-3 gap-y-1">
-              <template v-if="appliedDiscount">
-                <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">${{ appliedDiscount.final_amount.toLocaleString('es-CO') }}</span>
-                <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$32.500</span>
-                <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs sm:text-sm font-bold text-green-700">−{{ appliedDiscount.discount_percent }}%</span>
-              </template>
-              <template v-else>
-                <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">$32.500</span>
-                <span class="text-lg sm:text-xl font-bold text-slate-300 line-through decoration-2">$44.900</span>
-                <span class="text-xs sm:text-sm font-bold text-slate-400">COP</span>
-              </template>
+            <!-- Price (cambia según la divisa elegida) -->
+            <div class="mb-1 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
+              <span class="text-5xl sm:text-6xl font-black tracking-tight text-slate-900">{{ bigPrice }}</span>
+              <span class="text-xs sm:text-sm font-bold text-slate-400">{{ bigLabel }}</span>
+              <span v-if="appliedDiscount" class="rounded-full bg-green-100 px-2 py-0.5 text-xs sm:text-sm font-bold text-green-700">−{{ appliedDiscount.discount_percent }}%</span>
             </div>
 
-            <!-- Precio en moneda local -->
-            <div class="mb-6 sm:mb-8 flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500">
-              <span>Ver en</span>
-              <select
-                v-model="displayCurrency"
-                class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm font-semibold text-slate-700 focus:border-indigo-500 focus:outline-none"
-              >
-                <option value="COP">COP</option>
-                <option v-for="c in currencies" :key="c.code" :value="c.code">{{ c.code }}</option>
-              </select>
-              <span v-if="priceLoading" class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500"></span>
-              <span v-else-if="converted != null" class="font-bold text-slate-700">
-                ≈ {{ displaySymbol }}{{ converted.toLocaleString('es-CO', { maximumFractionDigits: 2 }) }} {{ displayCurrency }}
+            <!-- Referencia / estado -->
+            <div class="mb-6 sm:mb-8 flex h-5 items-center justify-center text-center text-xs text-slate-400">
+              <span v-if="priceLoading" class="inline-flex items-center gap-1.5">
+                <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500"></span>
+                Convirtiendo…
               </span>
+              <span v-else-if="showingConverted">≈ ${{ copAmount.toLocaleString('es-CO') }} COP</span>
+              <span v-else-if="!appliedDiscount" class="font-bold text-slate-300 line-through decoration-2">$44.900 COP</span>
             </div>
 
             <!-- Benefits List -->
@@ -234,17 +228,27 @@ const removeCode = () => {
 
 // ─── Precio en moneda local ───
 const BASE_PRICE_COP = 32500
+const copAmount = computed(() => appliedDiscount.value?.final_amount ?? BASE_PRICE_COP)
 const {
   currencies,
   displayCurrency,
   converted,
   loading: priceLoading,
-} = useLocalPrice(() => appliedDiscount.value?.final_amount ?? BASE_PRICE_COP)
+} = useLocalPrice(() => copAmount.value)
 
 const displaySymbol = computed(() => {
   const code = displayCurrency.value
   return code === 'COP' ? '$' : (SUPPORTED_CURRENCIES[code]?.symbol || '')
 })
+
+// El precio principal cambia según la divisa elegida.
+const showingConverted = computed(() => displayCurrency.value !== 'COP' && converted.value != null)
+const bigPrice = computed(() =>
+  showingConverted.value
+    ? displaySymbol.value + (converted.value as number).toLocaleString('es-CO', { maximumFractionDigits: 2 })
+    : '$' + copAmount.value.toLocaleString('es-CO'),
+)
+const bigLabel = computed(() => (showingConverted.value ? displayCurrency.value : 'COP'))
 
 defineProps({
   show: {
