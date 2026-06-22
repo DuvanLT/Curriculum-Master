@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
+import { migrateAnonymousTrial } from '../../utils/migrate-trial'
 
 export default defineEventHandler(async (event) => {
   /* throw createError({
@@ -65,6 +66,9 @@ export default defineEventHandler(async (event) => {
     args: [id, email, null, hashedPassword, name || null, verificationCode, locale, 'free_trial']
   })
 
+  // ─── Migrate anonymous trial data, if any ───
+  const fromTrial = await migrateAnonymousTrial(event, db, id)
+
   // Send verification email
   const config = useRuntimeConfig()
   if (config.resendApiKey) {
@@ -74,7 +78,7 @@ export default defineEventHandler(async (event) => {
 
       const emailSubject = isEn ? 'Verification Code - BringJobs' : 'Código de verificación - Bring Jobs'
       const emailTitle = isEn ? `Hello ${name || 'user'}!` : `¡Hola ${name || 'usuario'}!`
-      const emailBody = isEn 
+      const emailBody = isEn
         ? 'Thanks for joining BringJobs. To complete your registration, use the following verification code:'
         : 'Gracias por unirte a Bring Jobs. Para completar tu registro, utiliza el siguiente código de verificación:'
       const emailFooter = isEn
@@ -103,7 +107,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const user = { id, email, name, is_verified: 0, preferred_locale: locale, subscription_name: 'free_trial', last_payment_at: null }
+  const user = { id, email, name, is_verified: 0, preferred_locale: locale, subscription_name: 'free_trial', last_payment_at: null, from_trial: fromTrial }
 
   // Set session
   await setUserSession(event, { user })

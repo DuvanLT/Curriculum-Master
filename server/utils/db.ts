@@ -27,7 +27,8 @@ const ALLOWED_COLUMN_NAMES = new Set([
   'sidebar_tour_completed_at', 'is_verified', 'verification_code',
   'preferred_locale', 'subscription_name', 'last_payment_at',
   'lemon_squeezy_customer_id', 'lemon_squeezy_order_id',
-  'gateway_customer_id', 'gateway_order_id'
+  'gateway_customer_id', 'gateway_order_id',
+  'auth_provider', 'google_sub'
 ])
 
 async function ensureUserColumn(db: ReturnType<typeof useDb>, name: string, type: string) {
@@ -102,7 +103,9 @@ export const initDb = async () => {
     { name: 'lemon_squeezy_customer_id', type: 'TEXT' },
     { name: 'lemon_squeezy_order_id', type: 'TEXT' },
     { name: 'gateway_customer_id', type: 'TEXT' },
-    { name: 'gateway_order_id', type: 'TEXT' }
+    { name: 'gateway_order_id', type: 'TEXT' },
+    { name: 'auth_provider', type: "TEXT DEFAULT 'password'" },
+    { name: 'google_sub', type: 'TEXT' }
   ]
   for (const col of columns) {
     try {
@@ -238,6 +241,51 @@ export const initDb = async () => {
   } catch (e: any) {
     // Column might already exist, ignore error
   }
+
+  // ─── Discount codes (afiliados) ───
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS discount_codes (
+      code TEXT PRIMARY KEY,
+      seller_name TEXT NOT NULL,
+      discount_percent INTEGER NOT NULL,
+      active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS checkout_sessions (
+      reference TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      discount_code TEXT,
+      amount INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  try {
+    await db.execute('ALTER TABLE orders ADD COLUMN discount_code TEXT')
+  } catch (e: any) {
+    // Column might already exist, ignore error
+  }
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS anonymous_trials (
+      id TEXT PRIMARY KEY,
+      ip_hash TEXT,
+      profile_json TEXT,
+      experiences_json TEXT,
+      educations_json TEXT,
+      import_used INTEGER DEFAULT 0,
+      audit_used INTEGER DEFAULT 0,
+      audit_result_json TEXT,
+      analyze_used INTEGER DEFAULT 0,
+      jd_text TEXT,
+      analysis_result_json TEXT,
+      migrated_to_user_id TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
 
   // ─── Indexes for performance ───
   const indexes = [

@@ -14,6 +14,16 @@ export default defineEventHandler(async (event) => {
       return
     }
 
+    // Skip protection for anonymous free-trial routes (own usage limits apply)
+    if (url.pathname.startsWith('/api/trial/')) {
+      return
+    }
+
+    // Skip protection for currency routes (public exchange-rate data, no user data)
+    if (url.pathname.startsWith('/api/currency/')) {
+      return
+    }
+
     // 1. Check for valid user session
     const session = await getUserSession(event)
     if (session?.user) {

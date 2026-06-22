@@ -122,17 +122,13 @@
 <script setup>
 import { translateDate, translateIdiomas } from '~/utils/cvLocalize'
 
-const { t, locale, getLocaleMessage } = useI18n()
+const { locale } = useI18n()
+const { $i18n } = useNuxtApp()
 
 const cvLocale = computed(() => props.aiData?.cv_locale || locale.value)
 
-// Resolve a dot-path key from the target locale messages directly
-function ct(key) {
-  const msgs = getLocaleMessage(cvLocale.value)
-  const result = key.split('.').reduce((obj, part) => obj?.[part], msgs)
-  return typeof result === 'string' ? result : t(key)
-}
-
+// Use the global i18n instance — accepts locale as second argument (vue-i18n v9)
+const ct = (key) => $i18n.t(key, cvLocale.value)
 const td = (date) => translateDate(date, cvLocale.value)
 
 const PRESENT_TOKENS = new Set([
@@ -299,9 +295,12 @@ const idiomasText = computed(() => {
 
 const normalizedEducations = computed(() => {
   if (Array.isArray(props.educations) && props.educations.length) {
+    const translated = Array.isArray(props.aiData?.translated_educations) ? props.aiData.translated_educations : []
+    const map = new Map(translated.map(e => [e.id, e.titulo]))
     return props.educations.map(edu => ({
       ...edu,
-      fin: normalizedDate(edu.fin)
+      fin: normalizedDate(edu.fin),
+      titulo: map.get(edu.id) || edu.titulo
     }))
   }
 

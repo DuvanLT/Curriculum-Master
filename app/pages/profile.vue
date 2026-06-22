@@ -77,7 +77,7 @@
             
           </div>
         </template>
-        <div v-if="addingEducation" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
+        <div v-if="addingEducation" ref="educationFormRef" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4 scroll-mt-4">
           <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">{{ editingEducationId ? $t('profile.lbl_edit_study') : $t('profile.lbl_new_study') }}</div>
 
           <div class="profile-grid profile-grid-two gap-3 mb-3">
@@ -132,7 +132,7 @@
           </div>
         </template>
 
-        <div v-if="adding" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4">
+        <div v-if="adding" ref="expFormRef" class="bg-[var(--bg)]-bg3 border border-amber-dim rounded-[5px] p-4 mb-4 scroll-mt-4">
           <div class="font-mono text-[11px] text-amber mb-3 tracking-widest uppercase">{{ editingExpId ? $t('profile.lbl_edit_exp') : $t('profile.lbl_new_exp') }}</div>
 
           <div class="profile-grid profile-grid-exp gap-3 mb-3">
@@ -255,6 +255,18 @@ const editingExpId = ref<string | number | null>(null)
 const editingEducationId = ref<string | number | null>(null)
 const showConfirmDeleteExp = ref(false)
 const expToDelete = ref<string | number | null>(null)
+
+// Refs a los formularios de edición para hacer scroll suave al abrirlos.
+const educationFormRef = ref<HTMLElement | null>(null)
+const expFormRef = ref<HTMLElement | null>(null)
+
+// El formulario se renderiza con v-if al activar edición; esperamos al
+// siguiente tick para que exista en el DOM antes de hacer scroll hacia él.
+const scrollToEditForm = (formRef: Ref<HTMLElement | null>) => {
+  nextTick(() => {
+    formRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
+}
 
 const emptyEducationForm = () => ({
   titulo: '',
@@ -448,7 +460,7 @@ const startEditingEducation = (edu: any) => {
     descripcion: edu.descripcion || ''
   }
   addingEducation.value = true
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollToEditForm(educationFormRef)
 }
 
 const removeEducationEntry = (id?: string | number) => {
@@ -525,7 +537,7 @@ const startEditingExperience = (exp: any) => {
     link: exp.link || ''
   }
   adding.value = true
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollToEditForm(expFormRef)
 }
 
 const confirmRemoveExperience = (id?: string | number) => {

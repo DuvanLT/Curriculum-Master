@@ -87,7 +87,7 @@ const handleVerify = async () => {
     await fetchSession()
     
     setTimeout(() => {
-      navigateTo('/import-cv')
+      navigateTo(user.value?.from_trial ? '/profile' : '/import-cv')
     }, 1500)
   } catch (e) {
     error.value = e.data?.statusMessage || t('auth.verify_error')
@@ -99,7 +99,7 @@ const handleVerify = async () => {
 // Redirect if already verified or not logged in
 onMounted(() => {
   if (!user.value) navigateTo('/login')
-  if (user.value?.is_verified) navigateTo('/import-cv')
+  if (user.value?.is_verified) navigateTo(user.value?.from_trial ? '/profile' : '/import-cv')
 })
 </script>
 

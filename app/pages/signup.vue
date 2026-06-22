@@ -37,8 +37,20 @@
       
       </form>
 
+      <div class="flex items-center gap-3 my-6 relative z-10">
+        <div class="h-px flex-1 bg-border"></div>
+        <span class="font-mono text-[11px] text-text-dim uppercase">{{ t('auth.or') }}</span>
+        <div class="h-px flex-1 bg-border"></div>
+      </div>
+
+      <a href="/auth/google"
+         class="relative z-10 flex items-center justify-center gap-2 w-full h-[45px] border border-border rounded-[4px] text-[14px] font-medium text-text hover:bg-bg transition-colors">
+        <img src="https://www.google.com/favicon.ico" alt="" class="w-4 h-4" />
+        {{ t('auth.continue_with_google') }}
+      </a>
+
       <div class="mt-8 text-center text-[13px] text-text-dim relative z-10">
-        {{ t('auth.already_have_account') }} 
+        {{ t('auth.already_have_account') }}
         <NuxtLink to="/login" class="text-amber hover:underline font-medium ml-1">{{ t('auth.login_now') }}</NuxtLink>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { requireVerifiedUserSession } from '../utils/verified-session'
+import { deleteUserAccount } from '../utils/delete-account'
 
 export default defineEventHandler(async (event) => {
   const session = await requireVerifiedUserSession(event)
@@ -21,18 +22,16 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Delete the user from the database.
-    // ON DELETE CASCADE will handle experiences, applications, etc.
-    await db.execute({
-      sql: 'DELETE FROM users WHERE id = ?',
-      args: [userId]
-    })
+    // Delete the user. `orders` (FK sin cascade) se borra explícitamente dentro
+    // del util; el resto de tablas hijas caen por ON DELETE CASCADE.
+    await deleteUserAccount(db, userId)
 
     // Clear the user session after successful deletion
     await clearUserSession(event)
 
     return { success: true, message: 'Cuenta eliminada con éxito' }
   } catch (error: any) {
+    console.error('Error al eliminar la cuenta:', userId, error?.message || error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Error interno al intentar eliminar la cuenta. Por favor contáctenos si el problema persiste.'
