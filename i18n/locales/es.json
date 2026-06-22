@@ -5,7 +5,17 @@
     "code_apply": "Aplicar",
     "code_invalid": "Código inválido o inactivo",
     "code_applied": "Código {code} ({seller}): {percent}% de descuento. Nuevo precio: ${amount} COP",
-    "code_remove": "Quitar"
+    "code_remove": "Quitar",
+    "currency_names": {
+      "COP": "Peso colombiano",
+      "USD": "Dólar estadounidense",
+      "EUR": "Euro",
+      "MXN": "Peso mexicano",
+      "GBP": "Libra esterlina",
+      "BRL": "Real brasileño",
+      "PEN": "Sol peruano",
+      "CLP": "Peso chileno"
+    }
   },
   "entrevista": {
     "title": "Simulación de Entrevista",

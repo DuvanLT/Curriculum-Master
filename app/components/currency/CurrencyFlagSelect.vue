@@ -25,7 +25,7 @@
           >
             <img :src="flagUrl(o.code)" alt="" class="h-3.5 w-5 shrink-0 rounded-[2px] object-cover" />
             <span class="font-semibold">{{ o.code }}</span>
-            <span class="truncate text-slate-400">{{ o.name }}</span>
+            <span class="truncate text-slate-400">{{ currencyName(o.code) }}</span>
           </button>
         </li>
       </ul>
@@ -36,10 +36,11 @@
 <script setup lang="ts">
 import type { Currency } from '#shared/currency/types'
 
-interface Opt { code: string; name: string }
+interface Opt { code: string }
 
 const props = defineProps<{ modelValue: string; options: Currency[] }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const { t } = useI18n()
 
 const open = ref(false)
 
@@ -48,13 +49,13 @@ const FLAGS: Record<string, string> = {
   COP: 'co', USD: 'us', EUR: 'eu', MXN: 'mx', GBP: 'gb', BRL: 'br', PEN: 'pe', CLP: 'cl',
 }
 
-const COP_OPTION: Opt = { code: 'COP', name: 'Peso colombiano' }
 const allOptions = computed<Opt[]>(() => [
-  COP_OPTION,
-  ...props.options.map((c) => ({ code: c.code, name: c.name })),
+  { code: 'COP' },
+  ...props.options.map((c) => ({ code: c.code })),
 ])
 
 const flagUrl = (code: string) => `https://flagcdn.com/40x30/${FLAGS[code] || 'un'}.png`
+const currencyName = (code: string) => t(`checkout.currency_names.${code}`)
 
 const select = (code: string) => {
   emit('update:modelValue', code)
