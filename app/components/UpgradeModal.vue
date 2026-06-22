@@ -9,28 +9,24 @@
       <div class="relative flex min-h-full items-center justify-center p-4 sm:py-8">
         <!-- Modal Panel -->
         <div class="relative w-full max-w-lg transform transition-all">
-        <!-- Close button -->
-        <button 
-          @click="$emit('close')" 
-          class="absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700"
-        >
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        <!-- Selector de divisa (esquina superior izquierda) -->
-        <CurrencyFlagSelect
-          v-model="displayCurrency"
-          :options="currencies"
-          class="absolute left-4 top-4 z-50"
-        />
-
-        <div class="group relative overflow-hidden rounded-[2.5rem] bg-white p-6 shadow-[0_20px_80px_rgba(79,70,229,0.25)] ring-1 ring-slate-100 sm:p-10">
+        <div class="group relative overflow-hidden rounded-[2.5rem] bg-white px-6 pb-6 pt-2.5 shadow-[0_20px_80px_rgba(79,70,229,0.25)] ring-1 ring-slate-100 sm:px-10 sm:pb-10">
           <!-- Decorative Background -->
           <div class="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50 blur-3xl transition duration-500 group-hover:bg-indigo-100" />
 
           <div class="relative z-10">
+            <!-- Top bar: selector de divisa + cerrar (dentro del card) -->
+            <div class="mb-2 flex items-center justify-between">
+              <CurrencyFlagSelect v-model="displayCurrency" :options="currencies" />
+              <button
+                @click="$emit('close')"
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700"
+              >
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
             <!-- Header: Limit Reached Message -->
             <div class="mb-5 sm:mb-6 text-center">
               <h2 class="text-xl sm:text-2xl font-black italic text-slate-900 mb-2">¡Mejora tu plan!</h2>
@@ -45,7 +41,7 @@
             </div>
 
             <!-- Precio anterior (anterior vs actual), en la divisa elegida. +2px -->
-            <div class="mb-6 sm:mb-8 flex h-6 items-center justify-center gap-2 text-center text-sm text-slate-400">
+            <div class="mb-6 sm:mb-8 flex h-6 items-center justify-center gap-2 text-center text-base text-slate-400">
               <span v-if="priceLoading" class="inline-flex items-center gap-1.5 text-xs">
                 <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500"></span>
                 Convirtiendo…
@@ -256,11 +252,12 @@ const bigPrice = computed(() =>
 )
 const bigLabel = computed(() => (showingConverted.value ? displayCurrency.value : 'COP'))
 
-// Precio anterior (tachado), también en la divisa elegida.
+// Precio anterior (tachado), también en la divisa elegida. Sin símbolo de divisa
+// (la moneda se indica con su código al lado).
 const anchorPrice = computed(() =>
   showingConverted.value
-    ? displaySymbol.value + fmt(ANCHOR_PRICE_COP * (rate.value as number))
-    : '$' + ANCHOR_PRICE_COP.toLocaleString('es-CO'),
+    ? fmt(ANCHOR_PRICE_COP * (rate.value as number))
+    : ANCHOR_PRICE_COP.toLocaleString('es-CO'),
 )
 
 defineProps({
