@@ -41,14 +41,14 @@
             </div>
 
             <!-- Precio anterior (anterior vs actual), en la divisa elegida. +2px -->
-            <div class="mb-6 sm:mb-8 flex h-6 items-center justify-center gap-2 text-center text-base text-slate-400">
+            <div class="mb-2 flex h-6 items-center justify-center gap-2 text-center text-base text-slate-400">
               <span v-if="priceLoading" class="inline-flex items-center gap-1.5 text-xs">
                 <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500"></span>
                 Convirtiendo…
               </span>
               <template v-else>
                 <span class="font-bold text-slate-300 line-through decoration-2">{{ anchorPrice }}</span>
-                <span class="font-semibold text-slate-400">{{ bigLabel }}</span>
+                <span class="font-semibold text-xs text-slate-400">{{ bigLabel }}</span>
               </template>
             </div>
 
