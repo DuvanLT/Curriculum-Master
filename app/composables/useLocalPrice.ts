@@ -17,7 +17,7 @@ interface ConfigResponse {
 export function useLocalPrice(copAmount: () => number) {
   const currencies = ref<Currency[]>([])
   const displayCurrency = ref<CurrencyCode>('COP')
-  const rate = ref<number>(1)
+  const rate = ref<number | null>(null)
   const loading = ref(false)
   const error = ref(false)
 
@@ -43,13 +43,14 @@ export function useLocalPrice(copAmount: () => number) {
       rateCache[to] = data.rate
     } catch {
       error.value = true
+      rate.value = null
     } finally {
       loading.value = false
     }
   }
 
   const converted = computed<number | null>(() => {
-    if (displayCurrency.value === 'COP' || error.value) return null
+    if (displayCurrency.value === 'COP' || error.value || rate.value == null) return null
     try {
       return convert(copAmount(), rate.value)
     } catch {
@@ -70,5 +71,5 @@ export function useLocalPrice(copAmount: () => number) {
     await fetchRate()
   })
 
-  return { currencies, displayCurrency, converted, loading, error }
+  return { currencies, displayCurrency, converted, rate, loading, error }
 }

@@ -44,14 +44,16 @@
               <span v-if="appliedDiscount" class="rounded-full bg-green-100 px-2 py-0.5 text-xs sm:text-sm font-bold text-green-700">−{{ appliedDiscount.discount_percent }}%</span>
             </div>
 
-            <!-- Referencia / estado -->
-            <div class="mb-6 sm:mb-8 flex h-5 items-center justify-center text-center text-xs text-slate-400">
-              <span v-if="priceLoading" class="inline-flex items-center gap-1.5">
+            <!-- Precio anterior (anterior vs actual), en la divisa elegida. +2px -->
+            <div class="mb-6 sm:mb-8 flex h-6 items-center justify-center gap-2 text-center text-sm text-slate-400">
+              <span v-if="priceLoading" class="inline-flex items-center gap-1.5 text-xs">
                 <span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500"></span>
                 Convirtiendo…
               </span>
-              <span v-else-if="showingConverted">≈ ${{ copAmount.toLocaleString('es-CO') }} COP</span>
-              <span v-else-if="!appliedDiscount" class="font-bold text-slate-300 line-through decoration-2">$44.900 COP</span>
+              <template v-else>
+                <span class="font-bold text-slate-300 line-through decoration-2">{{ anchorPrice }}</span>
+                <span class="font-semibold text-slate-400">{{ bigLabel }}</span>
+              </template>
             </div>
 
             <!-- Benefits List -->
@@ -227,12 +229,14 @@ const removeCode = () => {
 }
 
 // ─── Precio en moneda local ───
-const BASE_PRICE_COP = 32500
+const BASE_PRICE_COP = 32500    // precio actual (lista)
+const ANCHOR_PRICE_COP = 44900  // precio "anterior" (ancla de marketing)
 const copAmount = computed(() => appliedDiscount.value?.final_amount ?? BASE_PRICE_COP)
 const {
   currencies,
   displayCurrency,
   converted,
+  rate,
   loading: priceLoading,
 } = useLocalPrice(() => copAmount.value)
 
@@ -241,14 +245,23 @@ const displaySymbol = computed(() => {
   return code === 'COP' ? '$' : (SUPPORTED_CURRENCIES[code]?.symbol || '')
 })
 
-// El precio principal cambia según la divisa elegida.
+const fmt = (n: number) => n.toLocaleString('es-CO', { maximumFractionDigits: 2 })
+
+// El precio principal (actual) cambia según la divisa elegida.
 const showingConverted = computed(() => displayCurrency.value !== 'COP' && converted.value != null)
 const bigPrice = computed(() =>
   showingConverted.value
-    ? displaySymbol.value + (converted.value as number).toLocaleString('es-CO', { maximumFractionDigits: 2 })
+    ? displaySymbol.value + fmt(converted.value as number)
     : '$' + copAmount.value.toLocaleString('es-CO'),
 )
 const bigLabel = computed(() => (showingConverted.value ? displayCurrency.value : 'COP'))
+
+// Precio anterior (tachado), también en la divisa elegida.
+const anchorPrice = computed(() =>
+  showingConverted.value
+    ? displaySymbol.value + fmt(ANCHOR_PRICE_COP * (rate.value as number))
+    : '$' + ANCHOR_PRICE_COP.toLocaleString('es-CO'),
+)
 
 defineProps({
   show: {
