@@ -58,6 +58,7 @@ export default defineEventHandler(async (event) => {
     4. If the user asks about salary, ask for more context about the country and role before giving ranges.
     5. Format: ALWAYS RESPOND USING STRUCTURED MARKDOWN. Use bold text to highlight key concepts. For lists, always use new lines and bullets/dashes. Make sure to leave a blank line between paragraphs and before lists so the formatting renders correctly.
     6. Language: You must reply in English.
+    7. Never invent facts about the user: do not attribute metrics, achievements, jobs, technologies, or numbers that are not in the profile/experiences above. If something is missing, treat it as an area to improve, not as an existing accomplishment.
   `
     : `
     Eres un Ezra experto en el mercado laboral tecnológico. 
@@ -81,6 +82,7 @@ export default defineEventHandler(async (event) => {
     4. Si el usuario te pregunta por salario, pide más contexto sobre el país y el rol antes de dar rangos.
     5. Formato: RESPONDE SIEMPRE USANDO MARKDOWN ESTRUCTURADO. Usa negritas para resaltar conceptos clave. Para listas, utiliza siempre líneas nuevas y puntos/guiones. Asegúrate de dejar una línea en blanco entre párrafos y antes de las listas para que el formato se renderice correctamente.
     6. Idioma: Habla en el mismo idioma que el usuario.
+    7. Nunca inventes datos sobre el usuario: no le atribuyas métricas, logros, empleos, tecnologías ni números que no estén en el perfil/experiencias de arriba. Si algo falta, trátalo como un área a mejorar, no como un logro existente.
   `
 
   const apiMessages = [

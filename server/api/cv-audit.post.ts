@@ -38,6 +38,12 @@ INSTRUCTIONS:
    - DO NOT use negative or critical tone.
 5. Provide a 2-line executive recommendation that connects the profile with the platform's potential.
 6. You must reply in English.
+
+CRITICAL ANTI-HALLUCINATION RULES:
+- Base EVERY strength and weakness STRICTLY on data that is actually present in the candidate profile below. Never invent, assume, or extrapolate facts.
+- NEVER fabricate metrics, percentages, numbers, achievements, projects, or technologies that are not literally in the profile. If the profile has no quantifiable metrics, you MUST NOT claim it does.
+- Do not praise something that is missing. If there are no metrics, that belongs in weaknesses, not strengths.
+- The JSON below is an EXAMPLE OF FORMAT ONLY. Do not copy its content; generate strengths and weaknesses derived from THIS specific candidate.
 `
     : `
 Eres un experto en reclutamiento y revisión de CVs profesionales. 
@@ -53,6 +59,12 @@ INSTRUCCIONES:
    - NO uses tono negativo ni crítico hacia el candidato. El candidato ya valió por llegar hasta aquí.
 5. Da una recomendación ejecutiva en 2 líneas motivadora que conecte el perfil con el potencial de la plataforma.
 6. Responde siempre en Español.
+
+REGLAS CRÍTICAS ANTI-ALUCINACIÓN:
+- Basa CADA fortaleza y debilidad EXCLUSIVAMENTE en datos que estén realmente presentes en el perfil del candidato de abajo. Nunca inventes, supongas ni extrapoles datos.
+- NUNCA inventes métricas, porcentajes, números, logros, proyectos o tecnologías que no estén literalmente en el perfil. Si el perfil no tiene métricas cuantificables, NO afirmes que las tiene.
+- No elogies algo que falta. Si no hay métricas, eso va en debilidades, no en fortalezas.
+- El JSON de abajo es SOLO UN EJEMPLO DE FORMATO. No copies su contenido; genera fortalezas y debilidades derivadas de ESTE candidato específico.
 `
 
   const userPrompt = isEn
@@ -64,14 +76,14 @@ RETURN ONLY A JSON OBJECT WITH THIS EXACT STRUCTURE (KEEP THE EXACT SPANISH KEYS
 {
   "score": 72,
   "fortalezas": [
-    "Clearly documented professional experience with well-defined roles.",
-    "Solid and up-to-date skill set aligned with the target industry.",
-    "Quantifiable achievements present in the listed experiences."
+    "<strength derived strictly from the candidate's real data>",
+    "<strength derived strictly from the candidate's real data>",
+    "<strength derived strictly from the candidate's real data>"
   ],
   "debilidades": [
-    "The professional summary is generic and does not differentiate the candidate.",
-    "Missing metrics or quantifiable impact in recent experiences.",
-    "No personal projects or portfolio to reinforce the professional profile."
+    "<improvement opportunity derived strictly from the candidate's real data>",
+    "<improvement opportunity derived strictly from the candidate's real data>",
+    "<improvement opportunity derived strictly from the candidate's real data>"
   ],
   "recomendacion": "Your profile has a solid foundation but needs more specificity. Prioritize quantifying your achievements and customizing your summary for each type of job."
 }
@@ -84,14 +96,14 @@ DEVUELVE ÚNICAMENTE UN OBJETO JSON CON ESTA ESTRUCTURA:
 {
   "score": 72,
   "fortalezas": [
-    "Experiencia profesional claramente documentada con roles bien definidos.",
-    "Stack tecnologico o set de habilidades solido y actualizado.",
-    "Logros cuantificables presentes en las experiencias listadas."
+    "<fortaleza derivada estrictamente de los datos reales del candidato>",
+    "<fortaleza derivada estrictamente de los datos reales del candidato>",
+    "<fortaleza derivada estrictamente de los datos reales del candidato>"
   ],
   "debilidades": [
-    "El resumen profesional es muy generico y no diferencia al candidato.",
-    "Faltan metricas o impacto cuantificable en las experiencias mas recientes.",
-    "No hay proyectos personales ni portfolio que refuerce el perfil profesional."
+    "<oportunidad de mejora derivada estrictamente de los datos reales del candidato>",
+    "<oportunidad de mejora derivada estrictamente de los datos reales del candidato>",
+    "<oportunidad de mejora derivada estrictamente de los datos reales del candidato>"
   ],
   "recomendacion": "Tu perfil tiene una base solida pero necesita mas especificidad. Prioriza cuantificar tus logros y personalizar tu resumen para cada tipo de vacante."
 }

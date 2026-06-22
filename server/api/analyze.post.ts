@@ -65,6 +65,8 @@ export default defineEventHandler(async (event) => {
     4. Provide a brief analysis and concrete recommendations.
     5. Language: English.
 
+    ANTI-HALLUCINATION: "keywords_presentes" may ONLY contain skills genuinely present in the candidate's profile/experiences. A skill that is in the JD but not in the profile goes in "keywords_faltantes", never in "keywords_presentes". Never invent metrics, achievements, experience, or numbers that are not in the candidate's data.
+
     IMPORTANT: This is NOT just for programmers. It can be for SALES, MARKETING, MEDICINE, CONSTRUCTION, etc. Extract technical/specific skills from ANY field.
   `
     : `
@@ -76,6 +78,8 @@ export default defineEventHandler(async (event) => {
     3. Calcula un puntaje de coincidencia (score) de 0 a 100.
     4. Proporciona un análisis breve y recomendaciones concretas.
     5. Idioma: Español.
+
+    ANTI-ALUCINACIÓN: "keywords_presentes" SOLO puede contener habilidades realmente presentes en el perfil/experiencias del candidato. Una habilidad que está en la vacante pero no en el perfil va en "keywords_faltantes", nunca en "keywords_presentes". Nunca inventes métricas, logros, experiencia ni números que no estén en los datos del candidato.
 
     IMPORTANTE: Esto NO es solo para programadores. Puede ser para VENTAS, MARKETING, MEDICINA, CONSTRUCCIÓN, etc. Extrae las habilidades técnicas/específicas de CUALQUIER campo.
   `
