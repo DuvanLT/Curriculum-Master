@@ -79,6 +79,19 @@ export default defineEventHandler(async (event) => {
   // fresh trial does not reset credits — the IP is capped across anon ids.
   await assertTrialIpQuota(db, event, anonId)
 
+  // Si ya importó, cortamos antes de leer el PDF y llamar a OpenAI.
+  const existingTrial = await db.execute({
+    sql: 'SELECT import_used FROM anonymous_trials WHERE id = ?',
+    args: [anonId]
+  })
+  const existingTrialRow = existingTrial.rows[0] as any
+  if (existingTrialRow && Number(existingTrialRow.import_used) === 1) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Ya usaste tu importación gratuita. Crea una cuenta para continuar.'
+    })
+  }
+
   await resolvePDFJSImport()
 
   let text = ''
@@ -124,22 +137,6 @@ export default defineEventHandler(async (event) => {
 
   if (!text || text.trim().length < 10) {
     throw cvNotReadableError('No se pudo extraer texto suficiente del archivo. Este importador solo admite PDFs con texto seleccionable y no procesa PDFs escaneados o basados en imagen.')
-  }
-
-  const claim = await db.execute({
-    sql: `INSERT INTO anonymous_trials (id, ip_hash, import_used)
-          VALUES (?, ?, 1)
-          ON CONFLICT(id) DO UPDATE SET
-            import_used = 1,
-            ip_hash = excluded.ip_hash
-          WHERE anonymous_trials.import_used = 0`,
-    args: [anonId, getClientIpHash(event)]
-  })
-  if (claim.rowsAffected === 0) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Ya usaste tu importación gratuita. Crea una cuenta para continuar.'
-    })
   }
 
   const openai = new OpenAI({
@@ -362,16 +359,26 @@ DEVUELVE UNICAMENTE JSON:
 
     const { educations: parsedEducations, experiences: parsedExperiences, ...profileFields } = parsed
 
+    // Recién ahora que la extracción terminó consumimos el crédito de importación,
+    // de forma atómica con el guardado del perfil. Si la persona se salió durante el
+    // procesamiento, el crédito no se quemó sin entregar nada: o queda disponible para
+    // reintentar, o el perfil queda guardado y lo ve al volver.
     await db.execute({
-      sql: `UPDATE anonymous_trials
-            SET profile_json = ?, experiences_json = ?, educations_json = ?, ip_hash = ?
-            WHERE id = ?`,
+      sql: `INSERT INTO anonymous_trials (id, ip_hash, import_used, profile_json, experiences_json, educations_json)
+            VALUES (?, ?, 1, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+              import_used = 1,
+              ip_hash = excluded.ip_hash,
+              profile_json = excluded.profile_json,
+              experiences_json = excluded.experiences_json,
+              educations_json = excluded.educations_json
+            WHERE anonymous_trials.import_used = 0`,
       args: [
+        anonId,
+        getClientIpHash(event),
         JSON.stringify(profileFields),
         JSON.stringify(parsedExperiences || []),
-        JSON.stringify(parsedEducations || []),
-        getClientIpHash(event),
-        anonId
+        JSON.stringify(parsedEducations || [])
       ]
     })
 

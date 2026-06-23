@@ -19,6 +19,13 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Primero debes importar tu CV.'
     })
   }
+  // Si ya lo usó, cortamos acá: no gastamos una llamada a OpenAI para alguien que vuelve.
+  if (Number(row.analyze_used) === 1) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Ya usaste tu análisis gratuito. Crea una cuenta para continuar.'
+    })
+  }
 
   const { jd, profile, experiences, locale = 'es' } = await readBody(event)
   const isEn = locale === 'en'
@@ -34,17 +41,6 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'Job description is too long (max 15,000 characters).'
-    })
-  }
-
-  const claim = await db.execute({
-    sql: 'UPDATE anonymous_trials SET analyze_used = 1 WHERE id = ? AND analyze_used = 0',
-    args: [anonId]
-  })
-  if (claim.rowsAffected === 0) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Ya usaste tu análisis gratuito. Crea una cuenta para continuar.'
     })
   }
 
@@ -165,8 +161,11 @@ export default defineEventHandler(async (event) => {
 
     const result = JSON.parse(content)
 
+    // Recién ahora que tenemos el resultado consumimos el slot, de forma atómica con el guardado.
+    // Si la persona se salió a mitad del análisis, el slot no se quemó sin entregar valor:
+    // o queda disponible para reintentar, o el resultado queda guardado y lo ve al volver.
     await db.execute({
-      sql: `UPDATE anonymous_trials SET jd_text = ?, analysis_result_json = ? WHERE id = ?`,
+      sql: `UPDATE anonymous_trials SET analyze_used = 1, jd_text = ?, analysis_result_json = ? WHERE id = ? AND analyze_used = 0`,
       args: [jd, content, anonId]
     })
 
