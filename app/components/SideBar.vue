@@ -26,6 +26,25 @@
     <div class="nav-section mb-6">
       <div class="nav-label text-[10px] text-text-dim px-4 mb-2 tracking-widest uppercase font-mono">{{ $t('sidebar.main') }}</div>
 
+      <!-- Acceso rápido al perfil, arriba del dashboard. La tarjeta con foto de abajo se mantiene. -->
+      <div
+        v-if="user && profileNavigationItem"
+        class="nav-item-shell"
+        :class="getTourShellClass(profileNavigationItem.id)"
+      >
+        <NuxtLink
+          :to="profileNavigationItem.to"
+          class="nav-item"
+          active-class="active"
+          :title="$t('sidebar.profile_link')"
+          :aria-label="$t('sidebar.profile_link')"
+          @click="handleNavigationClick"
+        >
+          <span class="material-symbols-outlined nav-icon">{{ profileNavigationItem.icon }}</span>
+          <span v-if="showItemText" class="nav-text">{{ $t('sidebar.profile_link') }}</span>
+        </NuxtLink>
+      </div>
+
       <div
         v-for="item in primaryNavigationItems"
         :key="item.id"

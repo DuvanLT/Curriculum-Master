@@ -326,6 +326,7 @@
   "sidebar": {
     "main": "Principal",
     "settings": "Configuración",
+    "profile_link": "Perfil",
     "unnamed": "Sin Nombre",
     "plan_free_trial": "Plan Gratis",
     "plan_beta": "Plan Beta",
