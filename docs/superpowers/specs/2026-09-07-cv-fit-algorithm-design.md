@@ -102,6 +102,10 @@ navegador, sin IA y sin PDF.
 
 ## B. Ecuación de presupuesto (servidor, antes de llamar a la IA)
 
+**Conjunto de entrada:** el presupuesto recibe **únicamente experiencias activas** (ver
+`2026-09-07-cv-active-experiences-design.md`). `computeBudget` no conoce la existencia del
+flag: solo recibe una lista más corta, y reparte más presupuesto entre las que quedan.
+
 ```
 H_exp = H_page · P  −  H_fijo  −  reserva(20px)
 ```
