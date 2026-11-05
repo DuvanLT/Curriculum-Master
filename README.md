@@ -13,6 +13,7 @@ Optimiza tu CV frente a los filtros ATS, practica entrevistas con voz y organiza
 ![libSQL](https://img.shields.io/badge/libSQL-Turso-4FF8D2?logo=sqlite&logoColor=black)
 ![OpenAI](https://img.shields.io/badge/OpenAI-gpt--4o-412991)
 ![Vitest](https://img.shields.io/badge/tests-Vitest-6E9F18?logo=vitest&logoColor=white)
+![Licencia MIT](https://img.shields.io/badge/licencia-MIT-blue)
 
 <img src="public/app_mockup.png" alt="Análisis de vacante en Bring Jobs: 85 % de coincidencia, keywords presentes y faltantes, y recomendaciones" width="900">
 
@@ -198,6 +199,10 @@ docs/superpowers/        Diseños (specs) y planes de implementación
 
 - **Ajuste determinista del CV generado:** una hoja bien llena por defecto y una segunda solo cuando esté justificada, medido y verificable en vez de depender del prompt *(en diseño)*.
 - **Experiencias activables:** desactivar una experiencia sin borrarla, para excluirla de la generación del CV *(en diseño)*.
+
+## 📄 Licencia
+
+El código se distribuye bajo la licencia [MIT](LICENSE): puedes usarlo, modificarlo y compartirlo. La versión alojada en [bringjobs.qaliby.com](https://bringjobs.qaliby.com) ofrece un plan gratuito y un plan Pro de pago único por 30 días; si prefieres, puedes correr tu propia instancia con tus llaves, como se explica más arriba.
 
 ## 👤 Autor
 
