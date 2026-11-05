@@ -13,7 +13,6 @@
   "dependencies": {
     "@libsql/client": "^0.17.0",
     "@nuxtjs/i18n": "^10.3.0",
-    "@posthog/nuxt": "^1.7.76",
     "bcryptjs": "^3.0.3",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
@@ -33,6 +32,7 @@
     "@tailwindcss/postcss": "^4.2.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-vue": "^6.0.5",
     "postcss": "^8.5.8",
     "vitest": "^2.1.9"
   }

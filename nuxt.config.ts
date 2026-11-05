@@ -3,11 +3,7 @@ export default defineNuxtConfig({
   ssr: true,
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
-  modules: ['nuxt-auth-utils', '@nuxtjs/i18n', '@posthog/nuxt'],
-  posthog: {
-    publicKey: process.env.NUXT_PUBLIC_POSTHOG_KEY,
-    host: process.env.NUXT_PUBLIC_POSTHOG_HOST,
-  },
+  modules: ['nuxt-auth-utils', '@nuxtjs/i18n'],
   i18n: {
     locales: [
       { code: 'es', name: 'Español', file: 'es.json' },
