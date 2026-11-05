@@ -204,7 +204,7 @@ const socialLinks = computed(() => {
   }
 
   if (props.profile?.otros) {
-    links.push({ label: t('profile.cv_label_other_links'), href: normalizeHref(props.profile.otros) })
+    links.push({ label: ct('profile.cv_label_other_links'), href: normalizeHref(props.profile.otros) })
   }
 
   return links
